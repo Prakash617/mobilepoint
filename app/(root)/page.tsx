@@ -7,33 +7,12 @@ import BrandFeature from "./_home/BrandFeature";
 import TopCellPhone from "./_home/TopCellPhone";
 import AudioCamera from "./_home/AudioCamera";
 import Adsrecentview from "./_home/Adsrecentview";
+import FreeAdvertizemantCard from "@/components/FreeAdvertizemantCard";
 
 export default function Home() {
   return (
     <>
-      <div className="my-border flex bg-linear-to-r items-center  from-[#f0a181] to-primary my-2 justify-between">
-        <div className="bg-white flex rounded-full ">
-          <div className="flex flex-row items-center gap-2 px-4 py-2">
-            <div className="font-bold">All Categories</div>
-            <div>
-              <IoIosArrowDown className="inline-block text-gray-500" />
-            </div>
-          </div>
-          <div className="flex items-center">
-            <input
-              type="text"
-              placeholder="search anything..."
-              className="mr-1 border-none text-gray-500 focus:border-none focus:ring-0 outline-none"
-            />
-          </div>
-        </div>
-
-        <div className="flex text-white gap-4">
-          <div>Free Shipping Over NRP. 2800/-</div>
-          <div>30 DAYS MONEY BACK</div>
-          <div>100% SECURE payment</div>
-        </div>
-      </div>
+      
       <div className="grid-layout gap-2 ">
         <div className="area-left-side rounded-xl bg-white text-left py-6 px-10 space-y-2">
           <p className="text-red-600">Sale 40% Off</p>
@@ -139,13 +118,10 @@ export default function Home() {
                     <li>RAM & Storage: 6GB RAM, 128GB Storage</li>
                   </ul>
                 </div>
-                <div className="flex mt-4">
-                  <button className="capitalize bg-[#fcf3fd] px-2 py-1 text-xs rounded-xs text-primary">
-                    Free shipping
-                  </button>
-                  <button className="capitalize bg-[#fcf3fd] ml-2 px-2 py-1 text-xs rounded-xs text-[#F1352B]">
-                    Free shipping
-                  </button>
+                <div className="flex mt-4 gap-2">
+                
+                  <FreeAdvertizemantCard text="Free shipping" color="primary" />
+                  <FreeAdvertizemantCard text="Free shipping" color="danger" />
                 </div>
                 <div className="flex justify-between my-8 border-b-2 border-gray-200 pb-8">
                   <div>

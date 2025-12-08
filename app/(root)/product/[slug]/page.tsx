@@ -1,0 +1,274 @@
+import { DynamicBreadcrumb } from "@/components/DynamicBreadcrumb";
+import FreeAdvertizemantCard from "@/components/FreeAdvertizemantCard";
+import Image from "next/image";
+import Link from "next/link";
+import { FaCheckCircle, FaFacebookF, FaHeart, FaInstagram, FaPinterest, FaShippingFast, FaTwitter, FaYoutube } from "react-icons/fa";
+import { IoMdRefresh } from "react-icons/io";
+
+type Props = { params: Promise<{ slug: string }> };
+
+export default async function ProductDetail({ params }: Props) {
+  const { slug } = await params;
+  console.log("slug", slug);
+  return (
+    <>
+      <DynamicBreadcrumb />
+
+      <div className="sm:w-full w-full my-2 md:container mx-auto p-4 bg-white rounded-xl">
+        {/* MAIN GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* LEFT SIDE – PRODUCT IMAGES */}
+          <div className="lg:col-span-4 bg-white rounded-xl p-4 ">
+            <div className="w-full h-[380px] relative p-4 flex justify-center items-center">
+              <Image
+                src="/productDetail.jpg"
+                alt="product"
+                width={400}
+                height={400}
+                className="object-contain"
+              />
+            </div>
+
+            {/* Thumbnails */}
+            <div className="flex gap-4 mt-4 justify-left">
+              {["/productDetail.jpg", "/phone2.jpg", "/phone3.jpg"].map(
+                (img) => (
+                  <div
+                    key={img}
+                    className="w-16 h-16 relative cursor-pointer  rounded-lg"
+                  >
+                    <Image
+                      src={img}
+                      alt="thumb"
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+
+          {/* MIDDLE COLUMN - PRODUCT INFO */}
+          <div className="lg:col-span-5 bg-white">
+            <p className="text-center text-sm text-gray-400">(5)</p>
+            <h2 className="text-2xl font-bold">
+              Samsung Galaxy X6 Ultra LTE 4G/128GB, Black Smartphone
+            </h2>
+
+            <p className="text-3xl font-semibold mt-2">Rs. 35,000/-</p>
+
+            <ul className="mt-4 space-y-2 text-gray-600 text-sm">
+              <li>
+                • Intel LGA 1700 Socket: Supports 13th & 12th Gen Intel Core
+              </li>
+              <li>• DDR5 Compatible: 4*SIM DIMMs with XMP 3.0</li>
+              <li>• Commanding Power Design: Twin 16+1+2 Phases</li>
+            </ul>
+            <div className="flex gap-2 mt-2">
+              <FreeAdvertizemantCard text="Free shipping" color="success" />
+              <FreeAdvertizemantCard text="Free gift" color="danger" />
+            </div>
+            <hr className="bg-background h-[3px] my-8 rounded-full" />
+
+            {/* Color Selection */}
+            <div className="mt-6">
+              <p className="font-bold">
+                COLOR:{" "}
+                <span className="text-secondary font-semibold">
+                  {" "}
+                  Midnight Blue{" "}
+                </span>
+              </p>
+
+              <div className="grid grid-cols-3 gap-2 mt-3">
+                {["Midnight Blue", "Deep Purple", "Space Black"].map((c) => (
+                  <div
+                    key={c}
+                    className="border-2 rounded-lg px-2 py-1 cursor-pointer hover:border-success flex items-center justify-center "
+                  >
+                    <div>
+                      <Image
+                        src="/phone3.jpg"
+                        alt="color"
+                        width={70}
+                        height={70}
+                      />
+                    </div>
+                    <div>
+                      <p className="text-sm">{c}</p>
+                      <p className="text-xs font-bold">Rs. 35,000/-</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Memory Select */}
+            <div className="mt-6">
+              <p className="font-semibold mb-2">MEMORY SIZE: 128GB</p>
+              <div className="flex gap-2 flex-wrap">
+                {["64GB", "128GB", "256GB", "512GB"].map((size) => (
+                  <button
+                    key={size}
+                    className={`px-4 py-2 border rounded-lg text-black hover:border-success ${
+                      size === "128GB" ? " border-success " : ""
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <hr className="bg-background h-[3px] my-8 rounded-full" />
+                
+            {/* Offers */}
+            <div className=" border rounded-xl p-4 bg-[#ecf6ec] flex justify-around items-center">
+              <div>
+                <Image src="/gift.png" alt="offer" width={100} height={100} />
+              </div>
+              <div className="font-medium">
+                <p className="text-sm">
+                  • Buy <span className="text-danger font-bold">02</span> boxes
+                  get a <b>Snack Tray</b>
+                </p>
+                <p className="text-sm">
+                  • Buy <span className="text-danger font-bold">04</span> boxes
+                  get a free <b>Block Toys</b>
+                </p>
+                <p className="text-xs text-gray-500 italic mt-4">
+                  Promotion will expires: 9:00 PM, 25/5/2024
+                </p>
+              </div>
+            </div>
+
+            {/* Meta */}
+            <div className="mt-6 text-sm text-secondary">
+              <p className="">
+                {" "}
+                <span className="text-black font-bold">SKU:</span> ABC025168
+              </p>
+              <p>
+                <span className="text-black font-bold">CATEGORY: </span>{" "}
+                <span className="text-succborder-success">
+                  Cell Phones & Tablets
+                </span>
+              </p>
+              <p>
+                <span className="text-black font-bold">BRAND: </span>
+                <span className="text-success">Samsung</span>
+              </p>
+
+                        <div className="flex flex-wrap space-x-4 my-4 ">
+                          {[FaTwitter, FaFacebookF, FaInstagram, FaYoutube, FaPinterest].map(
+                            (Icon, i) => (
+                              <div
+                                key={i}
+                                className="bg-secondary-background w-10 h-10 rounded-full flex justify-center items-center cursor-pointer"
+                              >
+                                <Icon className="text-black" />
+                              </div>
+                            )
+                          )}
+                        </div>
+            </div>
+          </div>
+
+          {/* RIGHT SIDE – CART BOX */}
+          <div className="lg:col-span-3  rounded-xl  ">
+            <div className="bg-background space-y-4 py-8 px-4 rounded-lg">
+              <p className="font-semibold text-sm text-secondary">
+                TOTAL PRICE:
+              </p>
+              <p className="text-2xl font-bold">Rs. 35,000/-</p>
+              <p className="text-xs  ">
+                {" "}
+                <span className="text-danger  font-bold">
+                  Rs. 3000/- Month{" "}
+                </span>{" "}
+                in 12 months.{" "}
+                <Link href="#" className="text-blue-500 underline">
+                  See more
+                </Link>
+              </p>
+              <hr className="border-slate-300 h-2 mt-2 " />
+
+              <div className="flex items-center gap-2 text-sm ">
+                <FaCheckCircle className="text-success" /> <span>In Stock</span>
+              </div>
+              {/* Quantity */}
+              <div className="flex bg-white justify-between px-4 items-center gap-4 border p-2 rounded-lg ">
+                <div>
+                  <button className="text-2xl font-bold">-</button>
+                </div>
+                <div className="font-bold">1</div>
+                <div>
+                  <button className="text-2xl font-bold">+</button>
+                </div>
+              </div>
+
+              <button className="w-full bg-success font-semibold text-white py-3 rounded-lg">
+                ADD TO CART
+              </button>
+
+              <button className="w-full bg-yellow-500 font-semibold text-black  py-3 rounded-lg">
+                BUY WITH{" "}
+                <Image
+                  src="/paypal1.png"
+                  alt="PayPal"
+                  width={80}
+                  height={20}
+                  className="inline-block ml-2"
+                />
+              </button>
+
+              <div className="mt-4 flex">
+                <p className="text-sm w-1/2 border-r-2 font-semibold pr-1 border-slate-300  text-secondary">
+                  <FaHeart className="inline-block mr-1 text-green-600" />{" "}
+                  Wishlist added
+                </p>
+                <p className="text-sm w-1/2 text-center font-semibold text-secondary">
+                  <IoMdRefresh className="inline-block font-bold text-lg mr-1" />{" "}
+                  Compare
+                </p>
+              </div>
+              <hr className="border-slate-300 h-2 my-4 " />
+              <div>
+                <p className="text-sm">Guaranteed Safe Checkout</p>
+              </div>
+              <div className="flex flex-wrap gap-2 justify-center">
+                <Image
+                  src="/garantee.png"
+                  alt="Verified by Visa"
+                  width={300}
+                  height={200}
+                  className="inline-block"
+                />
+
+               
+              </div>
+            </div>
+
+            {/* Support */}
+            <div className="mt-2 p-6 bg-background text-left space-y-2 rounded-lg ">
+              <div>
+
+              <button className="bg-black py-2 text-white rounded-lg px-6">
+                Quick Order 24/7
+              </button>
+              </div>
+              <div>
+
+              <p className="text-lg font-bold">9764578611</p>
+              </div>
+            </div>
+            <div className="flex space-x-2  my-2 items-center">
+              <FaShippingFast className="inline-block" />
+              <span>Shipment in <span className="font-bold">Kathmandu</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}

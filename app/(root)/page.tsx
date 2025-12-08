@@ -4,6 +4,9 @@ import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
 
 import HomeCarousel from "@/components/HomeCarousel";
 import BrandFeature from "./_home/BrandFeature";
+import TopCellPhone from "./_home/TopCellPhone";
+import AudioCamera from "./_home/AudioCamera";
+import Adsrecentview from "./_home/Adsrecentview";
 
 export default function Home() {
   return (
@@ -231,7 +234,11 @@ export default function Home() {
             Try free 30-days trails!
           </span>
         </div>
+     
       </div>
+         <TopCellPhone/>
+         <AudioCamera />
+         <Adsrecentview/>
     </>
   );
 }

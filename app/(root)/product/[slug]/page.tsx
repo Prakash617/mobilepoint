@@ -1,3 +1,4 @@
+import Button from "@/components/Button";
 import { DynamicBreadcrumb } from "@/components/DynamicBreadcrumb";
 import FreeAdvertizemantCard from "@/components/FreeAdvertizemantCard";
 import Image from "next/image";
@@ -207,9 +208,8 @@ export default async function ProductDetail({ params }: Props) {
                 </div>
               </div>
 
-              <button className="w-full bg-success font-semibold text-white py-3 rounded-lg">
-                ADD TO CART
-              </button>
+              {/* Buttons */}
+              <Button bgColor="bg-success" text=" ADD TO CART" textColor="text-white" />
 
               <button className="w-full bg-yellow-500 font-semibold text-black  py-3 rounded-lg">
                 BUY WITH{" "}

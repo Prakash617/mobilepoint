@@ -3,6 +3,8 @@ import { Inter, Inter_Tight } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Navbar1 from "@/components/Navbar1";
+import SearchBox from "@/components/SearchBox";
 
 // Inter regular font
 const inter = Inter({
@@ -29,12 +31,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${interTight.variable} min-h-screen antialiased`}>
-          <Footer/>
-        <div className="container">
-        <Navbar/>
+        <div className="md:w-full container">
+        <Navbar1 />
+        <SearchBox />
 
         {children}
         </div>
+          <Footer/>
       
       </body>
     </html>

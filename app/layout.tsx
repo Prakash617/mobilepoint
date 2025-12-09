@@ -31,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${interTight.variable} min-h-screen antialiased`}>
-        <div className="md:w-full container">
+        <div className="w-full md:w-5/6 md:mx-auto">
         <Navbar1 />
         <SearchBox />
 

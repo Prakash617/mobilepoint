@@ -1,10 +1,13 @@
 import Button from "@/components/Button";
 import { DynamicBreadcrumb } from "@/components/DynamicBreadcrumb";
 import FreeAdvertizemantCard from "@/components/FreeAdvertizemantCard";
+import Longtextmore from "@/components/Longtextmore";
+import { DM_Sans } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import { FaCheckCircle, FaFacebookF, FaHeart, FaInstagram, FaPinterest, FaShippingFast, FaTwitter, FaYoutube } from "react-icons/fa";
 import { IoMdRefresh } from "react-icons/io";
+
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -112,9 +115,8 @@ export default async function ProductDetail({ params }: Props) {
                 {["64GB", "128GB", "256GB", "512GB"].map((size) => (
                   <button
                     key={size}
-                    className={`px-4 py-2 border rounded-lg text-black hover:border-success ${
-                      size === "128GB" ? " border-success " : ""
-                    }`}
+                    className={`px-4 py-2 border rounded-lg text-black hover:border-success ${size === "128GB" ? " border-success " : ""
+                      }`}
                   >
                     {size}
                   </button>
@@ -122,7 +124,7 @@ export default async function ProductDetail({ params }: Props) {
               </div>
             </div>
             <hr className="bg-background h-[3px] my-8 rounded-full" />
-                
+
             {/* Offers */}
             <div className=" border rounded-xl p-4 bg-[#ecf6ec] flex justify-around items-center">
               <div>
@@ -160,18 +162,18 @@ export default async function ProductDetail({ params }: Props) {
                 <span className="text-success">Samsung</span>
               </p>
 
-                        <div className="flex flex-wrap space-x-4 my-4 ">
-                          {[FaTwitter, FaFacebookF, FaInstagram, FaYoutube, FaPinterest].map(
-                            (Icon, i) => (
-                              <div
-                                key={i}
-                                className="bg-secondary-background w-10 h-10 rounded-full flex justify-center items-center cursor-pointer"
-                              >
-                                <Icon className="text-black" />
-                              </div>
-                            )
-                          )}
-                        </div>
+              <div className="flex flex-wrap space-x-4 my-4 ">
+                {[FaTwitter, FaFacebookF, FaInstagram, FaYoutube, FaPinterest].map(
+                  (Icon, i) => (
+                    <div
+                      key={i}
+                      className="bg-secondary-background w-10 h-10 rounded-full flex justify-center items-center cursor-pointer"
+                    >
+                      <Icon className="text-black" />
+                    </div>
+                  )
+                )}
+              </div>
             </div>
           </div>
 
@@ -245,7 +247,7 @@ export default async function ProductDetail({ params }: Props) {
                   className="inline-block"
                 />
 
-               
+
               </div>
             </div>
 
@@ -253,21 +255,92 @@ export default async function ProductDetail({ params }: Props) {
             <div className="mt-2 p-6 bg-background text-left space-y-2 rounded-lg ">
               <div>
 
-              <button className="bg-black py-2 text-white rounded-lg px-6">
-                Quick Order 24/7
-              </button>
+                <button className="bg-black py-2 text-white rounded-lg px-6">
+                  Quick Order 24/7
+                </button>
               </div>
               <div>
 
-              <p className="text-lg font-bold">9764578611</p>
+                <p className="text-lg font-bold">9764578611</p>
               </div>
             </div>
             <div className="flex space-x-2  my-2 items-center">
               <FaShippingFast className="inline-block" />
               <span>Shipment in <span className="font-bold">Kathmandu</span></span>
             </div>
+
+
+          </div>
+
+        </div>
+      </div>
+      <div className="bg-white mb-1 rounded-lg">
+        <div>
+          <div className="flex gap-15 pl-5 pt-5 ">
+            <button className="hover:underline text-bold">DESCRIPTION</button>
+            <button className="hover:underline">REVIEWS (5) </button>
+            <button className="hover:underline">ADDITIONAL INFORMATION</button>
+          </div>
+          <div className=" ">
+            <p className="px-5  pt-6 text-base text-justify">Built for ultra-fast performance, the thin and lightweight Samsung Galaxy Tab S2 goes anywhere you go. Photos, movies and documents pop on a crisp, clear Super AMOLED display. Expandable
+              memory lets you enjoy more of your favorite content. And connecting and sharing between all your Samsung devices is easier than ever. Welcome to life with the reimagined Samsung Galaxy Tab
+              S2. Watch thev world come to life on your tablet's <b>Super AMOLED display * </b>. With deep contrast, rich colors and crisp details, you won't miss a thing
+            </p>
+            <div className="w-full h-[400px] flex items-center justify-center px-5 pt-7 ">
+              <img
+                src="/topcell22.jpg"
+                alt="My Image"
+                className="object-cover w-full h-full rounded-lg  "
+              />
+            </div>
+
+            <p className="mt-2 text-center text-sm font-semibold text-gray-300">
+              * The Galaxy Tab S2’s 4 : 3 ratio display provides you with an ideal environment for performing office tasks.
+            </p>
+            <div className="">
+              <h1 className="px-5 pt-3">From the manufacturer</h1>
+              <p className="px-5  pt-6 text-sm text-justify">Dive into the blockbuster movies you can't wait to see. Switch between your favorite apps quickly and easily. The new and improved octa-core processor gives you the power and speed you need
+                to see more and do more. Expand your tablet's memory from 32GB to up to an additional 128GB and enjoy more of your favorite music, photos, movies and games on the go with a microSD card.
+                With Quick Connect, start a show on your Smart TV and, with the touch of a button, take it with you by moving it to your Galaxy Tab S2.<br /><br />
+                Or send videos and photos from your tablet screen to your TV screen to share with everyone in the room. Work effortlessly between your Samsung tablet and Samsung smartphone with SideSync.
+                Quickly drag and drop photos between devices. And even respond to a call from your smartphone right on your tablet screen.
+              </p>
+            </div>
+            <div className=" grid grid-cols-2 gap-2 h-[450px] px-5 pt-4 mt-2">
+              <div>
+                <img
+                  src="/topcell23.png"
+                  alt="My Image"
+                  className="object-cover w-full h-full rounded-lg "
+                />
+
+              </div>
+              <div>
+                <img
+                  src="/topcell24.png"
+                  alt="My Image"
+                  className="object-cover w-full h-full rounded-lg "
+                />
+
+              </div>
+
+            </div>
+            <div className="">
+              <h1 className="px-5 pt-3"><b>Samsung Galaxy Tab S2, 8-Inch, White</b></h1>
+              <Longtextmore text="Dive into the blockbuster movies you can't wait to see. Switch between your favorite apps quickly and easily. The new and improved octa-core processor gives you the power and speed you need
+                to see more and do more. Expand your tablet's memory from 32GB to up to an additional 128GB and enjoy more of your favorite music, photos, movies and games on the go with a microSD card.
+                With Quick Connect, start a show on your Smart TV and, with the touch of a button, take it with you by moving it to your Galaxy Tab S2.<br /><br />
+                Or send videos and photos from your tablet screen to your TV screen to share with everyone in the room. Work effortlessly between your Samsung tablet and Samsung smartphone with SideSync.
+                Quickly drag and drop photos between devices. And even respond to a call from your smartphone right on your tablet screen."/>
+            
+            </div>
+
+
+
+
           </div>
         </div>
+
       </div>
     </>
   );

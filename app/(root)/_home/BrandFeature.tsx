@@ -1,7 +1,7 @@
-import Image from 'next/image'
-import React from 'react'
+import Image from "next/image";
+import React from "react";
 
-type Props = {}
+type Props = {};
 
 // data.ts (or inside same component file)
 const featureBrands = [
@@ -22,12 +22,11 @@ const topCategories = [
   { id: 4, img: "/laptop4.png", label: "Laptops" },
 ];
 
-
 const BrandFeature = (props: Props) => {
   return (
-    <div className="flex w-full mt-2 gap-2 justify-between ">
+    <div className="flex flex-col md:flex-row w-full mt-2 gap-2 justify-between ">
       {/* Feature Brands */}
-      <div className="rounded-xl p-6 w-1/2 bg-white">
+      <div className="rounded-xl p-6 w-full md:w-1/2 bg-white">
         <div className="flex justify-between mt-2">
           <div className="uppercase font-bold">Feature Brands</div>
           <div className="text-gray-400 font-extralight">View All</div>
@@ -48,7 +47,7 @@ const BrandFeature = (props: Props) => {
       </div>
 
       {/* Top Categories */}
-      <div className="rounded-xl p-6 w-1/2 bg-white">
+      <div className="rounded-xl p-6 w-full md:w-1/2 bg-white">
         <div className="flex justify-between mt-2">
           <div className="uppercase font-bold">Top Categories</div>
           <div className="text-gray-400 font-extralight">View All</div>
@@ -67,5 +66,4 @@ const BrandFeature = (props: Props) => {
   );
 };
 
-
-export default BrandFeature
+export default BrandFeature;

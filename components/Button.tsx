@@ -4,12 +4,13 @@ type Props = {
   text: string;
   bgColor: string;     // e.g., "bg-blue-500"
   textColor: string;   // e.g., "text-white"
+  size ?: string
 };
 
 const Button = (props: Props) => {
   return (
     <button
-      className={`w-full ${props.bgColor} font-semibold ${props.textColor} py-3 rounded-lg`}
+      className={`px-6 ${props.bgColor} ${props.size} font-semibold ${props.textColor} py-2  rounded-lg`}
     >
       {props.text}
     </button>

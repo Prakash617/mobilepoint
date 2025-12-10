@@ -1,12 +1,16 @@
-import React from 'react'
+import React from "react";
 
-type Props = {}
+type Props = {
+  height?: number;
+};
 
-const HorizontalLine = (props: Props) => {
+const HorizontalLine = ({ height = 1 }: Props) => {
   return (
-        <hr className="bg-background h-[3px] my-8 rounded-full" />
+    <hr
+      className={`bg-background my-8 rounded-full`}
+      style={{ height: `${height}px` }}
+    />
+  );
+};
 
-  )
-}
-
-export default HorizontalLine
+export default HorizontalLine;

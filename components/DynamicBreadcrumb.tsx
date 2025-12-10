@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { SlashIcon } from "lucide-react";
+import { RxSlash } from "react-icons/rx";
 
 import {
   Breadcrumb,
@@ -29,22 +29,22 @@ export function DynamicBreadcrumb() {
         {/* HOME */}
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link href="/">Home</Link>
+            <Link href="/" className="font-bold">Home</Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
 
         {paths.map((item, index) => (
-          <div key={index} className="flex items-center">
+          <div key={index} className="flex items-center justify-center">
             <BreadcrumbSeparator>
-              <SlashIcon />
+            <RxSlash className="text-xl stroke-1.5" />
             </BreadcrumbSeparator>
 
             <BreadcrumbItem>
               {index === paths.length - 1 ? (
-                <BreadcrumbPage>{item.name}</BreadcrumbPage>
+                <BreadcrumbPage className=" font-bold">{item.name}</BreadcrumbPage>
               ) : (
                 <BreadcrumbLink asChild>
-                  <Link href={item.href}>{item.name}</Link>
+                  <Link href={item.href} className=" font-bold">{item.name}</Link>
                 </BreadcrumbLink>
               )}
             </BreadcrumbItem>

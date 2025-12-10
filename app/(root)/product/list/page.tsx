@@ -33,36 +33,36 @@ const filters = [
 ];
 
 const brands = [
-  {
-    id: 1,
-    name: "Apple",
-    img: "/branditem1.png",
-    quantity: 14,
-  },
-  {
-    id: 2,
-    name: "Apple",
-    img: "/branditem2.png",
-    quantity: 6,
-  },
-  {
-    id: 3,
-    name: "Apple",
-    img: "/branditem3.png",
-    quantity: 10,
-  },
-  {
-    id: 4,
-    name: "Apple",
-    img: "/branditem4.png",
-    quantity: 18,
-  },
-  {
-    id: 5,
-    name: "Apple",
-    img: "/branditem5.png",
-    quantity: 1,
-  },
+{
+  id: 1,
+  name: "Apple",
+  img: "/branditem1.png",
+  quantity: 14,
+},
+{
+  id: 2,
+  name: "Apple",
+  img: "/branditem2.png",
+  quantity: 6,
+},
+{
+  id: 3,
+  name: "Apple",
+  img: "/branditem3.png",
+  quantity: 10,
+},
+{
+  id: 4,
+  name: "Apple",
+  img: "/branditem4.png",
+  quantity: 18,
+},
+{
+  id: 5,
+  name: "Apple",
+  img: "/branditem5.png",
+  quantity: 1,
+},
 ];
 
 const screenSizes = [

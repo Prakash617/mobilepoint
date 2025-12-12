@@ -33,7 +33,7 @@ type CardCarouselProps = {
   products: Product[];
 };
 
-export function CardCarousel({ products }: CardCarouselProps) {
+export function ListCardCarousel({ products }: CardCarouselProps) {
   return (
     <Carousel
       opts={{
@@ -41,7 +41,7 @@ export function CardCarousel({ products }: CardCarouselProps) {
       }}
       className="w-full max-w-full px-8"
     >
-      <CarouselContent className="gap-2 ml-2 sm:ml-0">
+      <CarouselContent className="gap-4 ">
         {products.map((product) => (
           <CarouselItem
             key={product.id}
@@ -51,7 +51,7 @@ export function CardCarousel({ products }: CardCarouselProps) {
               sm:basis-1/2
               md:basis-1/3
               lg:basis-1/4
-              xl:basis-1/5
+              
             "
           >
             <ProductCard
@@ -66,7 +66,7 @@ export function CardCarousel({ products }: CardCarouselProps) {
               new={product.new}
               sub_images={product.sub_images}
               slug={product.slug}
-              in_stock= {product.in_stock}
+              in_stock={product.in_stock ?? true}
               quantity={product.quantity}
             />
           </CarouselItem>

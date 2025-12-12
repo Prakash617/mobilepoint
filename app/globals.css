@@ -119,7 +119,7 @@ body {
       "left-side mid-main mid-main right-side"
       "left-side main-down main-down right-side";
 
-    grid-template-columns: 240px 1fr 1fr 280px;
+    grid-template-columns: 278px 1fr 1fr 280px;
 
     /* FIX: Set explicit row heights */
     grid-template-rows: 300px 100px;

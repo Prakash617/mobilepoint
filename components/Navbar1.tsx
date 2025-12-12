@@ -25,7 +25,7 @@ export default function Example() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="bg-[#f5f6f8] pt-4 pb-4 px-4 md:px-8 rounded-xl">
+    <div className="bg-[#f5f6f8] pt-4 pb-4 px-4 md:px-8 mt-2 rounded-xl">
       {/* ------------------------------ */}
       {/* MOBILE MENU */}
       {/* ------------------------------ */}

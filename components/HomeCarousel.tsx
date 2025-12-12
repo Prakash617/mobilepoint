@@ -66,7 +66,7 @@ const HomeCarousel = () => {
       <CarouselContent>
         {carouselData.map((item) => (
           <CarouselItem key={item.title}>
-            <div className="relative w-full h-[300px] rounded-lg">
+            <div className="relative w-full h-[310px] rounded-lg">
               <Image
                 src={item.image}
                 alt={item.title}

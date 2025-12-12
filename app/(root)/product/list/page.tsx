@@ -3,8 +3,16 @@ import { DynamicBreadcrumb } from "@/components/DynamicBreadcrumb";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
-import { useState } from "react";
 import StarFilter from "@/components/StartFilter";
+import { ListCardCarousel } from "@/components/ListCartCarousel";
+import HorizontalLine from "@/components/HorizontalLine";
+import Adsrecentview from "@/components/Adsrecentview";
+import { FaMinus } from "react-icons/fa";
+import { DropDown } from "@/components/DropDown";
+import ProductCardList from "@/components/ProductCardList";
+import PaginationBar from "@/components/PaginationBar";
+import PriceRangeSlider from "@/components/PriceRangeSlider";
+import HomeCarousel from "@/components/HomeCarousel";
 
 type Props = {};
 
@@ -23,6 +31,304 @@ const categories = [
   "Tablets Accessories",
   "Cell Phones ",
 ];
+const products = [
+  // 1–4
+  {
+    id: 1,
+    slug: "srok-smart-phone-128gb-oled-retina-1",
+    name: "SROK Smart Phone 128GB, Oled Retina",
+    price: 60000,
+    image: "/topcell2.png",
+    tag: true,
+    tag_text: "Save",
+    tagPrice: "199.0",
+    free_shipping: true,
+    free_gift: true,
+    new: true,
+    in_stock: true,
+    quantity: 25,
+    sub_images: [
+      "/topcell2.png",
+      "/topcell3.png",
+      "/topcell4.png",
+      "/topcell5.png",
+    ],
+  },
+  {
+    id: 2,
+    slug: "apod-pro-tablet-2023-lte-wifi-gps-cellular-512gb-1",
+    name: "aPod Pro Tablet 2023 LTE+ Wifi, GPS Cellular 12.9 Inch, 512GB",
+    price: 98000,
+    image: "/topcell1.png",
+    tag: true,
+    tag_text: "New",
+    tagPrice: null,
+    free_shipping: false,
+    free_gift: false,
+    new: true,
+    in_stock: true,
+    quantity: 12,
+    sub_images: ["/topcell1.png"],
+  },
+  {
+    id: 3,
+    slug: "opod-pro-12-9-inch-m1-2023-64gb-wifi-gps-1",
+    name: "OPod Pro 12.9 Inch M1 2023, 64GB + Wifi, GPS",
+    price: 70000,
+    image: "/topcell3.png",
+    tag: true,
+    tag_text: "New",
+    tagPrice: null,
+    free_shipping: false,
+    free_gift: false,
+    new: true,
+    in_stock: false,
+    quantity: 0,
+    sub_images: ["/topcell3.png"],
+  },
+  {
+    id: 4,
+    slug: "apod-pro-tablet-2023-512gb-1",
+    name: "aPod Pro Tablet 2023 LTE+ Wifi, GPS Cellular 12.9 Inch, 512GB",
+    price: 98000,
+    image: "/topcell1.png",
+    tag: true,
+    tag_text: "New",
+    tagPrice: null,
+    free_shipping: false,
+    free_gift: false,
+    new: true,
+    in_stock: true,
+    quantity: 8,
+    sub_images: ["/topcell1.png"],
+  },
+
+  // 5–8 (same products, new ids & slugs)
+  {
+    id: 5,
+    slug: "srok-smart-phone-128gb-oled-retina-2",
+    name: "SROK Smart Phone 128GB, Oled Retina",
+    price: 60000,
+    image: "/topcell2.png",
+    tag: true,
+    tag_text: "Save",
+    tagPrice: "199.0",
+    free_shipping: true,
+    free_gift: true,
+    new: true,
+    in_stock: true,
+    quantity: 25,
+    sub_images: [
+      "/topcell2.png",
+      "/topcell3.png",
+      "/topcell4.png",
+      "/topcell5.png",
+    ],
+  },
+  {
+    id: 6,
+    slug: "apod-pro-tablet-2023-lte-wifi-gps-cellular-512gb-2",
+    name: "aPod Pro Tablet 2023 LTE+ Wifi, GPS Cellular 12.9 Inch, 512GB",
+    price: 98000,
+    image: "/topcell1.png",
+    tag: true,
+    tag_text: "New",
+    tagPrice: null,
+    free_shipping: false,
+    free_gift: false,
+    new: true,
+    in_stock: true,
+    quantity: 12,
+    sub_images: ["/topcell1.png"],
+  },
+  {
+    id: 7,
+    slug: "opod-pro-12-9-inch-m1-2023-64gb-wifi-gps-2",
+    name: "OPod Pro 12.9 Inch M1 2023, 64GB + Wifi, GPS",
+    price: 70000,
+    image: "/topcell3.png",
+    tag: true,
+    tag_text: "New",
+    tagPrice: null,
+    free_shipping: false,
+    free_gift: false,
+    new: true,
+    in_stock: false,
+    quantity: 0,
+    sub_images: ["/topcell3.png"],
+  },
+  {
+    id: 8,
+    slug: "apod-pro-tablet-2023-512gb-2",
+    name: "aPod Pro Tablet 2023 LTE+ Wifi, GPS Cellular 12.9 Inch, 512GB",
+    price: 98000,
+    image: "/topcell1.png",
+    tag: true,
+    tag_text: "New",
+    tagPrice: null,
+    free_shipping: false,
+    free_gift: false,
+    new: true,
+    in_stock: true,
+    quantity: 8,
+    sub_images: ["/topcell1.png"],
+  },
+
+  // 9–12
+  {
+    id: 9,
+    slug: "srok-smart-phone-128gb-oled-retina-3",
+    name: "SROK Smart Phone 128GB, Oled Retina",
+    price: 60000,
+    image: "/topcell2.png",
+    tag: true,
+    tag_text: "Save",
+    tagPrice: "199.0",
+    free_shipping: true,
+    free_gift: true,
+    new: true,
+    in_stock: true,
+    quantity: 25,
+    sub_images: [
+      "/topcell2.png",
+      "/topcell3.png",
+      "/topcell4.png",
+      "/topcell5.png",
+    ],
+  },
+  {
+    id: 10,
+    slug: "apod-pro-tablet-2023-lte-wifi-gps-cellular-512gb-3",
+    name: "aPod Pro Tablet 2023 LTE+ Wifi, GPS Cellular 12.9 Inch, 512GB",
+    price: 98000,
+    image: "/topcell1.png",
+    tag: true,
+    tag_text: "New",
+    tagPrice: null,
+    free_shipping: false,
+    free_gift: false,
+    new: true,
+    in_stock: true,
+    quantity: 12,
+    sub_images: ["/topcell1.png"],
+  },
+  {
+    id: 11,
+    slug: "opod-pro-12-9-inch-m1-2023-64gb-wifi-gps-3",
+    name: "OPod Pro 12.9 Inch M1 2023, 64GB + Wifi, GPS",
+    price: 70000,
+    image: "/topcell3.png",
+    tag: true,
+    tag_text: "New",
+    tagPrice: null,
+    free_shipping: false,
+    free_gift: false,
+    new: true,
+    in_stock: false,
+    quantity: 0,
+    sub_images: ["/topcell3.png"],
+  },
+  {
+    id: 12,
+    slug: "apod-pro-tablet-2023-512gb-3",
+    name: "aPod Pro Tablet 2023 LTE+ Wifi, GPS Cellular 12.9 Inch, 512GB",
+    price: 98000,
+    image: "/topcell1.png",
+    tag: true,
+    tag_text: "New",
+    tagPrice: null,
+    free_shipping: false,
+    free_gift: false,
+    new: true,
+    in_stock: true,
+    quantity: 8,
+    sub_images: ["/topcell1.png"],
+  },
+  {
+    id: 13,
+    slug: "srok-smart-phone-128gb-oled-retina-3",
+    name: "SROK Smart Phone 128GB, Oled Retina",
+    price: 60000,
+    image: "/topcell2.png",
+    tag: true,
+    tag_text: "Save",
+    tagPrice: "199.0",
+    free_shipping: true,
+    free_gift: true,
+    new: true,
+    in_stock: true,
+    quantity: 25,
+    sub_images: [
+      "/topcell2.png",
+      "/topcell3.png",
+      "/topcell4.png",
+      "/topcell5.png",
+    ],
+  },
+  {
+    id: 14,
+    slug: "apod-pro-tablet-2023-lte-wifi-gps-cellular-512gb-3",
+    name: "aPod Pro Tablet 2023 LTE+ Wifi, GPS Cellular 12.9 Inch, 512GB",
+    price: 98000,
+    image: "/topcell1.png",
+    tag: true,
+    tag_text: "New",
+    tagPrice: null,
+    free_shipping: false,
+    free_gift: false,
+    new: true,
+    in_stock: true,
+    quantity: 12,
+    sub_images: ["/topcell1.png"],
+  },
+  {
+    id: 15,
+    slug: "opod-pro-12-9-inch-m1-2023-64gb-wifi-gps-3",
+    name: "OPod Pro 12.9 Inch M1 2023, 64GB + Wifi, GPS",
+    price: 70000,
+    image: "/topcell3.png",
+    tag: true,
+    tag_text: "New",
+    tagPrice: null,
+    free_shipping: false,
+    free_gift: false,
+    new: true,
+    in_stock: false,
+    quantity: 0,
+    sub_images: ["/topcell3.png"],
+  },
+  {
+    id: 16,
+    slug: "apod-pro-tablet-2023-512gb-3",
+    name: "aPod Pro Tablet 2023 LTE+ Wifi, GPS Cellular 12.9 Inch, 512GB",
+    price: 98000,
+    image: "/topcell1.png",
+    tag: true,
+    tag_text: "New",
+    tagPrice: null,
+    free_shipping: false,
+    free_gift: false,
+    new: true,
+    in_stock: true,
+    quantity: 8,
+    sub_images: ["/topcell1.png"],
+  },
+];
+
+const topCellPhone = [
+  { id: 1, name: "iPhone (iOS)", image: "/topcell1.png", quantity: 74 },
+  { id: 2, name: "Android", image: "/topcell2 copy.png", quantity: 12 },
+  { id: 3, name: "Gaming", image: "/topcell3 copy.png", quantity: 9 },
+  { id: 4, name: "Xiaomi", image: "/topcell4 copy.png", quantity: 9 },
+  { id: 5, name: "Accessories", image: "/topcell5 copy.png", quantity: 9 },
+  { id: 6, name: "5G Support", image: "/topcell6 copy.png", quantity: 9 },
+  { id: 7, name: "iPhone (iOS)", image: "/topcell1.png", quantity: 74 },
+  { id: 8, name: "Android", image: "/topcell2 copy.png", quantity: 12 },
+  { id: 9, name: "Gaming", image: "/topcell3 copy.png", quantity: 9 },
+  { id: 10, name: "Xiaomi", image: "/topcell4 copy.png", quantity: 9 },
+
+];
+
 
 const filters = [
   "Min: Rs 2500/-",
@@ -33,36 +339,36 @@ const filters = [
 ];
 
 const brands = [
-{
-  id: 1,
-  name: "Apple",
-  img: "/branditem1.png",
-  quantity: 14,
-},
-{
-  id: 2,
-  name: "Apple",
-  img: "/branditem2.png",
-  quantity: 6,
-},
-{
-  id: 3,
-  name: "Apple",
-  img: "/branditem3.png",
-  quantity: 10,
-},
-{
-  id: 4,
-  name: "Apple",
-  img: "/branditem4.png",
-  quantity: 18,
-},
-{
-  id: 5,
-  name: "Apple",
-  img: "/branditem5.png",
-  quantity: 1,
-},
+  {
+    id: 1,
+    name: "Apple",
+    img: "/branditem1.png",
+    quantity: 14,
+  },
+  {
+    id: 2,
+    name: "Apple",
+    img: "/branditem2.png",
+    quantity: 6,
+  },
+  {
+    id: 3,
+    name: "Apple",
+    img: "/branditem3.png",
+    quantity: 10,
+  },
+  {
+    id: 4,
+    name: "Apple",
+    img: "/branditem4.png",
+    quantity: 18,
+  },
+  {
+    id: 5,
+    name: "Apple",
+    img: "/branditem5.png",
+    quantity: 1,
+  },
 ];
 
 const screenSizes = [
@@ -113,10 +419,60 @@ const colors = [
 ];
 
 const ProductList = (props: Props) => {
-  const [rating, setRating] = useState(0); // selected rating
   return (
     <>
       <DynamicBreadcrumb />
+      <div className="p-4 bg-white rounded-lg space-y-8">
+        <div>
+          <p className=" font-bold uppercase">top cell phones & tablets</p>
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-4 rounded-lg bg-white ">
+          <div className="w-2/3">
+            <HomeCarousel />
+          </div>
+          <div className="w-1/3 rounded-lg relative bg-amber-200">
+            <Image
+              src="/photo1.png"
+              alt="topcell1"
+              fill
+              className="bg-cover h-full w-full object-cover rounded-lg"
+            />
+          </div>
+        </div>
+      </div>
+      <div className="p-4 bg-white rounded-lg space-y-8 my-2">
+        <div>
+          <p className=" font-bold uppercase">popular categories</p>
+        </div>
+
+         <div className="w-full  grid md:grid-cols-5 grid-cols-2 sm:grid-cols-3 gap-4 place-items-center">
+        
+              {topCellPhone.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex w-full items-center justify-between bg-white rounded-lg p-2 sm:p-3  hover:shadow transition"
+                >
+                  <div>
+                    <h3 className="font-bold text-sm">{item.name}</h3>
+                    {item.quantity && (
+                      <p className="text-secondary text-xs">{item.quantity} Items</p>
+                    )}
+                  </div>
+        
+                  <div className="relative w-[45px] h-[45px] sm:w-[55px] sm:h-[55px]">
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                </div>
+              ))}
+        
+            </div>
+      </div>
 
       <div className="bg-white my-2  flex flex-col md:flex-row gap-4 p-4  rounded-lg">
         <div className="md:w-1/4 w-full space-y-4 ">
@@ -202,20 +558,9 @@ const ProductList = (props: Props) => {
             </div>
             <hr className="h-px bg-gray-300 border-0" />
 
-            <div>
+            <div className="space-y-4">
               <p className="my-4 text-sm font-semibold">By Price</p>
-              <div className="flex flex-col space-y-4">
-                <div className="flex flex-wrap gap-2 justify-start">
-                  {filters.map((item, index) => (
-                    <button
-                      key={index}
-                      className="bg-white cursor-pointer p-2 px-3 text-xs rounded-lg"
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <PriceRangeSlider />
             </div>
             <hr className="h-px bg-gray-300 border-0" />
 
@@ -338,12 +683,53 @@ const ProductList = (props: Props) => {
           </div>
         </div>
         <div className="rounded-lg w-full border-2 border-gray p-4 md:w-3/4">
-        
-        <div>
-          <p className="text-lg font-bold uppercase">Best seller in this category</p>
-        </div>
+          <div>
+            <p className="text-lg font-bold uppercase">
+              Best seller in this category
+            </p>
+            {/* Product Carousel */}
+            <ListCardCarousel products={products} />
+          </div>
+          <HorizontalLine />
+          <div className="flex flex-1 flex-col gap-2 ">
+            <div className="flex items-center flex-wrap gap-2 font-normal text-xs text-secondary">
+              <div className="flex-1  ">
+                <span className="text-black font-semibold text-[14px]">
+                  1 - 40
+                </span>{" "}
+                of 120 results
+              </div>
+              <div className="flex-1 flex  items-center gap-2">
+                <div>
+                  <p>Show item</p>
+                </div>
+                <div className="flex flex-row rounded-sm w-30 h-10 bg-gray  justify-around items-center ">
+                  <div className="text-black font-semibold text-[14px] ">
+                    1{" "}
+                  </div>
+                  <div className="">1 </div>
+                  <div className="">1 </div>
+                </div>
+              </div>
+              <div className="flex-1 flex items-center gap-2">
+                <div>Show item</div>
+                <div>
+                  <DropDown />
+                </div>
+              </div>
+              <div className="px-2 flex-1 text-center">View As</div>
+            </div>
+            <div className=" ">
+              <ProductCardList products={products} limit={28} />
+
+              <div>
+                <PaginationBar />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+      <Adsrecentview />
     </>
   );
 };

@@ -41,54 +41,68 @@ function Adsrecentview() {
 
   return (
     <div className="pb-2 ">
-      
-        {adsrecentdata.map((adsproduct, index) => (
-          <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-2 pb-2">
-            <div className="relative">
-              <Image
-                src={adsproduct.image[0]}
-                alt="hell"
-                width={622}
-                height={180}
-                className="object-contain mt-2 "
-              />
-              <div className="absolute  top-13 left-100 z-50 text-white font-semibold">
-                <h1 className="text-4xl text-[#FFE400] ">10% Back</h1>
-                <p className="text-sm mt-2">
-                  Earn 10% Cash back on Swootech. Learn How
+
+      {adsrecentdata.map((adsproduct, index) => (
+        <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-2 pb-2">
+          <div className="relative">
+            <Image
+              src={adsproduct.image[0]}
+              alt="hell"
+              width={622}
+              height={180}
+              className="object-contain mt-2 "
+            />
+            <div className="absolute 
+    top-4 left-4 
+    sm:top-6 sm:left-8 
+    md:top-8 md:left-10 
+    z-50 text-white font-semibold"
+            >
+              <h1 className="text-2xl ml-62 sm:ml-85  mt-2 sm:text-3xl md:text-4xl text-[#FFE400]">10% Back</h1>
+
+              <p className="text-xs  ml-62 sm:ml-85 sm:text-2xl md:text-xs mt-2 w-40 sm:w-52 md:w-auto">
+                Earn 10% Cash back on<br></br> Swootech.<span className="underline underline-offset-3"> Learn How</span>
+              </p>
+            </div>
+
+          </div>
+          <div className="relative">
+            <Image
+              src={adsproduct.image[1]}
+              alt="hell"
+              width={622}
+              height={180}
+              className="object-contain mt-2 "
+            />
+            <div className="absolute z-50 left-5 top-7 text-sm  sm:top-13 sm:left-10 sm:z-50 text-white sm:font-semibold">
+              <div className="flex relative w-100  sm:gap-2">
+                <h1 className="sm:text-2xl text-sm sm:top-10 ">Download<br></br> our app</h1>
+                <p className="text-xs ml-2 mt-0.5 pr-5 sm:hidden">
+                  Enter your phone number<br />
+                  and we'll send you a<br />
+                  download link.
+                </p>
+
+
+                <p className="text-xs ml-2 mt-0.5 pr-5 hidden sm:block">
+                  Enter your phone number and we'll send you a download link.
                 </p>
               </div>
-            </div>
-            <div className="relative">
-              <Image
-                src={adsproduct.image[1]}
-                alt="hell"
-                width={622}
-                height={180}
-                className="object-contain mt-2 "
-              />
-              <div className="absolute  top-13 left-10 z-50 text-white font-semibold">
-                <div className="flex relative w-100 gap-2">
-                  <h1 className="text-2xl ">Download our app</h1>
-                  <p className="text-sm pr-5">
-                    Enter your phone number and we'll send you a download link.
-                  </p>
-                </div>
-                <div className=" relative ">
-                  <input
-                    type="text"
-                    className="w-70  h-9 p-2 rounded-sm bg-[#353739]  mt-2 placeholder:text-white text-white opacity-68 text-sm"
-                    placeholder="(+xx) xxx..."
-                  />
-                  <button className="text-green-600 hover:underline absolute left-50 top-5 text-xs">
-                    SEND LINK
-                  </button>
-                </div>
+              <div className=" relative  ">
+                <input
+                  type="text"
+                  className="w-50 h-7 mt-2  sm:w-70  sm:h-9 p-2 rounded-sm bg-[#353739]  sm:mt-2 placeholder:text-white text-white opacity-68 text-sm"
+                  placeholder="(+xx) xxx..."
+                />
+                <button className="text-green-600 hover:underline absolute left-33 top-3 text-xs sm:left-50 sm:top-5 sm:text-xs">
+                  SEND LINK
+                </button>
               </div>
             </div>
           </div>
-        ))}
-      
+        </div>
+      ))}
+
       <div className="w-full bg-white rounded-xl border p-5 shadow-sm ">
         <div className="flex justify-between items-center mb-4">
           <h2 className="font-semibold text-sm md:text-base">
@@ -130,9 +144,8 @@ function Adsrecentview() {
                 </p>
 
                 <p
-                  className={`text-sm font-semibold ${
-                    item.priceColor || "text-black"
-                  }`}
+                  className={`text-sm font-semibold ${item.priceColor || "text-black"
+                    }`}
                 >
                   {item.price}
                 </p>

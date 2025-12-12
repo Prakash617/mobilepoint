@@ -291,10 +291,10 @@ export default async function ProductDetail({ params }: Props) {
 
 
 
-          <div className="row-span-2 sm:col-span-2  bg-white rounded-t-lg sm:rounded-tl-lg sm:rounded-bl-lg">
+          <div className="row-span-2 sm:col-span-2  bg-white rounded-t-lg sm:rounded-tl-lg sm:rounded-bl-lg ">
             <h1 className="ml-20 mt-3 sm:mt-4 font-bold  sm:ml-5 ">FREQUENTLY BOUGHT TOGETHER</h1>
             <div className="grid grid-cols-8 mt-3 ">
-              <div className="col-span-2">
+              <div className="col-span-2 pl-0 sm:pl-20">
                 <img
                   src="/productDetail.jpg"
                   alt="My Image"
@@ -302,7 +302,7 @@ export default async function ProductDetail({ params }: Props) {
                 />
 
               </div>
-              <div className="col-span-1"><div className="w-8 h-8 ml-3 mt-9 sm:mt-15 sm:ml-5 bg-[#e2e4eb] rounded-full flex justify-center items-center"><FaPlus /></div> </div>
+              <div className="col-span-1 ml-0 sm:ml-5"><div className="w-8 h-8 ml-3 mt-9 sm:mt-15 sm:ml-5 bg-[#e2e4eb] rounded-full flex justify-center items-center"><FaPlus /></div> </div>
               <div className="col-span-2">
                 <img
                   src="/topcell25.jpg"
@@ -311,9 +311,9 @@ export default async function ProductDetail({ params }: Props) {
                 />
               </div>
               <div className="col-span-1">
-                <div className="w-8 h-8 ml-3 mt-9  sm:mt-15 sm:ml-5 bg-[#e2e4eb] rounded-full flex justify-center items-center"><FaPlus /></div>
+                <div className="w-8 h-8 ml-3 mt-9 sm:mr-10  sm:mt-15 sm:ml-5 bg-[#e2e4eb] rounded-full flex justify-center items-center"><FaPlus /></div>
               </div>
-              <div className="col-span-2">
+              <div className="col-span-2 sm:pr-15">
                 <img
                   src="/topcell26.jpg"
                   alt="My Image"
@@ -331,9 +331,11 @@ export default async function ProductDetail({ params }: Props) {
       .replace(/[^a-z0-9-]/g, "");
 
     return (
-      <div key={index} className="mt-2 mb-2">
+      <div className="mt-3">
+
+      <div key={index} className=" mb-2">
         <div className="flex items-center gap-3 pl-7">
-          <Checkbox id={safeId} className="bg-white mb-2" />
+          <Checkbox id={safeId} className="bg-white  " />
           <Label
             htmlFor={safeId}
             className="flex text-left gap-2 text-secondary"
@@ -344,6 +346,7 @@ export default async function ProductDetail({ params }: Props) {
           
           </Label>
         </div>
+      </div>
       </div>
     );
   })}
@@ -383,13 +386,13 @@ export default async function ProductDetail({ params }: Props) {
       <div className="bg-white mb-1 rounded-lg">
         <div>
           <div className="flex flex-wrap gap-4 sm:gap-5 lg:gap-8 px-3 pt-8 pb-5">
-  <button className="hover:underline font-semibold text-sm sm:font-bold lg:text-xl sm:pl-2">
+  <button className="cursor-pointer font-semibold text-sm sm:font-bold lg:text-xl sm:pl-2">
     DESCRIPTION
   </button>
-  <button className="hover:underline font-semibold text-sm sm:text-base sm:ml-6 text-[#666666] lg:text-lg">
+  <button className="cursor-pointer font-semibold text-sm sm:text-base sm:ml-6 text-[#666666] lg:text-lg">
     REVIEWS (5)
   </button>
-  <button className="hover:underline font-semibold text-sm sm: sm:text-base sm:ml-6 lg:text-lg text-[#666666] ">
+  <button className="cursor-pointer font-semibold text-sm sm: sm:text-base sm:ml-6 lg:text-lg text-[#666666] ">
     ADDITIONAL INFORMATION
   </button>
 </div>
@@ -437,10 +440,10 @@ export default async function ProductDetail({ params }: Props) {
 </div>
 
             <div className=" ">
-              <h1 className="px-5 pt-4 font-bold">Samsung Galaxy Tab S2, 8-Inch, White</h1>
+              <h1 className="px-5 pt-4 text-xl text-[#777777]">Samsung Galaxy Tab S2, 8-Inch, White</h1>
               <Longtextmore  text="Dive into the blockbuster movies you can't wait to see. Switch between your favorite apps quickly and easily. The new and improved octa-core processor gives you the power and speed you need
                 to see more and do more. Expand your tablet's memory from 32GB to up to an additional 128GB and enjoy more of your favorite music, photos, movies and games on the go with a microSD card.
-                With Quick Connect, start a show on your Smart TV and, with the touch of a button, take it with you by moving it to your Galaxy Tab S2.<br /><br />
+                With Quick Connect, start a show on your Smart TV and, with the touch of a button, take it with you by moving it to your Galaxy Tab S2.
                 Or send videos and photos from your tablet screen to your TV screen to share with everyone in the room. Work effortlessly between your Samsung tablet and Samsung smartphone with SideSync.
                 Quickly drag and drop photos between devices. And even respond to a call from your smartphone right on your tablet screen."/>
 

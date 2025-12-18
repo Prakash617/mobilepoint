@@ -1,9 +1,8 @@
 import Button from "@/components/Button";
 import { DynamicBreadcrumb } from "@/components/DynamicBreadcrumb";
 import FreeAdvertizemantCard from "@/components/FreeAdvertizemantCard";
-import Longtextmore from "@/app/(root)/product/[slug]/Longtextmore";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import Longtextmore from "@/app/(root)/products/[slug]/Longtextmore";
+
 import Image from "next/image";
 import Link from "next/link";
 
@@ -21,6 +20,7 @@ import {
 import { IoMdRefresh } from "react-icons/io";
 import Adsrecentview from "@/components/Adsrecentview";
 import RelatedProduct from "@/components/RelatedProduct";
+import FrequantlyBrout from "./FrequantlyBrout";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -39,7 +39,12 @@ const related_products = [
     new: true,
     in_stock: true,
     quantity: 25,
-    sub_images: ["/topcell2.png","/topcell3.png","/topcell4.png","/topcell5.png"],
+    sub_images: [
+      "/topcell2.png",
+      "/topcell3.png",
+      "/topcell4.png",
+      "/topcell5.png",
+    ],
   },
   {
     id: 2,
@@ -105,24 +110,6 @@ const related_products = [
     quantity: 0,
     sub_images: ["/topcell1.png"],
   },
-
-];
-const frequentitem = [
-  {
-    name: "Somseng Galatero X6 Ultra LTE 4G/128 Gb, Black Smartphone",
-    price: "Rs. 35000/-",
-    textColor: "text-[#333333]",
-  },
-  {
-    name: "BOSO 2 Wireless On Ear Headphone",
-    price: "Rs. 25000/-",
-    textColor: "text-red-600",
-  },
-  {
-    name: "Opplo Watch Series 8 GPS + Cellular Stainless Stell Case with Milanese Loop",
-    price: "Rs. 15000/-",
-    textColor: "text-red-600",
-  },
 ];
 
 export default async function ProductDetail({ params }: Props) {
@@ -132,7 +119,7 @@ export default async function ProductDetail({ params }: Props) {
     <>
       <DynamicBreadcrumb />
 
-      <div className="sm:w-full w-full my-2 md:container mx-auto p-4 bg-white rounded-xl">
+      <div className="sm:w-full w-full my-2  mx-auto p-4 bg-white rounded-xl">
         {/* MAIN GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* LEFT SIDE – PRODUCT IMAGES */}
@@ -392,125 +379,19 @@ export default async function ProductDetail({ params }: Props) {
           </div>
         </div>
       </div>
-      <div className=" rounded-lg  mb-2">
-        <div className="grid grid-rows-[3fr_2fr_2fr_2fr] rounded-lg   sm:grid-cols-[3fr_2fr_2fr_2fr] sm:grid-rows-1 ">
-          <div className="row-span-2 sm:col-span-2  bg-white rounded-t-lg sm:rounded-tl-lg sm:rounded-bl-lg">
-            <h1 className="ml-20 mt-3 sm:mt-4 font-bold  sm:ml-5 ">
-              FREQUENTLY BOUGHT TOGETHER
-            </h1>
-            <div className="grid grid-cols-8 mt-3 ">
-              <div className="col-span-2">
-                <img
-                  src="/productDetail.jpg"
-                  alt="My Image"
-                  className="object-cover w-full h-full rounded-lg "
-                />
-              </div>
-              <div className="col-span-1">
-                <div className="w-8 h-8 ml-3 mt-9 sm:mt-15 sm:ml-5 bg-[#e2e4eb] rounded-full flex justify-center items-center">
-                  <FaPlus />
-                </div>{" "}
-              </div>
-              <div className="col-span-2">
-                <img
-                  src="/topcell25.jpg"
-                  alt="My Image"
-                  className="object-cover w-full h-full rounded-lg "
-                />
-              </div>
-              <div className="col-span-1">
-                <div className="w-8 h-8 ml-3 mt-9  sm:mt-15 sm:ml-5 bg-[#e2e4eb] rounded-full flex justify-center items-center">
-                  <FaPlus />
-                </div>
-              </div>
-              <div className="col-span-2">
-                <img
-                  src="/topcell26.jpg"
-                  alt="My Image"
-                  className="object-cover w-full h-full rounded-lg opacity-30 "
-                />
-              </div>
-            </div>
-            <div className="mt-2">
-              {frequentitem.map((item, index) => {
-                // Create safe ID using item.name
-                const safeId = item.name
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")
-                  .replace(/[^a-z0-9-]/g, "");
 
-                return (
-                  <div key={index} className="mt-2 mb-2">
-                    <div className="flex items-center gap-3 pl-7">
-                      <Checkbox id={safeId} className="bg-white mb-2" />
-                      <Label
-                        htmlFor={safeId}
-                        className="flex text-left gap-2 text-secondary"
-                      >
-                        <span className="opacity-75">
-                          {item.name}{" "}
-                          <span className={`${item.textColor} font-bold`}>
-                            {item.price}
-                          </span>
-                        </span>
-                      </Label>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+      <FrequantlyBrout />
 
-          <div className="row-span-2   bg-white rounded-b-lg sm:rounded-tr-lg sm:rounded-br-lg   sm:mr-2">
-            <div className="mt-10 ml-7">
-              <h1 className="text-sm text-[#999999] ml-5 mt-7">Total Price:</h1>
-              <h1 className="text-3xl ml-5 mt-2 mb-5 font-bold">
-                Rs. 65,000/-{" "}
-              </h1>
-              <div className="ml-5">
-                <div className="pr-25">
-                  <Button
-                    bgColor="bg-[#1ABA1A] "
-                    text="ADD TO CART"
-                    textColor="text-white text-sm "
-                  />
-                </div>
-                <div className="flex mt-5">
-                  <FaHeart className="text-[#999999] text-sm mt-1 mr-2" />
-                  <p className="text-sm text-[#999999]"> Ad all to Wishlist</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className=" flex flex-col gap-1.5 mt-2 sm:mt-0">
-            <div>
-              <img
-                src="/topcell27.png"
-                alt="My Image"
-                className="object-cover w-full h-full rounded-lg "
-              />
-            </div>
-
-            <div>
-              <img
-                src="/topcell28.png"
-                alt="My Image"
-                className="object-cover w-full h-full rounded-lg "
-              />
-            </div>
-          </div>
-        </div>
-      </div>
       <div className="bg-white mb-1 rounded-lg">
         <div>
           <div className="flex flex-wrap gap-4 sm:gap-5 lg:gap-8 px-3 pt-8 pb-5">
-            <button className="hover:underline font-semibold text-sm sm:font-bold lg:text-xl sm:pl-2">
+            <button className="cursor-pointer font-semibold text-sm sm:font-bold lg:text-xl sm:pl-2">
               DESCRIPTION
             </button>
-            <button className="hover:underline font-semibold text-sm sm:text-base sm:ml-6 text-[#666666] lg:text-lg">
+            <button className="cursor-pointer font-semibold text-sm sm:text-base sm:ml-6 text-[#666666] lg:text-lg">
               REVIEWS (5)
             </button>
-            <button className="hover:underline font-semibold text-sm sm: sm:text-base sm:ml-6 lg:text-lg text-[#666666] ">
+            <button className="cursor-pointer font-semibold text-sm sm: sm:text-base sm:ml-6 lg:text-lg text-[#666666] ">
               ADDITIONAL INFORMATION
             </button>
           </div>
@@ -527,7 +408,7 @@ export default async function ProductDetail({ params }: Props) {
               <b>Super AMOLED display * </b>. With deep contrast, rich colors
               and crisp details, you won't miss a thing
             </p>
-            <div className="w-full h-[400px] flex items-center relative justify-center px-5 pt-7 ">
+            <div className="w-full h-[400px] relative mt-2 px-5 pt-7 ">
               <Image
                 src="/topcell22.jpg"
                 alt="My Image"
@@ -565,30 +446,33 @@ export default async function ProductDetail({ params }: Props) {
               </p>
             </div>
             <div className="grid grid-cols-1 grid-rows-2 gap-2 px-5 pt-4 mt-2 sm:grid-cols-2 sm:grid-rows-1">
-              <div className="h-[250px] sm:h-[450px]">
-                <img
+              <div className="relative h-[250px] sm:h-[450px]">
+                <Image
                   src="/topcell23.png"
                   alt="Image 1"
-                  className="w-full h-full object-cover rounded-lg"
+                  fill
+                  className="object-cover rounded-lg"
                 />
               </div>
-              <div className="h-[250px] sm:h-[450px]">
-                <img
+
+              <div className="relative h-[250px] sm:h-[450px]">
+                <Image
                   src="/topcell24.png"
                   alt="Image 2"
-                  className="w-full h-full object-cover rounded-lg"
+                  fill
+                  className="object-cover rounded-lg"
                 />
               </div>
             </div>
 
             <div className=" ">
-              <h1 className="px-5 pt-4 font-bold">
+              <h1 className="px-5 pt-4 text-xl text-[#777777]">
                 Samsung Galaxy Tab S2, 8-Inch, White
               </h1>
               <Longtextmore
                 text="Dive into the blockbuster movies you can't wait to see. Switch between your favorite apps quickly and easily. The new and improved octa-core processor gives you the power and speed you need
                 to see more and do more. Expand your tablet's memory from 32GB to up to an additional 128GB and enjoy more of your favorite music, photos, movies and games on the go with a microSD card.
-                With Quick Connect, start a show on your Smart TV and, with the touch of a button, take it with you by moving it to your Galaxy Tab S2.<br /><br />
+                With Quick Connect, start a show on your Smart TV and, with the touch of a button, take it with you by moving it to your Galaxy Tab S2.
                 Or send videos and photos from your tablet screen to your TV screen to share with everyone in the room. Work effortlessly between your Samsung tablet and Samsung smartphone with SideSync.
                 Quickly drag and drop photos between devices. And even respond to a call from your smartphone right on your tablet screen."
               />
@@ -596,7 +480,7 @@ export default async function ProductDetail({ params }: Props) {
           </div>
         </div>
       </div>
-      <RelatedProduct products={related_products}  />
+      <RelatedProduct products={related_products} />
       <Adsrecentview />
     </>
   );

@@ -20,7 +20,7 @@ export default function Longtextmore({ text }: { text: string }) {
       {/* Show More / Show Less Button */}
       <button
         onClick={() => setOpen(!open)}
-        className="text-[#0D6EFD] text-sm hover:underline ml-5 mt-2"
+        className="text-[#0D6EFD] text-sm hover:underline ml-5 mt-4 mb-5"
       >
         {open ? "Show Less" : "Show More"}
       </button>

@@ -9,6 +9,8 @@ import FreeAdvertizemantCard from "@/components/FreeAdvertizemantCard";
 import HomeCarouselSection from "./_home/HomeCarouselSection";
 import DealOfDay from "./_home/DealOfDay";
 import ProductCardTab from "@/components/ProductCardTab";
+import AdsCards from "./_home/AdsCards";
+import CuratedProducts from "./_home/CuratedProducts";
 
 export default function Home() {
   return (
@@ -17,10 +19,12 @@ export default function Home() {
      <HomeCarouselSection/>
       <BrandFeature/>
       <DealOfDay/>
+      <CuratedProducts/>
       <ProductCardTab/>
       <TopCellPhone/>
       <AudioCamera />
-      {/* <Adsrecentview/> */}
+      <AdsCards/>
+      <Adsrecentview/>
     </>
   );
 }

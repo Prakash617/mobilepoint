@@ -23,7 +23,7 @@ const ProductCard = ({
 }: ProductCardProps) => {
   return (
     <Link
-      href={`/product/${slug}`}
+      href={`/products/${slug}`}
       className="cursor-pointer justify-center h-[480px] w-[220px] hover:border border-gray p-2 rounded-lg space-y-4 flex flex-col"
     >
       {/* Image */}

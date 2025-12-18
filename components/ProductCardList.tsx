@@ -1,10 +1,27 @@
 import React from 'react'
 import ProductCard from './ProductCard'
-import { ProductCardProps } from '@/types'
+
+type Product = {
+  id: number;
+  name: string;
+  slug: string;
+  price: number;
+  image: string;
+  tag?: boolean;
+  tag_text?: string;
+  tagColor?: string;
+  tagPrice?: string | null;
+  free_shipping?: boolean;
+  free_gift?: boolean;
+  new?: boolean;
+  sub_images?: string[];
+  in_stock?: boolean;
+  quantity?: number;
+};
 
 type Props = {
-  products: ProductCardProps[]
-  limit?: number   // 👈 NEW PROP
+  products: Product[]
+  limit?: number
 }
 
 const ProductCardList = ({ products, limit }: Props) => {

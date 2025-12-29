@@ -1,7 +1,7 @@
 import Image from "next/image";
 import React from "react";
 
-type Props = {};
+type Props = object;
 
 const adsrecentdata = ["/topcell6.png", "/topcell20.png"];
 

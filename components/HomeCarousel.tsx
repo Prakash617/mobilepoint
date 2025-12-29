@@ -5,40 +5,28 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
   type CarouselApi,
 } from "./ui/carousel";
 import Image from "next/image";
 import Autoplay from "embla-carousel-autoplay";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
-
-const carouselData = [
-  {
-    title: "Noise Cancelling",
-    sub_title: "Headphone",
-    description:
-      "Bose Over-Ear Headphone\nWifi, Voice Assistant\nLow Latency Game Mode",
-    image: "/carousel1.png",
-  },
-  {
-    title: "Premium Laptop",
-    description:
-      "High Performance Processor\nFast SSD Storage\nExtended Battery Life",
-    image: "/laptop.png",
-  },
-  {
-    title: "Latest Smartphone",
-    description:
-      "Advanced Camera System\nHigh Refresh Rate Display\nFast Charging Technology",
-    image: "/mobile2.png",
-  },
-];
+import { useCarousels } from "@/hooks/useCarousels";
+import Link from "next/link";
+import type { Carousel as CarouselType, CarouselSlide } from "@/types/carousel"; // type alias
 
 const HomeCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [api, setApi] = useState<CarouselApi>();
+  const [api, setApi] = useState<CarouselApi | undefined>(undefined);
 
+  const {
+    data: carousels,
+    isLoading,
+    error,
+  } = useCarousels({
+    position: "home_main",
+  });
+
+  /** ✅ Hooks MUST run every render */
   useEffect(() => {
     if (!api) return;
 
@@ -47,8 +35,33 @@ const HomeCarousel = () => {
     };
 
     api.on("select", onSelect);
-    return () => api.off("select", onSelect);
+    return () => {
+      api.off("select", onSelect);
+      return;
+    };
   }, [api]);
+
+
+const carouselData: CarouselSlide[] =
+  carousels?.results
+    ?.flatMap((carousel: CarouselType) => carousel.slides ?? [])
+    .filter((slide: CarouselSlide) => slide.is_active)
+    .sort((a: CarouselSlide, b: CarouselSlide) => a.order - b.order) ?? [];
+
+
+
+  /** ✅ Render logic AFTER hooks */
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading carousel</div>;
+  }
+
+  if (carouselData.length === 0) {
+    return null;
+  }
 
   return (
     <div className="relative w-full">
@@ -59,67 +72,64 @@ const HomeCarousel = () => {
         opts={{ align: "start" }}
       >
         <CarouselContent>
-          {carouselData.map((item) => (
-            <CarouselItem key={item.title}>
+          {carouselData.map((item:CarouselSlide, index:number) => (
+            <CarouselItem key={index}>
               <div className="relative w-full h-[310px] rounded-lg">
+                {item.image && (
+                  
                 <Image
                   src={item.image}
                   alt={item.title}
                   fill
                   className="object-cover -z-10 rounded-lg"
                 />
+                )}
+
                 <div className="w-1/2 space-y-7 px-10 text-white font-bold absolute top-1/2 left-8 -translate-y-1/2">
                   <p className="text-2xl">
                     {item.title} <br />
-                    {item.sub_title && (
+                    {item.subtitle && (
                       <span className="text-xl font-medium">
-                        {item.sub_title}
+                        {item.subtitle}
                       </span>
                     )}
                   </p>
-                  <p className="font-extralight whitespace-pre-line">
-                    {item.description}
-                  </p>
-                  <button className="bg-white px-4 py-1 font-medium text-black rounded-[10px]">
-                    Buy Now
-                  </button>
+
+                  {item.description && (
+                    <p className="font-extralight whitespace-pre-line">
+                      {item.description}
+                    </p>
+                  )}
+
+                  {item.link_url && (
+                    <Link href={item.link_url} className="bg-white px-4 py-2 font-medium text-black rounded-[10px]">
+                      {item.link_text || "Buy Now"}
+                    </Link>
+                  )}
                 </div>
               </div>
             </CarouselItem>
           ))}
         </CarouselContent>
 
-        {/* Custom Navigation Buttons */}
-        {/* <button
-          onClick={() => api?.scrollPrev()}
-          className="absolute top-1/2 left-2 -translate-y-1/2 bg-white/80 hover:bg-white text-black p-2 rounded-full shadow-md z-10"
-        >
-          <MdChevronLeft size={24} />
-        </button> */}
-
-        {/* <button
-          onClick={() => api?.scrollNext()}
-          className="absolute top-1/2 right-2 -translate-y-1/2 bg-white/80 hover:bg-white text-black p-2 rounded-full shadow-md z-10"
-        >
-          <MdChevronRight size={24} />
-        </button> */}
-
-        {/* Slide Indicators */}
-        <div className="absolute bottom-4 right-8 px-4 py-2  flex items-center gap-1  rounded-full bg-white text-black text-sm font-semibold">
+        {/* Indicators */}
+        <div className="absolute bottom-4 right-8 px-4 py-2 flex items-center gap-1 rounded-full bg-white text-black text-sm font-semibold">
           <button
             onClick={() => api?.scrollPrev()}
-            className="  text-[#B3B3B3]  hover:text-black cursor-pointer "
+            className="text-[#B3B3B3] hover:text-black"
           >
             <MdChevronLeft size={24} />
           </button>
+
           <div className="font-medium">
             <span>{currentIndex + 1}</span>
-            <span className=" mx-1 text-md">/</span>
+            <span className="mx-1">/</span>
             <span>{carouselData.length}</span>
           </div>
+
           <button
             onClick={() => api?.scrollNext()}
-            className=" text-[#B3B3B3]  hover:text-black cursor-pointer  "
+            className="text-[#B3B3B3] hover:text-black"
           >
             <MdChevronRight size={24} />
           </button>

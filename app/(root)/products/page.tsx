@@ -13,6 +13,7 @@ import ProductCardList from "@/components/ProductCardList";
 import PaginationBar from "@/components/PaginationBar";
 import PriceRangeSlider from "@/components/PriceRangeSlider";
 import HomeCarousel from "@/components/HomeCarousel";
+import { useProducts } from "@/hooks/useProducts";
 
 type Props = {};
 
@@ -31,289 +32,7 @@ const categories = [
   "Tablets Accessories",
   "Cell Phones ",
 ];
-const products = [
-  // 1–4
-  {
-    id: 1,
-    slug: "srok-smart-phone-128gb-oled-retina-1",
-    name: "SROK Smart Phone 128GB, Oled Retina",
-    price: 60000,
-    image: "/topcell2.png",
-    tag: true,
-    tag_text: "Save",
-    tagPrice: "199.0",
-    free_shipping: true,
-    free_gift: true,
-    new: true,
-    in_stock: true,
-    quantity: 25,
-    sub_images: [
-      "/topcell2.png",
-      "/topcell3.png",
-      "/topcell4.png",
-      "/topcell5.png",
-    ],
-  },
-  {
-    id: 2,
-    slug: "apod-pro-tablet-2023-lte-wifi-gps-cellular-512gb-1",
-    name: "aPod Pro Tablet 2023 LTE+ Wifi, GPS Cellular 12.9 Inch, 512GB",
-    price: 98000,
-    image: "/topcell1.png",
-    tag: true,
-    tag_text: "New",
-    tagPrice: null,
-    free_shipping: false,
-    free_gift: false,
-    new: true,
-    in_stock: true,
-    quantity: 12,
-    sub_images: ["/topcell1.png"],
-  },
-  {
-    id: 3,
-    slug: "opod-pro-12-9-inch-m1-2023-64gb-wifi-gps-1",
-    name: "OPod Pro 12.9 Inch M1 2023, 64GB + Wifi, GPS",
-    price: 70000,
-    image: "/topcell3.png",
-    tag: true,
-    tag_text: "New",
-    tagPrice: null,
-    free_shipping: false,
-    free_gift: false,
-    new: true,
-    in_stock: false,
-    quantity: 0,
-    sub_images: ["/topcell3.png"],
-  },
-  {
-    id: 4,
-    slug: "apod-pro-tablet-2023-512gb-1",
-    name: "aPod Pro Tablet 2023 LTE+ Wifi, GPS Cellular 12.9 Inch, 512GB",
-    price: 98000,
-    image: "/topcell1.png",
-    tag: true,
-    tag_text: "New",
-    tagPrice: null,
-    free_shipping: false,
-    free_gift: false,
-    new: true,
-    in_stock: true,
-    quantity: 8,
-    sub_images: ["/topcell1.png"],
-  },
 
-  // 5–8 (same products, new ids & slugs)
-  {
-    id: 5,
-    slug: "srok-smart-phone-128gb-oled-retina-2",
-    name: "SROK Smart Phone 128GB, Oled Retina",
-    price: 60000,
-    image: "/topcell2.png",
-    tag: true,
-    tag_text: "Save",
-    tagPrice: "199.0",
-    free_shipping: true,
-    free_gift: true,
-    new: true,
-    in_stock: true,
-    quantity: 25,
-    sub_images: [
-      "/topcell2.png",
-      "/topcell3.png",
-      "/topcell4.png",
-      "/topcell5.png",
-    ],
-  },
-  {
-    id: 6,
-    slug: "apod-pro-tablet-2023-lte-wifi-gps-cellular-512gb-2",
-    name: "aPod Pro Tablet 2023 LTE+ Wifi, GPS Cellular 12.9 Inch, 512GB",
-    price: 98000,
-    image: "/topcell1.png",
-    tag: true,
-    tag_text: "New",
-    tagPrice: null,
-    free_shipping: false,
-    free_gift: false,
-    new: true,
-    in_stock: true,
-    quantity: 12,
-    sub_images: ["/topcell1.png"],
-  },
-  {
-    id: 7,
-    slug: "opod-pro-12-9-inch-m1-2023-64gb-wifi-gps-2",
-    name: "OPod Pro 12.9 Inch M1 2023, 64GB + Wifi, GPS",
-    price: 70000,
-    image: "/topcell3.png",
-    tag: true,
-    tag_text: "New",
-    tagPrice: null,
-    free_shipping: false,
-    free_gift: false,
-    new: true,
-    in_stock: false,
-    quantity: 0,
-    sub_images: ["/topcell3.png"],
-  },
-  {
-    id: 8,
-    slug: "apod-pro-tablet-2023-512gb-2",
-    name: "aPod Pro Tablet 2023 LTE+ Wifi, GPS Cellular 12.9 Inch, 512GB",
-    price: 98000,
-    image: "/topcell1.png",
-    tag: true,
-    tag_text: "New",
-    tagPrice: null,
-    free_shipping: false,
-    free_gift: false,
-    new: true,
-    in_stock: true,
-    quantity: 8,
-    sub_images: ["/topcell1.png"],
-  },
-
-  // 9–12
-  {
-    id: 9,
-    slug: "srok-smart-phone-128gb-oled-retina-3",
-    name: "SROK Smart Phone 128GB, Oled Retina",
-    price: 60000,
-    image: "/topcell2.png",
-    tag: true,
-    tag_text: "Save",
-    tagPrice: "199.0",
-    free_shipping: true,
-    free_gift: true,
-    new: true,
-    in_stock: true,
-    quantity: 25,
-    sub_images: [
-      "/topcell2.png",
-      "/topcell3.png",
-      "/topcell4.png",
-      "/topcell5.png",
-    ],
-  },
-  {
-    id: 10,
-    slug: "apod-pro-tablet-2023-lte-wifi-gps-cellular-512gb-3",
-    name: "aPod Pro Tablet 2023 LTE+ Wifi, GPS Cellular 12.9 Inch, 512GB",
-    price: 98000,
-    image: "/topcell1.png",
-    tag: true,
-    tag_text: "New",
-    tagPrice: null,
-    free_shipping: false,
-    free_gift: false,
-    new: true,
-    in_stock: true,
-    quantity: 12,
-    sub_images: ["/topcell1.png"],
-  },
-  {
-    id: 11,
-    slug: "opod-pro-12-9-inch-m1-2023-64gb-wifi-gps-3",
-    name: "OPod Pro 12.9 Inch M1 2023, 64GB + Wifi, GPS",
-    price: 70000,
-    image: "/topcell3.png",
-    tag: true,
-    tag_text: "New",
-    tagPrice: null,
-    free_shipping: false,
-    free_gift: false,
-    new: true,
-    in_stock: false,
-    quantity: 0,
-    sub_images: ["/topcell3.png"],
-  },
-  {
-    id: 12,
-    slug: "apod-pro-tablet-2023-512gb-3",
-    name: "aPod Pro Tablet 2023 LTE+ Wifi, GPS Cellular 12.9 Inch, 512GB",
-    price: 98000,
-    image: "/topcell1.png",
-    tag: true,
-    tag_text: "New",
-    tagPrice: null,
-    free_shipping: false,
-    free_gift: false,
-    new: true,
-    in_stock: true,
-    quantity: 8,
-    sub_images: ["/topcell1.png"],
-  },
-  {
-    id: 13,
-    slug: "srok-smart-phone-128gb-oled-retina-3",
-    name: "SROK Smart Phone 128GB, Oled Retina",
-    price: 60000,
-    image: "/topcell2.png",
-    tag: true,
-    tag_text: "Save",
-    tagPrice: "199.0",
-    free_shipping: true,
-    free_gift: true,
-    new: true,
-    in_stock: true,
-    quantity: 25,
-    sub_images: [
-      "/topcell2.png",
-      "/topcell3.png",
-      "/topcell4.png",
-      "/topcell5.png",
-    ],
-  },
-  {
-    id: 14,
-    slug: "apod-pro-tablet-2023-lte-wifi-gps-cellular-512gb-3",
-    name: "aPod Pro Tablet 2023 LTE+ Wifi, GPS Cellular 12.9 Inch, 512GB",
-    price: 98000,
-    image: "/topcell1.png",
-    tag: true,
-    tag_text: "New",
-    tagPrice: null,
-    free_shipping: false,
-    free_gift: false,
-    new: true,
-    in_stock: true,
-    quantity: 12,
-    sub_images: ["/topcell1.png"],
-  },
-  {
-    id: 15,
-    slug: "opod-pro-12-9-inch-m1-2023-64gb-wifi-gps-3",
-    name: "OPod Pro 12.9 Inch M1 2023, 64GB + Wifi, GPS",
-    price: 70000,
-    image: "/topcell3.png",
-    tag: true,
-    tag_text: "New",
-    tagPrice: null,
-    free_shipping: false,
-    free_gift: false,
-    new: true,
-    in_stock: false,
-    quantity: 0,
-    sub_images: ["/topcell3.png"],
-  },
-  {
-    id: 16,
-    slug: "apod-pro-tablet-2023-512gb-3",
-    name: "aPod Pro Tablet 2023 LTE+ Wifi, GPS Cellular 12.9 Inch, 512GB",
-    price: 98000,
-    image: "/topcell1.png",
-    tag: true,
-    tag_text: "New",
-    tagPrice: null,
-    free_shipping: false,
-    free_gift: false,
-    new: true,
-    in_stock: true,
-    quantity: 8,
-    sub_images: ["/topcell1.png"],
-  },
-];
 
 const topCellPhone = [
   { id: 1, name: "iPhone (iOS)", image: "/topcell1.png", quantity: 74 },
@@ -419,6 +138,16 @@ const colors = [
 ];
 
 const ProductList = (props: Props) => {
+  const { data: products, isLoading, error } = useProducts();
+    
+    console.log(products);
+    if (isLoading) {
+      return <div>Loading...</div>;
+    }
+    if (error) {
+      return <div>Error: {error.message}</div>;
+    }
+
   return (
     <>
       <DynamicBreadcrumb />
@@ -688,7 +417,7 @@ const ProductList = (props: Props) => {
               Best seller in this category
             </p>
             {/* Product Carousel */}
-            <ListCardCarousel products={products} />
+            <ListCardCarousel products={products?.results || []} />
           </div>
           <HorizontalLine />
           <div className="flex flex-1 flex-col gap-2 ">
@@ -720,7 +449,7 @@ const ProductList = (props: Props) => {
               <div className="px-2 flex-1 text-center">View As</div>
             </div>
             <div className=" ">
-              <ProductCardList products={products} limit={28} />
+              <ProductCardList products={products?.results ?? []}  />
 
               <div>
                 <PaginationBar />

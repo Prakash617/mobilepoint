@@ -10,24 +10,7 @@ import {
 } from "@/components/ui/carousel";
 
 import ProductCard from "./ProductCard";
-
-type Product = {
-  id: number;
-  name: string;
-  slug: string;
-  price: number;
-  image: string;
-  tag?: boolean;
-  tag_text?: string;
-  tagColor?: string;
-  tagPrice?: string | null;
-  free_shipping?: boolean;
-  free_gift?: boolean;
-  new?: boolean;
-  sub_images?: string[];
-  in_stock?: boolean;
-  quantity?: number;
-};
+import { Product } from "@/types/product";
 
 type CardCarouselProps = {
   products: Product[];
@@ -54,21 +37,7 @@ export function CardCarousel({ products }: CardCarouselProps) {
               xl:basis-1/5
             "
           >
-            <ProductCard
-              name={product.name}
-              price={product.price}
-              image={product.image}
-              tag={product.tag_text}
-              tagColor={product.tagColor}
-              tagPrice={product.tagPrice ? Number(product.tagPrice) : undefined}
-              free_shipping={product.free_shipping}
-              free_gift={product.free_gift}
-              new={product.new}
-              sub_images={product.sub_images}
-              slug={product.slug}
-              in_stock= {product.in_stock}
-              quantity={product.quantity}
-            />
+            <ProductCard product={product} />
           </CarouselItem>
         ))}
       </CarouselContent>

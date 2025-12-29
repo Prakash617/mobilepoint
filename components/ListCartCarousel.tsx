@@ -10,30 +10,13 @@ import {
 } from "@/components/ui/carousel";
 
 import ProductCard from "./ProductCard";
+import { Product } from "@/types/product";
 
-type Product = {
-  id: number;
-  name: string;
-  slug: string;
-  price: number;
-  image: string;
-  tag?: boolean;
-  tag_text?: string;
-  tagColor?: string;
-  tagPrice?: string | null;
-  free_shipping?: boolean;
-  free_gift?: boolean;
-  new?: boolean;
-  sub_images?: string[];
-  in_stock?: boolean;
-  quantity?: number;
-};
 
-type CardCarouselProps = {
-  products: Product[];
-};
 
-export function ListCardCarousel({ products }: CardCarouselProps) {
+
+
+export const ListCardCarousel = ({ products }: { products: Product[] }) => {
   return (
     <Carousel
       opts={{
@@ -42,11 +25,11 @@ export function ListCardCarousel({ products }: CardCarouselProps) {
       className="w-full max-w-full px-8"
     >
       <CarouselContent className="gap-4 ">
-        {products.map((product) => (
+        {products?.map((product) => (
           <CarouselItem
             key={product.id}
             className="
-              flex-shrink-0
+              shrink-0
               basis-full
               sm:basis-1/2
               md:basis-1/3
@@ -55,19 +38,7 @@ export function ListCardCarousel({ products }: CardCarouselProps) {
             "
           >
             <ProductCard
-              name={product.name}
-              price={product.price}
-              image={product.image}
-              tag={product.tag_text}
-              tagColor={product.tagColor}
-              tagPrice={product.tagPrice ? Number(product.tagPrice) : undefined}
-              free_shipping={product.free_shipping}
-              free_gift={product.free_gift}
-              new={product.new}
-              sub_images={product.sub_images}
-              slug={product.slug}
-              in_stock={product.in_stock ?? true}
-              quantity={product.quantity}
+              product={product}
             />
           </CarouselItem>
         ))}

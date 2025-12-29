@@ -9,7 +9,7 @@ export default function Longtextmore({ text }: { text: string }) {
     <div className="relative">
       {/* Text container */}
       <div className={`relative text-gray-800 px-5 pt-6 text-sm text-justify ${open ? "" : "max-h-20 overflow-hidden"}`}>
-        <p>{text}</p>
+        <div className="html-content" dangerouslySetInnerHTML={{ __html: text }}/>
 
         {/* Fade overlay */}
         {!open && (
@@ -20,7 +20,7 @@ export default function Longtextmore({ text }: { text: string }) {
       {/* Show More / Show Less Button */}
       <button
         onClick={() => setOpen(!open)}
-        className="text-[#0D6EFD] text-sm hover:underline ml-5 mt-4 mb-5"
+        className={`text-[#0D6EFD] text-sm uppercase hover:underline cursor-pointer ${open ? "text-success" : ""} ml-5 mt-4 mb-5`}
       >
         {open ? "Show Less" : "Show More"}
       </button>

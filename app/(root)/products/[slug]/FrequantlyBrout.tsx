@@ -28,8 +28,8 @@ const frequentitem = [
 const FrequantlyBrout = (props: Props) => {
   return (
     <div className=" rounded-lg  mb-2">
-      <div className="grid grid-rows-[3fr_2fr_2fr_2fr] rounded-lg   sm:grid-cols-[3fr_2fr_2fr_2fr] sm:grid-rows-1 ">
-        <div className="row-span-2 sm:col-span-2  bg-white rounded-t-lg sm:rounded-tl-lg sm:rounded-bl-lg ">
+      <div className="grid grid-rows-[3fr_2fr_2fr_2fr]   sm:grid-cols-[3fr_2fr_2fr_2fr] sm:grid-rows-1 ">
+        <div className="row-span-2 sm:col-span-2  rounded-bl-lg rounded-tl-lg   bg-white  ">
           <h1 className="ml-20 mt-3 sm:mt-4 font-bold  sm:ml-5 ">
             FREQUENTLY BOUGHT TOGETHER
           </h1>
@@ -66,7 +66,7 @@ const FrequantlyBrout = (props: Props) => {
               />
             </div>
           </div>
-          <div className="mt-2">
+          <div className="mt-2 pb-3">
             {frequentitem.map((item, index) => {
               // Create safe ID using item.name
               const safeId = item.name
@@ -75,8 +75,8 @@ const FrequantlyBrout = (props: Props) => {
                 .replace(/[^a-z0-9-]/g, "");
 
               return (
-                <div className="mt-3">
-                  <div key={index} className=" mb-2">
+                <div className="mt-3" key={index}>
+                  <div  className=" mb-2">
                     <div className="flex items-center gap-3 pl-7">
                       <Checkbox id={safeId} className="bg-white  " />
                       <Label
@@ -98,15 +98,19 @@ const FrequantlyBrout = (props: Props) => {
           </div>
         </div>
 
-        <div className="row-span-2   bg-white rounded-b-lg sm:rounded-tr-lg sm:rounded-br-lg   sm:mr-2">
-          <div className="mt-10 ml-7">
-            <h1 className="text-sm text-[#999999] ml-5 mt-7">Total Price:</h1>
-            <h1 className="text-3xl ml-5 mt-2 mb-5 font-bold">Rs. 65,000/- </h1>
-            <div className="ml-5">
-              <div className="pr-25">
+        <div className="row-span-2   bg-white rounded-br-lg rounded-tr-lg    sm:mr-2">
+          <div className="mt-8 p-4 space-y-4">
+            <div>
+
+            <h1 className="text-sm text-[#999999] ">Total Price:</h1>
+            <h1 className="text-3xl  font-bold">Rs. 65,000/- </h1>
+            </div>
+            <div className="">
+              <div className="">
                 <Button
                   bgColor="bg-[#1ABA1A] "
                   text="ADD TO CART"
+                  fullWidth = {true}
                   textColor="text-white text-sm "
                 />
               </div>

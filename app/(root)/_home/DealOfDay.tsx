@@ -13,6 +13,7 @@ import {
 import { useDeals } from "@/hooks/useProducts";
 import { useAdvertisements } from "@/hooks/useAds";
 import Link from "next/link";
+import DealsOfDaySkeleton from "@/components/skeleton/DealsOfDaySkeleton";
 
 /* ---------- helpers ---------- */
 const hmsToSeconds = (hms: string) => {
@@ -84,13 +85,13 @@ const DealOfDay = () => {
     return () => clearInterval(interval);
   }, []);
 
-  if (isAdsLoading) {
-    return <div>Loading...</div>;
-  }
+  // if (isAdsLoading) {
+  //   return <div>Loading...</div>;
+  // }
   if (adsError) {
     return <div>Error loading carousel</div>;
   }
-  if (isLoading) return <div>Loading deals...</div>;
+  if (isLoading) return <DealsOfDaySkeleton/>;
   if (error) return <div>Error loading deals</div>;
 
   return (

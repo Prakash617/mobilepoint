@@ -1,3 +1,5 @@
+"use client";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -11,6 +13,16 @@ import {
 } from "react-icons/fa";
 
 const Footer = () => {
+  const { data: siteSettings, isLoading } = useSiteSettings();
+
+  const socialLinks = [
+    { icon: FaTwitter, href: siteSettings?.twitter_url },
+    { icon: FaFacebookF, href: siteSettings?.facebook_url },
+    { icon: FaInstagram, href: siteSettings?.instagram_url },
+    { icon: FaYoutube, href: siteSettings?.youtube_url },
+    { icon: FaPinterest, href: siteSettings?.linkedin_url },
+  ];
+
   return (
     <div className="bg-white py-14 space-y-10">
       {/* Top Sections */}
@@ -18,31 +30,31 @@ const Footer = () => {
         
         {/* Left Column */}
         <div className="w-full lg:w-1/4 p-1 text-left space-y-8">
-          <p className="uppercase font-bold">mobile point shop</p>
+          <p className="uppercase font-bold">{siteSettings?.site_name}</p>
 
           <div className="uppercase mt-4">
             <p>hotline 24/7</p>
-            <p className="text-primary text-xl font-bold">+977 1 5357875</p>
+            <p className="text-primary text-xl font-bold">{siteSettings?.phone}</p>
           </div>
 
           <div className="text-sm">
             <p>
-              New Road
-              <br />
-              Kathmandu, Nepal
+              {siteSettings?.address}
             </p>
-            <p>contact@mobilepoint.shop</p>
+            <p>{siteSettings?.email}</p>
           </div>
 
           <div className="flex flex-wrap space-x-4">
-            {[FaTwitter, FaFacebookF, FaInstagram, FaYoutube, FaPinterest].map(
-              (Icon, i) => (
+            {socialLinks.map(
+              (social, i) => (
+                <Link href={social.href || '#'} key={i}>
                 <div
-                  key={i}
+                  
                   className="bg-secondary-background w-7 h-7 rounded-full flex justify-center items-center cursor-pointer"
                 >
-                  <Icon />
+                  <social.icon />
                 </div>
+                </Link>
               )
             )}
           </div>
@@ -168,7 +180,7 @@ const Footer = () => {
       {/* Bottom Section */}
       <div className="container border-t-2 pt-8 flex flex-col lg:flex-row items-center text-secondary text-sm font-light gap-5 lg:gap-0">
         
-        <p>© 2024 Mobile Point Shop. All Rights Reserved.</p>
+        <p>© {new Date().getFullYear()} {siteSettings?.site_name}. All Rights Reserved.</p>
 
         <div className="flex gap-6 mx-auto lg:mx-auto">
           {["paypal", "bank", "visa", "stripe", "kalti"].map((img) => (

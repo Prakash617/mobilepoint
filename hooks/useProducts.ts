@@ -1,15 +1,18 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { productService, recentlyViewedService } from '@/services/productService';
-
-// Get all products
-export function useProducts(params?: {
+type ProductParams = {
   page?: number;
   search?: string;
   category?: string;
   brand?: string;
   is_featured?: boolean;
   best_seller?: boolean;
-}) {
+  limit?: number;           // dynamic limit
+  endpoint?: string;        // e.g. 'new', 'best-sellers', etc.
+};
+
+// Get all products
+export function useProducts(params?: ProductParams) {
   return useQuery({
     queryKey: ['products', params],
     queryFn: () => productService.getProducts(params),

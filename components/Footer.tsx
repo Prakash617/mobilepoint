@@ -1,6 +1,6 @@
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 import {
   FaAngleDown,
   FaFacebookF,
@@ -11,6 +11,11 @@ import {
 } from "react-icons/fa";
 
 const Footer = () => {
+const { data, isLoading, isError, error } = useSiteSettings();
+
+  if (isLoading) return <p>Loading...</p>;
+  if (isError) return <p>Error: {(error as Error).message}</p>;
+
   return (
     <div className="bg-white py-14 space-y-10">
       {/* Top Sections */}

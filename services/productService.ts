@@ -12,17 +12,26 @@ import {
 
 export const productService = {
   // Get all products with pagination and filters
-  getProducts: async (params?: {
-    page?: number;
-    search?: string;
-    category?: string;
-    brand?: string;
-    is_featured?: boolean;
-    best_seller?: boolean;
-  }) => {
-    const { data } = await api.get<PaginatedResponse<Product>>('/products/', { params });
-    return data;
-  },
+ getProducts: async (params?: {
+  page?: number;
+  search?: string;
+  category?: string;
+  brand?: string;
+  is_featured?: boolean;
+  best_seller?: boolean;
+  limit?: number;           // dynamic limit
+  endpoint?: string;        // e.g., 'new', 'best-sellers'
+}) => {
+  
+
+  if (!params) params = {};
+  const { endpoint, ...queryParams } = params;
+
+  const url = endpoint ? `/products/${endpoint}/` : '/products/';
+
+  const { data } = await api.get<PaginatedResponse<Product>>(url, { params: queryParams });
+  return data;
+},
   getRelatedProducts: async (params?: { slug: string; limit?: number }) => {
     const { data } = await api.get<Product[]>(`/products/${params?.slug}/related/`, { params: { limit: params?.limit } });
     return data;

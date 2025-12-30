@@ -13,6 +13,7 @@ import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import { useCarousels } from "@/hooks/useCarousels";
 import Link from "next/link";
 import type { Carousel as CarouselType, CarouselSlide } from "@/types/carousel"; // type alias
+import CarouselSkeleton from "./skeleton/HomeCarouselSkeleton";
 
 const HomeCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -52,7 +53,7 @@ const carouselData: CarouselSlide[] =
 
   /** ✅ Render logic AFTER hooks */
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <CarouselSkeleton />;
   }
 
   if (error) {

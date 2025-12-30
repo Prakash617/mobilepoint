@@ -1,4 +1,6 @@
 'use client';
+import { FeatureBrandsSkeleton } from "@/components/skeleton/FeatureBrandSkeleton";
+
 import { useBrands, useCategories, useFeaturedBrands, useTopCategories } from "@/hooks/useProducts";
 import { Brand } from "@/types/product";
 import Image from "next/image";
@@ -28,9 +30,10 @@ type Props = {};
 
 const BrandFeature = (props: Props) => {
   // const { data: categories, isLoading, error } = useCategories();
-  const { data: brands, isLoading, error } = useFeaturedBrands();
+  const { data: brands, isLoading: loadingBrands, error } = useFeaturedBrands();
   const { data: top, isLoading: loadingTop } = useTopCategories({ limit: 4 });
-  if (isLoading || loadingTop) return <div>Loading...</div>;
+  
+  if (loadingBrands || loadingTop) return <div><FeatureBrandsSkeleton/></div>;
   if (error) return <div>Something went wrong</div>;
 
   // const featureBrands = brands?.results.slice(0, 8);

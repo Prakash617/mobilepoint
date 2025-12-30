@@ -3,11 +3,12 @@
 import Image from "next/image";
 import React from "react";
 import { useGroupedCategories } from "@/hooks/useGroupedCategories";
+import AudioCameraSkeleton from "@/components/skeleton/AudioCameraSkeleton";
 
 export default function AudioCamera() {
   const { data, isLoading, error } = useGroupedCategories();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <AudioCameraSkeleton />;
   if (error) return <div>Failed to load</div>;
 
   // 🔹 MAP API DATA INTO EXISTING UI SHAPE

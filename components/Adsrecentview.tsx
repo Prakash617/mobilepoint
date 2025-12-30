@@ -11,6 +11,7 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 import { useRecentlyViewed } from "@/hooks/useProducts";
 import Link from "next/link";
+import RecentlyViewedSkeleton from "./skeleton/AdsRecentViewSkeleton";
 
 function Adsrecentview() {
   const { data, isLoading, error } = useRecentlyViewed({ limit: 10 });
@@ -30,7 +31,7 @@ function Adsrecentview() {
           </p>;
 
   // ⏳ loading → don't show component
-  if (isLoading) return null;
+  if (isLoading) return <RecentlyViewedSkeleton />;
 
   // 📭 no recently viewed items
   if (!data || data.length === 0) return null;

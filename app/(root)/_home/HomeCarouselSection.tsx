@@ -1,5 +1,6 @@
 "use client";
 import HomeCarousel from "@/components/HomeCarousel";
+import HomeCarouselSectionSkeleton from "@/components/skeleton/HomeCarouselSkeleton";
 import { useAdvertisements } from "@/hooks/useAds";
 import { useCarousels } from "@/hooks/useCarousels";
 import { useCategories } from "@/hooks/useProducts";
@@ -31,24 +32,22 @@ const HomeCarouselSection = (props: Props) => {
   console.log("Advertisements2:", ads[1]);
   console.log("Advertisements3:", ads[2]);
   console.log("Advertisements4:", ads[3]);
-
-  if (isAdsLoading) {
-    return <div>Loading...</div>;
-  }
-  if (adsError) {
-    return <div>Error loading carousel</div>;
-  }
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+   if (isLoading || isAdsLoading) {
+  return <HomeCarouselSectionSkeleton slides={3} categoriesCount={5} adsCount={4} />;
+}
 
   if (error) {
     return <div>Error loading carousel</div>;
   }
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Something went wrong</div>;
+ 
+  if (adsError) {
+    return <div>Error loading carousel</div>;
+  }
+
+
+
+ 
   return (
     <div className="w-full ">
       {/* Mobile Layout (< 768px) - Stacked vertically */}

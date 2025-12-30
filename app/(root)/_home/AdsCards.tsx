@@ -1,11 +1,16 @@
+// import AdsCardsSkeleton from "@/components/skeleton/AdsCardSkeleton";
 import Image from "next/image";
 import React from "react";
+
 
 type Props = object;
 
 const adsrecentdata = ["/topcell6.png", "/topcell20.png"];
 
 const AdsCards = (props: Props) => {
+//   const isLoading = true; // Replace with actual loading state
+// if (isLoading) return <AdsCardsSkeleton /> ;
+
   return (
     <div className="flex flex-col md:flex-row gap-2 my-2">
       {/* Left Card */}

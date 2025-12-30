@@ -3,6 +3,7 @@
 import { CardCarousel } from "./CardCarousel";
 import { useProducts } from "@/hooks/useProducts";
 import Link from "next/link";
+import CardCarouselSectionSkeleton from "./skeleton/ProductCardTabSkeleton";
 
 type Props = {};
 
@@ -15,7 +16,7 @@ const ProductCardTab = (props: Props) => {
     return product.default_variant?.sold_quantity > 0;
   }) || [];
 
-  if (isLoading) return <div>Loading products...</div>;
+  if (isLoading) return <CardCarouselSectionSkeleton slides={5} tabsCount={3} />;
   if (error) return <div>Error loading products</div>;
 
   return (
@@ -36,6 +37,7 @@ const ProductCardTab = (props: Props) => {
       
       {/* Product Carousel */}
       <div>
+        
         <CardCarousel products={bestSellers} />
       </div>
     </div>

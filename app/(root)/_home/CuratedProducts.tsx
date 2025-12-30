@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/carousel";
 import { useCurated } from "@/hooks/useCurated";
 import Link from "next/link";
+import CuratedForYouCarouselSkeleton from "@/components/skeleton/CuratedProductsSkeleton";
 
 const CuratedProductsCarousel = () => {
   const [api, setApi] = React.useState<CarouselApi>();
@@ -20,7 +21,7 @@ const CuratedProductsCarousel = () => {
 
   const products = data?.results || [];
 
-  if (isLoading) return <div>Loading curated products...</div>;
+  if (isLoading) return <CuratedForYouCarouselSkeleton />;
   if (error) return <div>Failed to load curated products</div>;
 
   return (

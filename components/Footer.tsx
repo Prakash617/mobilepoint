@@ -11,10 +11,10 @@ import {
 } from "react-icons/fa";
 
 const Footer = () => {
-const { data, isLoading, isError, error } = useSiteSettings();
+// const { data, isLoading, isError, error } = useSiteSettings();
 
-  if (isLoading) return <p>Loading...</p>;
-  if (isError) return <p>Error: {(error as Error).message}</p>;
+//   if (isLoading) return <p>Loading...</p>;
+//   if (isError) return <p>Error: {(error as Error).message}</p>;
 
   return (
     <div className="bg-white py-14 space-y-10">

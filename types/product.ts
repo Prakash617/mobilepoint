@@ -97,6 +97,17 @@ export interface ProductDetail extends Product {
   meta_description: string;
   created_at: string;
   updated_at: string;
+  promotions: Promotions;
+}
+
+export interface FreeGiftPromotion {
+  description: string;
+  expires_at: string;
+}
+
+export interface Promotions {
+  free_shipping: any; // You can define a more specific type if you have its structure
+  free_gift: FreeGiftPromotion | null;
 }
 
 export interface PaginatedResponse<T> {

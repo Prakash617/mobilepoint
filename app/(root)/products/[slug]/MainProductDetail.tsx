@@ -4,7 +4,6 @@ import { useState, useMemo } from "react";
 import FreeAdvertizemantCard from "@/components/FreeAdvertizemantCard";
 import Longtextmore from "@/app/(root)/products/[slug]/Longtextmore";
 import Image from "next/image";
-import Link from "next/link";
 import FrequantlyBrout from "./FrequantlyBrout";
 import Button from "@/components/Button";
 import {
@@ -13,26 +12,36 @@ import {
   FaHeart,
   FaInstagram,
   FaPinterest,
-  FaPlus,
   FaShippingFast,
   FaTwitter,
   FaYoutube,
 } from "react-icons/fa";
 import { IoMdRefresh } from "react-icons/io";
+import {
+  AvailableAttribute,
+  ProductDetail,
+  ProductImage,
+  ProductVariant,
+  VariantAttribute,
+} from "@/types/product";
 
 type Props = {
-  product: any; // Replace with your Product type
+  product: ProductDetail;
 };
 
 const MainProductDetail = ({ product }: Props) => {
   // State for selected variant attributes
-  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>(() => {
+  const [selectedAttributes, setSelectedAttributes] = useState<
+    Record<string, string>
+  >(() => {
     const defaults: Record<string, string> = {};
-    product.available_attributes.forEach((attr: any) => {
-      const defaultVariant = product.variants.find((v: any) => v.is_default);
+    product.available_attributes.forEach((attr: AvailableAttribute) => {
+      const defaultVariant = product.variants.find(
+        (v: ProductVariant) => v.is_default
+      );
       if (defaultVariant) {
         const attrValue = defaultVariant.attributes.find(
-          (a: any) => a.attribute === attr.name
+          (a: VariantAttribute) => a.attribute === attr.name
         );
         if (attrValue) {
           defaults[attr.name] = attrValue.value;
@@ -46,41 +55,76 @@ const MainProductDetail = ({ product }: Props) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Find the currently selected variant based on selected attributes
-  const selectedVariant = useMemo(() => {
-    return product.variants.find((variant: any) => {
-      return Object.entries(selectedAttributes).every(([attrName, attrValue]) => {
-        return variant.attributes.some(
-          (a: any) => a.attribute === attrName && a.value === attrValue
+  const selectedVariant: ProductVariant = useMemo(() => {
+    return (
+      product.variants.find((variant: ProductVariant) => {
+        return Object.entries(selectedAttributes).every(
+          ([attrName, attrValue]) => {
+            return variant.attributes.some(
+              (a: VariantAttribute) =>
+                a.attribute === attrName && a.value === attrValue
+            );
+          }
         );
-      });
-    }) || product.variants[0];
+      }) || product.variants[0]
+    );
   }, [selectedAttributes, product.variants]);
 
   // Get images for display (variant images if available, otherwise product images)
-  const displayImages = selectedVariant.images.length > 0 
-    ? selectedVariant.images 
-    : product.images;
+  const displayImages: ProductImage[] =
+    selectedVariant.images.length > 0 ? selectedVariant.images : product.images;
 
   const currentImage = displayImages[currentImageIndex] || displayImages[0];
 
   // Handle attribute selection
   const handleAttributeChange = (attrName: string, value: string) => {
-    setSelectedAttributes(prev => ({
-      ...prev,
-      [attrName]: value
-    }));
+    setSelectedAttributes((prev) => {
+      const newAttrs = { ...prev, [attrName]: value };
+
+      // Check if this new combination is valid
+      const isValidCombination = product.variants.some(
+        (variant: ProductVariant) => {
+          return Object.entries(newAttrs).every(([key, val]) =>
+            variant.attributes.some(
+              (a: VariantAttribute) => a.attribute === key && a.value === val
+            )
+          );
+        }
+      );
+
+      // If it's not valid, we need to find the best alternative.
+      if (!isValidCombination) {
+        // Find the first variant that matches the attribute we just changed.
+        const newVariant = product.variants.find((variant: ProductVariant) =>
+          variant.attributes.some(
+            (a: VariantAttribute) =>
+              a.attribute === attrName && a.value === value
+          )
+        );
+        if (newVariant) {
+          // And update the whole attributes state based on this new variant
+          const newVariantAttributes: Record<string, string> = {};
+          newVariant.attributes.forEach((attr: VariantAttribute) => {
+            newVariantAttributes[attr.attribute] = attr.value;
+          });
+          return newVariantAttributes;
+        }
+      }
+
+      return newAttrs; // It was a valid combination, so just update it.
+    });
   };
 
   // Handle quantity change
   const incrementQuantity = () => {
     if (quantity < selectedVariant.stock_quantity) {
-      setQuantity(prev => prev + 1);
+      setQuantity((prev) => prev + 1);
     }
   };
 
   const decrementQuantity = () => {
     if (quantity > 1) {
-      setQuantity(prev => prev - 1);
+      setQuantity((prev) => prev - 1);
     }
   };
 
@@ -105,12 +149,14 @@ const MainProductDetail = ({ product }: Props) => {
 
             {/* Thumbnails */}
             <div className="flex gap-4 mt-2 justify-left overflow-x-auto">
-              {displayImages.map((img: any, index: number) => (
+              {displayImages.map((img: ProductImage, index: number) => (
                 <div
                   key={img.id}
                   onClick={() => setCurrentImageIndex(index)}
                   className={`w-20 h-20  relative cursor-pointer  border-2 ${
-                    index === currentImageIndex ? "border-success" : "border-gray-200"
+                    index === currentImageIndex
+                      ? "border-success"
+                      : "border-gray-200"
                   }`}
                 >
                   <Image
@@ -131,7 +177,9 @@ const MainProductDetail = ({ product }: Props) => {
             </p>
             <h2 className="text-xl font-bold capitalize">{product.name}</h2>
             <div className="mt-2">
-              <p className="text-lg font-semibold">Rs. {selectedVariant.price} /-</p>
+              <p className="text-lg font-semibold">
+                Rs. {selectedVariant.price} /-
+              </p>
               {/* {selectedVariant.compare_at_price && parseFloat(selectedVariant.compare_at_price) > parseFloat(selectedVariant.price) && (
                 <p className="text-lg text-gray-400 line-through">
                   Rs. {selectedVariant.compare_at_price}
@@ -140,7 +188,10 @@ const MainProductDetail = ({ product }: Props) => {
             </div>
 
             <div className="mt-4 space-y-2 text-gray-600 text-sm">
-              <div className="html-content" dangerouslySetInnerHTML={{ __html: product.short_description }} />
+              <div
+                className="html-content"
+                dangerouslySetInnerHTML={{ __html: product.short_description }}
+              />
             </div>
 
             <div className="flex gap-2 mt-2">
@@ -152,13 +203,17 @@ const MainProductDetail = ({ product }: Props) => {
                 />
               )}
               {product.free_gift && (
-                <FreeAdvertizemantCard text="Free gift" bgColor="#fcf4f4" color="danger" />
+                <FreeAdvertizemantCard
+                  text="Free gift"
+                  bgColor="#fcf4f4"
+                  color="danger"
+                />
               )}
             </div>
             <hr className="bg-background h-[3px] my-8 rounded-full" />
 
             {/* Dynamic Attribute Selection */}
-            {product.available_attributes.map((attribute: any) => (
+            {product.available_attributes.map((attribute: AvailableAttribute) => (
               <div key={attribute.name} className="mt-6">
                 <p className="font-bold mb-2">
                   {attribute.display_name.toUpperCase()}:{" "}
@@ -167,60 +222,94 @@ const MainProductDetail = ({ product }: Props) => {
                   </span>
                 </p>
 
-         <div className="flex gap-2 mt-3">
-  {attribute.values.map((val: any) => {
-    const isSelected = selectedAttributes[attribute.name] === val.value;
+                <div className="flex gap-2 mt-3">
+                  {attribute.values
+                    .filter((val) => {
+                      const otherSelectedAttrs = Object.fromEntries(
+                        Object.entries(selectedAttributes).filter(
+                          ([key]) => key !== attribute.name
+                        )
+                      );
 
-    // Compute the price for this specific attribute value
-    const priceForValue = product.variants.find((variant: any) => {
-      return Object.entries({
-        ...selectedAttributes,
-        [attribute.name]: val.value, // pretend this value is selected
-      }).every(([attrName, attrValue]) =>
-        variant.attributes.some(
-          (a: any) => a.attribute === attrName && a.value === attrValue
-        )
-      );
-    })?.price;
+                      return product.variants.some((variant: ProductVariant) => {
+                        const hasValue = variant.attributes.some(
+                          (a: VariantAttribute) =>
+                            a.attribute === attribute.name &&
+                            a.value === val.value
+                        );
+                        if (!hasValue) return false;
 
-    return (
-      <div
-        key={val.id}
-        onClick={() => handleAttributeChange(attribute.name, val.value)}
-        className={`border-2 rounded-lg px-2 py-1 cursor-pointer hover:border-success flex items-center justify-center ${
-          isSelected ? "border-success" : "border-gray-200"
-        }`}
-      >
-        {val.image && (
-          <div>
-            <Image
-              src={val.image}
-              alt={val.value}
-              width={70}
-              height={70}
-            />
-          </div>
-        )}
-        {val.color_code && (
-          <div
-            className="w-6 h-6 rounded-full mr-2"
-            style={{ backgroundColor: val.color_code }}
-          />
-        )}
-        <div>
-          <p className="text-sm">{val.value}</p>
+                        const matchesOthers = Object.entries(
+                          otherSelectedAttrs
+                        ).every(([key, value]) =>
+                          variant.attributes.some(
+                            (a: VariantAttribute) =>
+                              a.attribute === key && a.value === value
+                          )
+                        );
+                        return matchesOthers;
+                      });
+                    })
+                    .map((val) => {
+                      const isSelected =
+                        selectedAttributes[attribute.name] === val.value;
 
-          {/* Show price only if image exists */}
-          {val.image && priceForValue && (
-            <p className="text-xs font-bold">Rs.{priceForValue}-</p>
-          )}
-        </div>
-      </div>
-    );
-  })}
-</div>
+                      // Compute the price for this specific attribute value
+                      const priceForValue = product.variants.find(
+                        (variant: ProductVariant) => {
+                          return Object.entries({
+                            ...selectedAttributes,
+                            [attribute.name]: val.value, // pretend this value is selected
+                          }).every(([attrName, attrValue]) =>
+                            variant.attributes.some(
+                              (a: VariantAttribute) =>
+                                a.attribute === attrName &&
+                                a.value === attrValue
+                            )
+                          );
+                        }
+                      )?.price;
 
+                      return (
+                        <div
+                          key={val.id}
+                          onClick={() =>
+                            handleAttributeChange(attribute.name, val.value)
+                          }
+                          className={`border-2 rounded-lg px-2 py-1 cursor-pointer hover:border-success flex items-center justify-center ${
+                            isSelected ? "border-success" : "border-gray-200"
+                          }`}
+                        >
+                          {val.image && (
+                            <div>
+                              <Image
+                                src={val.image}
+                                alt={val.value}
+                                width={70}
+                                height={70}
+                              />
+                            </div>
+                          )}
+                          {val.color_code && (
+                            <div
+                              className="w-6 h-6 rounded-full mr-2"
+                              style={{ backgroundColor: val.color_code }}
+                            />
+                          )}
+                          <div>
+                            <p className="text-sm">{val.value}</p>
 
+                            {/* Show price only if image exists */}
+                            {val.image && priceForValue && (
+                              <p className="text-xs font-bold">
+                                Rs.{priceForValue}-
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
               </div>
             ))}
 
@@ -241,26 +330,37 @@ const MainProductDetail = ({ product }: Props) => {
             )} */}
 
             {/* Offers */}
-            {product.free_gift && (
-              
-            <div className=" border rounded-xl p-4 bg-[#ecf6ec] flex justify-around items-center">
-              <div>
-                <Image src="/gift.png" alt="offer" width={100} height={100} />
+            {product.promotions.free_gift && (
+              <div className=" border rounded-xl p-4 bg-[#ecf6ec] flex justify-around items-center">
+                <div>
+                  <Image
+                    src="/gift.png"
+                    alt="offer"
+                    width={100}
+                    height={100}
+                  />
+                </div>
+                <div className="font-medium ">
+                  <div
+                    className="html-content"
+                    dangerouslySetInnerHTML={{
+                      __html: product.promotions.free_gift.description,
+                    }}
+                  />
+
+                  <p className="text-xs text-gray-500 italic mt-4">
+                    Promotion will expires:{" "}
+                    {product.promotions.free_gift.expires_at}
+                  </p>
+                </div>
               </div>
-              <div className="font-medium ">
-                <div className="html-content" dangerouslySetInnerHTML={{ __html: product.promotions.free_gift.description }} />
-              
-                <p className="text-xs text-gray-500 italic mt-4">
-                  Promotion will expires: {product.promotions.free_gift.expires_at}
-                </p>
-              </div>
-            </div>
             )}
 
             {/* Meta */}
             <div className="mt-6 text-sm text-secondary">
               <p>
-                <span className="text-black font-bold">SKU:</span> {selectedVariant.sku}
+                <span className="text-black font-bold">SKU:</span>{" "}
+                {selectedVariant.sku}
               </p>
               <p>
                 <span className="text-black font-bold">CATEGORY: </span>
@@ -272,16 +372,20 @@ const MainProductDetail = ({ product }: Props) => {
               </p>
 
               <div className="flex flex-wrap space-x-4 my-4">
-                {[FaTwitter, FaFacebookF, FaInstagram, FaYoutube, FaPinterest].map(
-                  (Icon, i) => (
-                    <div
-                      key={i}
-                      className="bg-secondary-background w-10 h-10 rounded-full flex justify-center items-center cursor-pointer"
-                    >
-                      <Icon className="text-black" />
-                    </div>
-                  )
-                )}
+                {[
+                  FaTwitter,
+                  FaFacebookF,
+                  FaInstagram,
+                  FaYoutube,
+                  FaPinterest,
+                ].map((Icon, i) => (
+                  <div
+                    key={i}
+                    className="bg-secondary-background w-10 h-10 rounded-full flex justify-center items-center cursor-pointer"
+                  >
+                    <Icon className="text-black" />
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -289,9 +393,11 @@ const MainProductDetail = ({ product }: Props) => {
           {/* RIGHT SIDE – CART BOX */}
           <div className="lg:col-span-3 rounded-xl">
             <div className="bg-background space-y-4 py-8 px-4 rounded-lg">
-              <p className="font-semibold text-sm text-secondary">TOTAL PRICE:</p>
+              <p className="font-semibold text-sm text-secondary">
+                TOTAL PRICE:
+              </p>
               <p className="text-2xl font-bold">Rs. {totalPrice}</p>
-              
+
               <hr className="border-slate-300 h-2 mt-2" />
 
               <div className="flex items-center gap-2 text-sm">
@@ -332,7 +438,7 @@ const MainProductDetail = ({ product }: Props) => {
                 bgColor="bg-success"
                 text="ADD TO CART"
                 textColor="text-white"
-                fullWidth = {true}
+                fullWidth={true}
                 disabled={!selectedVariant.is_in_stock}
               />
 
@@ -352,7 +458,8 @@ const MainProductDetail = ({ product }: Props) => {
 
               <div className="mt-4 flex">
                 <p className="text-sm w-1/2 border-r-2 font-semibold pr-1 border-slate-300 text-secondary">
-                  <FaHeart className="inline-block mr-1 text-green-600" /> Wishlist
+                  <FaHeart className="inline-block mr-1 text-green-600" />{" "}
+                  Wishlist
                 </p>
                 <p className="text-sm w-1/2 text-center font-semibold text-secondary">
                   <IoMdRefresh className="inline-block font-bold text-lg mr-1" />{" "}
@@ -412,7 +519,6 @@ const MainProductDetail = ({ product }: Props) => {
           </div>
 
           <div className="px-5 pt-6 text-base text-justify">
-            
             <Longtextmore text={product.description} />
           </div>
         </div>

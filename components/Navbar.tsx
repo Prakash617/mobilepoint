@@ -1,103 +1,163 @@
+"use client";
+
+import { useState } from "react";
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogPanel,
+  Tab,
+  TabGroup,
+  TabList,
+  TabPanel,
+  TabPanels,
+} from "@headlessui/react";
+import {
+  Bars3Icon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+
 import Image from 'next/image'
 import { CiShoppingCart } from 'react-icons/ci'
 import { GoPerson } from 'react-icons/go'
 import { IoIosArrowDown } from 'react-icons/io'
+import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { NavigationMenuDemo } from "./NavMenu";
 
-type Props = {}
+export default function Navbar() {
+  const { data: siteSettings, isLoading } = useSiteSettings();
+  const [open, setOpen] = useState(false);
 
-const Navbar = (props: Props) => {
   return (
-    <div className="bg-[#f5f6f8] pt-4 pb-8 px-8 rounded-xl">
-            <div className=" flex justify-between items-center ">
-              <div className="flex items-center ">
-                <div>
-                  <button className="bg-secondary-background pl-8 p-1 mr-4 rounded-lg">
-                    Hotline 24/7
-                  </button>
+    <div className="bg-[#f5f6f8] pt-4 pb-4 px-4 md:px-8 mt-2 rounded-xl">
+      {/* ------------------------------ */}
+      {/* MOBILE MENU */}
+      {/* ------------------------------ */}
+      <Dialog open={open} onClose={setOpen} className="relative z-40 lg:hidden">
+        <DialogBackdrop className="fixed inset-0 bg-black/25" />
+        <div className="fixed inset-0 z-50 flex">
+          <DialogPanel className="w-full max-w-xs bg-white h-full overflow-y-auto p-4">
+            <div className="flex justify-end">
+              <button onClick={() => setOpen(false)}>
+                <XMarkIcon className="w-6 h-6 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Example mobile items */}
+            <TabGroup className="mt-4">
+              <TabList className="flex gap-4 border-b pb-2">
+                <Tab className="data-selected:font-bold">Women</Tab>
+                <Tab className="data-selected:font-bold">Men</Tab>
+              </TabList>
+
+              <TabPanels className="mt-4">
+                <TabPanel>
+                  <p className="text-gray-600">Women Categories</p>
+                </TabPanel>
+
+                <TabPanel>
+                  <p className="text-gray-600">Men Categories</p>
+                </TabPanel>
+              </TabPanels>
+            </TabGroup>
+          </DialogPanel>
+        </div>
+      </Dialog>
+
+      {/* ------------------------------ */}
+      {/* TOP BAR - only for desktop */}
+      {/* ------------------------------ */}
+      <div className="hidden md:flex justify-between text-sm text-gray-700">
+        <div className="flex items-center gap-2">
+          <button className="bg-secondary-background px-4 py-1 rounded-lg">
+            Hotline 24/7
+          </button>
+          <span className="font-semibold">{isLoading ? 'Loading...' : siteSettings?.phone}</span>
+        </div>
+
+        <div className="flex items-center gap-10">
+          <div className="flex gap-6">
+            <span>Sell on Mobile Point</span>
+            <span>Track Order</span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1">
+              NRP <IoIosArrowDown />
+            </div>
+
+            <div className="flex items-center gap-2 border-l pl-3">
+              <Image src="/flag.png" width={15} height={15} alt="Flag" />
+              Eng <IoIosArrowDown />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ------------------------------ */}
+      {/* MAIN NAVBAR */}
+      {/* ------------------------------ */}
+      <nav className="max-w-7xl mx-auto mt-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Mobile Menu Button */}
+          <button
+            className="lg:hidden bg-white p-2 rounded-md text-gray-500"
+            onClick={() => setOpen(true)}
+          >
+            <Bars3Icon className="w-6 h-6" />
+          </button>
+
+          {/* Logo */}
+          <div className="flex items-center">
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <div className="h-5 w-5 bg-gray-300 animate-pulse rounded-full"></div>
+                <div className="ml-2">
+                  <div className="h-5 w-20 bg-gray-300 animate-pulse rounded-full"></div>
                 </div>
-                <div className="font-semibold">+977 12345678</div>
               </div>
-              <div>
-                <div className="flex">
-                  <div className="flex gap-x-6 mr-12">
-                    <div>Sell on Mobile Point</div>
-                    <div>Track Order</div>
-                  </div>
-                  <div className="flex">
-                    <div className="flex px-1 gap-2 items-center">
-                      <div>NRP</div>
-                      <div>
-                        <IoIosArrowDown />
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 px-1 border-l-1 border-gray-300">
-                      <div>
-                        <Image
-                          src="/flag.png"
-                          alt="Logo"
-                          width={15}
-                          height={15}
-                          className="mr-1"
-                        />
-                      </div>
-                      <div>
-                        Eng <IoIosArrowDown className="inline" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            ) : (
+              <Image
+                src={siteSettings?.logo || '/default-logo.png'}
+                alt={siteSettings?.site_name || 'Logo'}
+                width={160}
+                height={80}
+                className="h-12 w-auto"
+              />
+            )}
+          </div>
+
+          {/* Desktop Menu */}
+          <div className="hidden lg:flex">
+            <NavigationMenuDemo />
+          </div>
+
+          {/* Right Icons (User + Cart) */}
+          <div className="flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-3">
+              <div className="h-10 w-10 bg-secondary-background rounded-full flex items-center justify-center">
+                <GoPerson size={24} className="text-gray-500" />
+              </div>
+              <div className="text-sm">
+                <p>Welcome</p>
+                <p className="font-bold">Log In / Register</p>
               </div>
             </div>
-            <div className="flex mt-8 justify-between items-center">
-              <div>
-                <Image src="/logo.png" alt="Logo" width={200} height={200} />
+
+            <div className="relative flex items-center gap-3">
+              <div className="h-10 w-10 bg-secondary-background rounded-full flex items-center justify-center relative">
+                <CiShoppingCart size={24} className="text-gray-500" />
+                <span className="absolute top-6 right-[-5px] bg-primary text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                  5
+                </span>
               </div>
-              <div className="flex justify-items-start grow">
-                <div>
-                  <ul className="uppercase flex flex-row  font-extrabold gap-x-4">
-                    <li>Home</li>
-                    <li className="flex items-center">
-                      Product <IoIosArrowDown />
-                    </li>
-                    <li className="flex items-center">
-                      Hot Sales <IoIosArrowDown />
-                    </li>
-                    <li>Contact</li>
-                  </ul>
-                </div>
-              </div>
-              <div className="flex gap-x-8">
-                <div className="flex gap-x-4">
-                  <div>
-                    <div className="h-12 w-12 bg-secondary-background text-[#b3b3b3] flex justify-center align-center items-center rounded-full">
-                      <GoPerson size={32} className="m-4" />
-                    </div>
-                  </div>
-    
-                  <div>
-                    <p>Welcome</p>
-                    <p className="font-bold">Log In / Register</p>
-                  </div>
-                </div>
-                <div className="flex gap-x-4 relative">
-                  <div>
-                    <div className="h-12 w-12 relative text-[#b3b3b3]  bg-secondary-background flex justify-center align-center items-center rounded-full">
-                      <div className="w-6 h-6 bg-primary absolute bottom-[-10px] right-[-5px] rounded-full text-center text-white">
-                        5
-                      </div>
-                      <CiShoppingCart size={32} className="m-4" />
-                    </div>
-                  </div>
-    
-                  <div>
-                    <p>Cart</p>
-                    <p className="font-bold">Rs.3000/-</p>
-                  </div>
-                </div>
+              <div className="hidden md:block text-sm">
+                <p>Cart</p>
+                <p className="font-bold">Rs. 3000/-</p>
               </div>
             </div>
           </div>
-  )
+        </div>
+      </nav>
+    </div>
+  );
 }
-
-export default Navbar

@@ -29,7 +29,7 @@ export function CardCarousel({ products }: CardCarouselProps) {
           <CarouselItem
             key={product.id}
             className="
-              flex-shrink-0
+              shrink-0
               basis-full
               sm:basis-1/2
               md:basis-1/3

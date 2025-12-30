@@ -3,41 +3,67 @@
 import { CardCarousel } from "./CardCarousel";
 import { useProducts } from "@/hooks/useProducts";
 import Link from "next/link";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { ProductTabs } from "@/components/ProductTabs";
 
 type Props = {};
 
 const ProductCardTab = (props: Props) => {
-  // Fetch all products (assuming useProducts fetches your API)
-  const { data, isLoading ,error } = useProducts({ best_seller: true });
-  // Filter best seller products dynamically
-  const bestSellers = data?.results?.filter((product: any) => {
-    // Using sold_quantity from default_variant
-    return product.default_variant?.sold_quantity > 0;
-  }) || [];
+  // Best sellers
+  const { data: bestSellerData, isLoading: bestLoading, error: bestError } = useProducts({
+    endpoint: "best_seller",
+    limit: 10,
+  });
 
-  if (isLoading) return <div>Loading products...</div>;
-  if (error) return <div>Error loading products</div>;
+  // New products
+  const { data: newData, isLoading: newLoading, error: newError } = useProducts({
+    endpoint: "new",
+    limit: 10,
+  });
+
+  // Featured products (Popular)
+  const { data: featuredData, isLoading: featuredLoading, error: featuredError } = useProducts({
+    is_featured: true,
+    limit: 8,
+  });
+
+  const bestSellers = bestSellerData?.results || [];
+  const newIn = newData?.results || [];
+  const popular = featuredData?.results || [];
+
+  if (bestLoading || newLoading || featuredLoading) return <div>Loading products...</div>;
+  if (bestError || newError || featuredError) return <div>Error loading products</div>;
+
+  const tabs = [
+    { value: "best-seller", label: "Best Seller" },
+    { value: "new-in", label: "New in" },
+    { value: "popular", label: "Popular" },
+  ];
 
   return (
     <div className="bg-white my-2 p-8 space-y-4 rounded-lg">
-      {/* Header & Tabs */}
-      <div className="flex justify-between">
-        <div className="flex flex-wrap gap-4 sm:gap-5 mb-8 lg:gap-8 text-thin lg:text-lg text-secondary">
-          <button className="text-black font-semibold uppercase cursor-pointer">
-            Best Seller
-          </button>
-          <button className="uppercase cursor-pointer">New in</button>
-          <button className="uppercase cursor-pointer">Popular</button>
+      <Tabs defaultValue="best-seller" className="w-full">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <ProductTabs tabs={tabs} />
+          <Link href="/" className="text-gray-400 text-sm">
+            View All
+          </Link>
         </div>
-        <div>
-          <Link href={'/'} className="text-gray-400 text-sm">View All</Link>
-        </div>
-      </div>
-      
-      {/* Product Carousel */}
-      <div>
-        <CardCarousel products={bestSellers} />
-      </div>
+
+        {/* Tab Contents */}
+        <TabsContent value="best-seller">
+          <CardCarousel products={bestSellers} />
+        </TabsContent>
+
+        <TabsContent value="new-in">
+          <CardCarousel products={newIn} />
+        </TabsContent>
+
+        <TabsContent value="popular">
+          <CardCarousel products={popular} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

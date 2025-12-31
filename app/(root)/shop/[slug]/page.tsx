@@ -13,26 +13,66 @@ import ProductCardList from "@/components/ProductCardList";
 import PaginationBar from "@/components/PaginationBar";
 import PriceRangeSlider from "@/components/PriceRangeSlider";
 import HomeCarousel from "@/components/HomeCarousel";
-import { useProducts } from "@/hooks/useProducts";
+import { useBestProducts, useFilteredProducts, usePopularCategories, useProducts } from "@/hooks/useProducts";
+import { useParams } from "next/navigation";
+import { useFiltersMetadata } from "@/hooks/useFiltersMetadata";
 
 type Props = {};
 
-const categories = [
-  "All",
-  "Iphone",
-  "Samsung",
-  "Xiaomi",
-  "Asus",
-  "Gaming Smartphone",
-  "Window Tablets",
-  "eReader",
-  "Smartphone Chargers",
-  "5G Support Smartphone",
-  "Smartphone Accessories",
-  "Tablets Accessories",
-  "Cell Phones ",
-];
+// const categories = [
+//   "All",
+//   "Iphone",
+//   "Samsung",
+//   "Xiaomi",
+//   "Asus",
+//   "Gaming Smartphone",
+//   "Window Tablets",
+//   "eReader",
+//   "Smartphone Chargers",
+//   "5G Support Smartphone",
+//   "Smartphone Accessories",
+//   "Tablets Accessories",
+//   "Cell Phones ",
+// ];
 
+const AttributeValues = ({ attr }) => {
+  if (attr.slug === "color") {
+    return (
+      <div className="flex flex-wrap gap-2">
+        {attr.values.map((value) => (
+          <button
+            key={value.id}
+            className="w-8 h-8 rounded-md border-2 border-gray-200 cursor-pointer"
+            style={{ backgroundColor: value.color_code || "#FFFFFF" }}
+            title={value.value}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-2 gap-y-3 gap-x-6">
+      {attr.values.map((value, index) => {
+        const safeId = `${attr.slug}-${value.value}-${index}`;
+        return (
+          <div key={safeId} className="flex items-center ">
+            <Checkbox id={safeId} className="bg-white" />
+            <Label
+              htmlFor={safeId}
+              className="flex items-center gap-0 cursor-pointer"
+            >
+              <span className="px-1 py-1 rounded-lg text-xs font-medium">
+                {value.value}
+              </span>
+              <span className="opacity-75">({value.count})</span>
+            </Label>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 const topCellPhone = [
   { id: 1, name: "iPhone (iOS)", image: "/topcell1.png", quantity: 74 },
@@ -45,9 +85,7 @@ const topCellPhone = [
   { id: 8, name: "Android", image: "/topcell2 copy.png", quantity: 12 },
   { id: 9, name: "Gaming", image: "/topcell3 copy.png", quantity: 9 },
   { id: 10, name: "Xiaomi", image: "/topcell4 copy.png", quantity: 9 },
-
 ];
-
 
 const filters = [
   "Min: Rs 2500/-",
@@ -138,15 +176,37 @@ const colors = [
 ];
 
 const ProductList = (props: Props) => {
-  const { data: products, isLoading, error } = useProducts();
-    
-    console.log(products);
-    if (isLoading) {
-      return <div>Loading...</div>;
-    }
-    if (error) {
-      return <div>Error: {error.message}</div>;
-    }
+  const params = useParams();
+  const category = params.slug;
+  const { data: popularCategories, isLoading: isPopularLoading, error: popularError } = usePopularCategories({limit: 10});
+  const { data: filteredProducts, isLoading: isFilteredLoading, error: filteredError } = useFilteredProducts({
+    category: [`${category}`],
+    // brand: ['apple'],
+    // min_price: 0,
+    // max_price: 70000,
+    // page: 1,
+    // page_size: 24,
+  });
+
+  const {
+    data: bestProducts,
+    isLoading: isBestLoading,
+    error: bestError,
+  } = useBestProducts({ limit: 10, category: `${category}` });
+
+  const {
+    data: filterMetaData,
+    isLoading: isFilterLoading,
+    error: filterError,
+  } = useFiltersMetadata({ category: `${category}` });
+
+  console.log("slug", category);
+  if (isBestLoading) {
+    return <div>Loading...</div>;
+  }
+  if (bestError) {
+    return <div>Error: {bestError.message}</div>;
+  }
 
   return (
     <>
@@ -154,6 +214,7 @@ const ProductList = (props: Props) => {
       <div className="p-4 bg-white rounded-lg space-y-8">
         <div>
           <p className=" font-bold uppercase">top cell phones & tablets</p>
+          <p className="font-bold uppercase">{category}</p>
         </div>
 
         <div className="flex flex-col md:flex-row gap-4 rounded-lg bg-white ">
@@ -175,32 +236,32 @@ const ProductList = (props: Props) => {
           <p className=" font-bold uppercase">popular categories</p>
         </div>
 
-         <div className="w-full  grid md:grid-cols-5 grid-cols-2 sm:grid-cols-3 gap-4 place-items-center">
-        
-              {topCellPhone.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex w-full items-center justify-between bg-white rounded-lg p-2 sm:p-3  hover:shadow transition"
-                >
-                  <div>
-                    <h3 className="font-bold text-sm">{item.name}</h3>
-                    {item.quantity && (
-                      <p className="text-secondary text-xs">{item.quantity} Items</p>
-                    )}
-                  </div>
-        
-                  <div className="relative w-[45px] h-[45px] sm:w-[55px] sm:h-[55px]">
-                    <Image
-                      src={item.image}
-                      alt={item.name}
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                </div>
-              ))}
-        
+        <div className="w-full  grid md:grid-cols-5 grid-cols-2 sm:grid-cols-3 gap-4 place-items-center">
+          {popularCategories?.results.map((item) => (
+            <div
+              key={item.id}
+              className="flex w-full items-center justify-between bg-white rounded-lg p-2 sm:p-3  hover:shadow transition"
+            >
+              <div>
+                <h3 className="font-bold text-sm">{item.name}</h3>
+                {item.total_products && (
+                  <p className="text-secondary text-xs">
+                    {item.total_products} Items
+                  </p>
+                )}
+              </div>
+
+              <div className="relative w-[45px] h-[45px] sm:w-[55px] sm:h-[55px]">
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  fill
+                  className="object-contain"
+                />
+              </div>
             </div>
+          ))}
+        </div>
       </div>
 
       <div className="bg-white my-2  flex flex-col md:flex-row gap-4 p-4  rounded-lg">
@@ -216,16 +277,18 @@ const ProductList = (props: Props) => {
                 Cell Phones & Tablets
               </p>
 
-              <div className="flex flex-col items-left gap-3">
-                {categories.map((item, index) => {
-                  const safeId = item
-                    .toLowerCase()
-                    .replace(/\s+/g, "-")
-                    .replace(/[^a-z0-9-]/g, "");
+              <div className="flex flex-col items-start gap-3">
+                {filterMetaData?.categories.map((item) => {
+                  const safeId = `cat-${item.slug}`;
+
                   return (
-                    <div key={index} className="flex items-center gap-2">
-                      <Checkbox id={safeId} className="bg-white" />
-                      <Label htmlFor={safeId}>{item}</Label>
+                    <div key={item.slug} className="flex items-center gap-2">
+                      <Checkbox
+                        id={safeId}
+                        className="bg-white"
+                        value={item.slug}
+                      />
+                      <Label htmlFor={safeId}>{item.name}</Label>
                     </div>
                   );
                 })}
@@ -237,7 +300,7 @@ const ProductList = (props: Props) => {
               <p className="uppercase font-bold">Categories</p>
               <p>Reset All</p>
             </div>
-            <div>
+            {/* <div>
               <div className="flex flex-wrap space-x-2 space-y-2  text-right">
                 <div className="flex flex-wrap gap-2 justify-start">
                   {filters.map((item, index) => (
@@ -250,41 +313,45 @@ const ProductList = (props: Props) => {
                   ))}
                 </div>
               </div>
-            </div>
+            </div> */}
             <p className="my-4 text-sm font-semibold">By Brands</p>
-            <div>
+            {/* <div>
               <input
                 type="text"
                 className="bg-white p-2 rounded-sm outline-none"
               />
-            </div>
+            </div> */}
             <div className="flex flex-col items-start gap-3">
-              {brands.map((item, index) => {
-                // Ensure unique IDs even if names repeat
-                const safeId = `${item.name
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")
-                  .replace(/[^a-z0-9-]/g, "")}-${item.id}`;
+              {filterMetaData?.brands.map((item) => {
+                const safeId = `brand-${item.slug}`;
 
                 return (
-                  <div key={item.id} className="flex items-center gap-2">
-                    <Checkbox id={safeId} className="bg-white" />
+                  <div key={item.slug} className="flex items-center gap-2">
+                    <Checkbox
+                      id={safeId}
+                      className="bg-white"
+                      value={item.slug}
+                    />
                     <Label
                       htmlFor={safeId}
-                      className="flex items-center gap-2 text-secondary "
+                      className="flex items-center gap-2 text-secondary"
                     >
-                      <Image
-                        src={item.img}
-                        width={80}
-                        height={25}
-                        alt={item.name}
-                      />
-                      <span className="opacity-75">({item.quantity})</span>
+                      {item.logo && (
+                        <Image
+                          src={item.logo}
+                          width={80}
+                          height={25}
+                          alt={item.name}
+                        />
+                      )}
+                      <span>{item.name}</span>
+                      <span className="opacity-75">({item.product_count})</span>
                     </Label>
                   </div>
                 );
               })}
             </div>
+
             <hr className="h-px bg-gray-300 border-0" />
 
             <div className="space-y-4">
@@ -292,16 +359,17 @@ const ProductList = (props: Props) => {
               <PriceRangeSlider />
             </div>
             <hr className="h-px bg-gray-300 border-0" />
-
-            <div>
-              <p className="my-4 text-sm font-semibold">By Rating</p>
-              <div className="flex flex-col space-y-4">
-                <StarFilter />
+            {filterMetaData?.ratings && (
+              <div>
+                <p className="my-4 text-sm font-semibold">By Rating</p>
+                <div className="flex flex-col space-y-4">
+                  <StarFilter ratings={filterMetaData?.ratings} />
+                </div>
               </div>
-            </div>
+            )}
 
             <hr className="h-px bg-gray-300 border-0" />
-            <div>
+            {/* <div>
               <p className="my-4 text-sm font-semibold">By Screen Size</p>
               <div className="flex flex-col space-y-4">
                 <div className="flex flex-wrap gap-2 justify-start">
@@ -316,8 +384,15 @@ const ProductList = (props: Props) => {
                 </div>
               </div>
             </div>
-            <hr className="h-px bg-gray-300 border-0" />
-            <div>
+            <hr className="h-px bg-gray-300 border-0" /> */}
+            {filterMetaData?.attributes?.map((attr,index) => (
+              <div key={index} className="mb-6">
+                <p className="my-4 text-sm font-semibold">{attr.name}</p>
+                <AttributeValues attr={attr} />
+              </div>
+            ))}
+
+            {/* <div>
               <p className="my-4 text-sm font-semibold">By Color</p>
               <div className="flex flex-wrap gap-2">
                 {colors.map((color, index) => (
@@ -371,9 +446,9 @@ const ProductList = (props: Props) => {
                   );
                 })}
               </div>
-            </div>
-            <hr className="h-px bg-gray-300 border-0" />
-            <div>
+            </div> */}
+            {/* <hr className="h-px bg-gray-300 border-0" /> */}
+            {/* <div>
               <p className="my-4 text-sm font-semibold">By Conditions</p>
 
               <div className="grid grid-cols-1 gap-y-3 gap-x-2">
@@ -398,7 +473,7 @@ const ProductList = (props: Props) => {
                   );
                 })}
               </div>
-            </div>
+            </div> */}
 
             <hr className="h-px bg-gray-300 border-0" />
           </div>
@@ -417,7 +492,7 @@ const ProductList = (props: Props) => {
               Best seller in this category
             </p>
             {/* Product Carousel */}
-            <ListCardCarousel products={products?.results || []} />
+            <ListCardCarousel products={bestProducts?.results || []} />
           </div>
           <HorizontalLine />
           <div className="flex flex-1 flex-col gap-2 ">
@@ -449,7 +524,7 @@ const ProductList = (props: Props) => {
               <div className="px-2 flex-1 text-center">View As</div>
             </div>
             <div className=" ">
-              <ProductCardList products={products?.results ?? []}  />
+              <ProductCardList products={filteredProducts?.results ?? []} />
 
               <div>
                 <PaginationBar />

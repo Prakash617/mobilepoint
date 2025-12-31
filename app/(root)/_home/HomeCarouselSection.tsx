@@ -2,7 +2,6 @@
 import HomeCarousel from "@/components/HomeCarousel";
 import HomeCarouselSectionSkeleton from "@/components/skeleton/HomeCarouselSkeleton";
 import { useAdvertisements } from "@/hooks/useAds";
-import { useCarousels } from "@/hooks/useCarousels";
 import { useCategories } from "@/hooks/useProducts";
 import Image from "next/image";
 import Link from "next/link";
@@ -59,16 +58,19 @@ const HomeCarouselSection = (props: Props) => {
 
         {/* Categories */}
         <div className="rounded-xl bg-white text-left py-4 px-6 space-y-2">
-          <p className="text-red-600 font-semibold text-sm">Sale 40% Off</p>
-          {categories?.results?.map((category) => (
-            <p
-              key={category.id}
-              className="text-sm hover:underline cursor-pointer"
-            >
-              {category.name}
-            </p>
-          ))}
-        </div>
+  <p className="text-red-600 font-semibold text-sm">Sale 40% Off</p>
+  {categories?.results?.map((category) => (
+    <Link
+      href={`/shop/${category.slug}`}
+      key={category.id}
+      className="text-sm hover:underline cursor-pointer"
+    >
+    
+      {category.name} {/* Only show the category name as the link */}
+    </Link>
+  ))}
+</div>
+
 
         {/* Ad banners in 2x2 grid on mobile */}
         <div className="grid grid-cols-2 gap-2">
@@ -104,12 +106,13 @@ const HomeCarouselSection = (props: Props) => {
           <div className="area-left-side rounded-xl bg-white text-left py-6 px-10 space-y-2">
             <p className="text-red-600 font-semibold">Sale 40% Off</p>
             {categories?.results?.map((category) => (
-              <p
+              <Link
+                href={`/shop/${category.slug}`}
                 key={category.id}
-                className="text-sm hover:underline cursor-pointer"
+                className="text-sm hover:underline cursor-pointer block"
               >
                 {category.name}
-              </p>
+              </Link>
             ))}
           </div>
 

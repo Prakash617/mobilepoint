@@ -1,58 +1,77 @@
-import { useState } from 'react';
+"use client"
+import { useState, useEffect } from 'react';
 import { Slider } from "@/components/ui/slider"
 
-type SliderProps = React.ComponentProps<typeof Slider>
+type PriceRangeSliderProps = {
+  min?: number;
+  max?: number;
+  onValueCommit?: (value: [number, number]) => void;
+  className?: string;
+};
 
-export default function PriceRangeSlider({ className, ...props }: SliderProps) {
-  const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(10000);
-  const [range, setRange] = useState([0, 100]);
+export default function PriceRangeSlider({ 
+  min = 0, 
+  max = 100000, 
+  onValueCommit, 
+  className 
+}: PriceRangeSliderProps) {
+  const [localMin, setLocalMin] = useState(min);
+  const [localMax, setLocalMax] = useState(max);
+
+  useEffect(() => {
+    setLocalMin(min);
+    setLocalMax(max);
+  }, [min, max]);
+
+  const handleSliderCommit = (value: number[]) => {
+    if (onValueCommit) {
+      onValueCommit([value[0], value[1]]);
+    }
+  };
 
   const handleSliderChange = (value: number[]) => {
-    setRange(value);
-    // Convert slider percentage to price range
-    const min = Math.round((value[0] / 100) * 10000);
-    const max = Math.round((value[1] / 100) * 10000);
-    setMinPrice(min);
-    setMaxPrice(max);
+    setLocalMin(value[0]);
+    setLocalMax(value[1]);
   };
 
   const handleMinInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value) || 0;
-    setMinPrice(value);
-    setRange([Math.round((value / 10000) * 100), range[1]]);
+    setLocalMin(value);
   };
 
   const handleMaxInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value) || 0;
-    setMaxPrice(value);
-    setRange([range[0], Math.round((value / 10000) * 100)]);
+    setLocalMax(value);
   };
 
-  const handleGo = () => {
-    console.log('Price range:', minPrice, '-', maxPrice);
-    // Add your filter logic here
+  const handleInputBlur = () => {
+    if (onValueCommit) {
+      onValueCommit([localMin, localMax]);
+    }
   };
 
   return (
     <div className="w-full">
       <Slider
-        value={range}
+        min={min}
+        max={max}
+        value={[localMin, localMax]}
         onValueChange={handleSliderChange}
-        max={100}
-        step={1}
+        onValueCommit={handleSliderCommit}
+        step={100}
         className={`w-full mb-4 ${className || ''}`}
-        {...props}
       />
       <div className="flex items-center flex-wrap gap-2">
         <div className="bg-white border border-gray-300 p-3 gap-2 flex rounded-md font-semibold">
           <p>Rs.</p>
           <input
             type="number"
-            min={0}
-            value={minPrice}
+            min={min}
+            max={max}
+            value={localMin}
             onChange={handleMinInputChange}
-            className="w-16 outline-none"
+            onBlur={handleInputBlur}
+            className="w-24 outline-none"
           />
         </div>
         <div className="text-gray-400">
@@ -64,18 +83,13 @@ export default function PriceRangeSlider({ className, ...props }: SliderProps) {
           <p>Rs.</p>
           <input
             type="number"
-            value={maxPrice}
+            min={min}
+            max={max}
+            value={localMax}
             onChange={handleMaxInputChange}
-            className="w-16 outline-none"
+            onBlur={handleInputBlur}
+            className="w-24 outline-none"
           />
-        </div>
-        <div>
-          <button 
-            onClick={handleGo}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold"
-          >
-            Go
-          </button>
         </div>
       </div>
     </div>

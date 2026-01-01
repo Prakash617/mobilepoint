@@ -7,44 +7,34 @@ import StarFilter from "@/components/StartFilter";
 import { ListCardCarousel } from "@/components/ListCartCarousel";
 import HorizontalLine from "@/components/HorizontalLine";
 import Adsrecentview from "@/components/Adsrecentview";
-import { FaMinus } from "react-icons/fa";
 import { DropDown } from "@/components/DropDown";
 import ProductCardList from "@/components/ProductCardList";
 import PaginationBar from "@/components/PaginationBar";
 import PriceRangeSlider from "@/components/PriceRangeSlider";
 import HomeCarousel from "@/components/HomeCarousel";
-import { useBestProducts, useFilteredProducts, usePopularCategories, useProducts } from "@/hooks/useProducts";
-import { useParams } from "next/navigation";
+import { useBestProducts, useFilteredProducts, usePopularCategories } from "@/hooks/useProducts";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useFiltersMetadata } from "@/hooks/useFiltersMetadata";
+import { ProductFilters } from "@/types/product";
+import { useState, useEffect } from "react";
 
-type Props = {};
+const AttributeValues = ({ attr, filters, onCheckboxChange }) => {
+  const handleCheckboxChange = (value: string) => {
+    onCheckboxChange(attr.slug, value);
+  };
 
-// const categories = [
-//   "All",
-//   "Iphone",
-//   "Samsung",
-//   "Xiaomi",
-//   "Asus",
-//   "Gaming Smartphone",
-//   "Window Tablets",
-//   "eReader",
-//   "Smartphone Chargers",
-//   "5G Support Smartphone",
-//   "Smartphone Accessories",
-//   "Tablets Accessories",
-//   "Cell Phones ",
-// ];
-
-const AttributeValues = ({ attr }) => {
   if (attr.slug === "color") {
     return (
       <div className="flex flex-wrap gap-2">
         {attr.values.map((value) => (
           <button
             key={value.id}
-            className="w-8 h-8 rounded-md border-2 border-gray-200 cursor-pointer"
+            className={`w-8 h-8 rounded-md border-2 cursor-pointer ${
+              filters.color?.includes(value.value) ? 'border-blue-500' : 'border-gray-200'
+            }`}
             style={{ backgroundColor: value.color_code || "#FFFFFF" }}
             title={value.value}
+            onClick={() => handleCheckboxChange(value.value)}
           />
         ))}
       </div>
@@ -57,7 +47,12 @@ const AttributeValues = ({ attr }) => {
         const safeId = `${attr.slug}-${value.value}-${index}`;
         return (
           <div key={safeId} className="flex items-center ">
-            <Checkbox id={safeId} className="bg-white" />
+            <Checkbox 
+              id={safeId} 
+              className="bg-white" 
+              checked={(filters[attr.slug] as string[] | undefined)?.includes(value.value) || false}
+              onCheckedChange={() => handleCheckboxChange(value.value)}
+            />
             <Label
               htmlFor={safeId}
               className="flex items-center gap-0 cursor-pointer"
@@ -74,138 +69,130 @@ const AttributeValues = ({ attr }) => {
   );
 };
 
-const topCellPhone = [
-  { id: 1, name: "iPhone (iOS)", image: "/topcell1.png", quantity: 74 },
-  { id: 2, name: "Android", image: "/topcell2 copy.png", quantity: 12 },
-  { id: 3, name: "Gaming", image: "/topcell3 copy.png", quantity: 9 },
-  { id: 4, name: "Xiaomi", image: "/topcell4 copy.png", quantity: 9 },
-  { id: 5, name: "Accessories", image: "/topcell5 copy.png", quantity: 9 },
-  { id: 6, name: "5G Support", image: "/topcell6 copy.png", quantity: 9 },
-  { id: 7, name: "iPhone (iOS)", image: "/topcell1.png", quantity: 74 },
-  { id: 8, name: "Android", image: "/topcell2 copy.png", quantity: 12 },
-  { id: 9, name: "Gaming", image: "/topcell3 copy.png", quantity: 9 },
-  { id: 10, name: "Xiaomi", image: "/topcell4 copy.png", quantity: 9 },
-];
 
-const filters = [
-  "Min: Rs 2500/-",
-  "10.9 Inch",
-  "Color: Red",
-  "128 GB",
-  "128 GB",
-];
-
-const brands = [
-  {
-    id: 1,
-    name: "Apple",
-    img: "/branditem1.png",
-    quantity: 14,
-  },
-  {
-    id: 2,
-    name: "Apple",
-    img: "/branditem2.png",
-    quantity: 6,
-  },
-  {
-    id: 3,
-    name: "Apple",
-    img: "/branditem3.png",
-    quantity: 10,
-  },
-  {
-    id: 4,
-    name: "Apple",
-    img: "/branditem4.png",
-    quantity: 18,
-  },
-  {
-    id: 5,
-    name: "Apple",
-    img: "/branditem5.png",
-    quantity: 1,
-  },
-];
-
-const screenSizes = [
-  {
-    id: 1,
-    size: "7” & Under",
-  },
-  {
-    id: 2,
-    size: "7.1” - 8.9”",
-  },
-  {
-    id: 3,
-    size: "9” - 10.9”",
-  },
-  {
-    id: 4,
-    size: "11” & Greater",
-  },
-];
-
-const memories = [
-  { size: "64GB", count: 12 },
-  { size: "128GB", count: 25 },
-  { size: "256GB", count: 8 },
-  { size: "512GB", count: 5 },
-  { size: "1TB", count: 3 },
-  { size: "2TB", count: 2 },
-  { size: "4TB", count: 1 },
-  { size: "8TB", count: 1 },
-  { size: "16TB", count: 1 },
-];
-const conditions = [
-  { name: "New", count: 12 },
-  { name: "Like New", count: 25 },
-  { name: "Open Box", count: 8 },
-];
-
-const colors = [
-  { name: "Red", hex: "#f87171" },
-  { name: "Blue", hex: "#60a5fa" },
-  { name: "Green", hex: "#34d399" },
-  { name: "Yellow", hex: "#facc15" },
-  { name: "Black", hex: "#000000" },
-  { name: "white", hex: "#ffffff" },
-  { name: "Orange", hex: "#ffa500" },
-  { name: "Brown", hex: "#964b00" },
-];
-
-const ProductList = (props: Props) => {
+const ProductList = () => {
   const params = useParams();
-  const category = params.slug;
-  const { data: popularCategories, isLoading: isPopularLoading, error: popularError } = usePopularCategories({limit: 10});
-  const { data: filteredProducts, isLoading: isFilteredLoading, error: filteredError } = useFilteredProducts({
-    category: [`${category}`],
-    // brand: ['apple'],
-    // min_price: 0,
-    // max_price: 70000,
-    // page: 1,
-    // page_size: 24,
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const categorySlug = params.slug as string;
+
+  const [filters, setFilters] = useState<ProductFilters>({
+    page: 1,
+    page_size: 10,
   });
+
+  useEffect(() => {
+    const newFilters: ProductFilters = {
+      page: parseInt(searchParams.get('page') || '1', 10),
+      page_size: parseInt(searchParams.get('page_size') || '10', 10),
+    };
+    
+    const categories = searchParams.get('category')?.split(',');
+    if (categories) {
+      newFilters.category = categories;
+    } else if (categorySlug) {
+      newFilters.category = [categorySlug];
+    }
+
+    const brands = searchParams.get('brand')?.split(',');
+    if (brands) newFilters.brand = brands;
+
+    const ratings = searchParams.get('rating')?.split(',');
+    if (ratings) newFilters.rating = ratings;
+    
+    const minPrice = searchParams.get('min_price');
+    if (minPrice) newFilters.min_price = Number(minPrice);
+    
+    const maxPrice = searchParams.get('max_price');
+    if (maxPrice) newFilters.max_price = Number(maxPrice);
+
+    searchParams.forEach((value, key) => {
+      if (!['page', 'page_size', 'category', 'brand', 'rating', 'min_price', 'max_price'].includes(key)) {
+        newFilters[key] = value.split(',');
+      }
+    });
+
+    setFilters(newFilters);
+  }, [searchParams, categorySlug]);
+
+  const updateUrl = (updatedFilters: ProductFilters) => {
+    const queryParams = new URLSearchParams();
+    Object.entries(updatedFilters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && (Array.isArray(value) ? value.length > 0 : value !== '')) {
+            if (Array.isArray(value)) {
+                queryParams.set(key, value.join(','));
+            } else {
+                queryParams.set(key, String(value));
+            }
+        }
+    });
+    router.push(`${window.location.pathname}?${queryParams.toString()}`);
+  };
+  
+  const handleCheckboxChange = (filterKey: keyof ProductFilters, value: string) => {
+    const currentValues = filters[filterKey] as string[] || [];
+    const newValues = currentValues.includes(value)
+      ? currentValues.filter((v) => v !== value)
+      : [...currentValues, value];
+    const newFilters = { ...filters, [filterKey]: newValues, page: 1 };
+    setFilters(newFilters);
+    updateUrl(newFilters);
+  };
+  
+  const handleRatingChange = (rating: number) => {
+    const currentRatings = filters.rating as string[] || [];
+    const ratingStr = String(rating);
+    const newRatings = currentRatings.includes(ratingStr)
+      ? currentRatings.filter((r) => r !== ratingStr)
+      : [...currentRatings, ratingStr];
+    const newFilters = { ...filters, rating: newRatings, page: 1 };
+    setFilters(newFilters);
+    updateUrl(newFilters);
+  };
+
+  const handlePriceChange = (values: [number, number]) => {
+    const newFilters = { ...filters, min_price: values[0], max_price: values[1], page: 1 };
+    setFilters(newFilters);
+    updateUrl(newFilters);
+  };
+
+  const handlePageChange = (page: number) => {
+    const newFilters = { ...filters, page };
+    setFilters(newFilters);
+    updateUrl(newFilters);
+  };
+
+  const resetFilters = () => {
+    const defaultFilters: ProductFilters = {
+      page: 1,
+      page_size: 10,
+      category: categorySlug ? [categorySlug] : [],
+    };
+    setFilters(defaultFilters);
+    router.push(`${window.location.pathname}?category=${categorySlug}`);
+  };
+
+
+  const { data: popularCategories, isLoading: isPopularLoading, error: popularError } = usePopularCategories({limit: 10});
+  const { data: filteredProducts, isLoading: isFilteredLoading, error: filteredError } = useFilteredProducts(filters);
 
   const {
     data: bestProducts,
     isLoading: isBestLoading,
     error: bestError,
-  } = useBestProducts({ limit: 10, category: `${category}` });
+  } = useBestProducts({ limit: 10, category: categorySlug });
 
   const {
     data: filterMetaData,
     isLoading: isFilterLoading,
     error: filterError,
-  } = useFiltersMetadata({ category: `${category}` });
+  } = useFiltersMetadata({ category: categorySlug });
 
-  console.log("slug", category);
-  if (isBestLoading) {
+  if (isBestLoading || isPopularLoading || isFilterLoading) {
     return <div>Loading...</div>;
   }
-  if (bestError) {
-    return <div>Error: {bestError.message}</div>;
+  if (bestError || popularError || filterError) {
+    return <div>Error: {bestError?.message || popularError?.message || filterError?.message}</div>;
   }
 
   return (
@@ -214,7 +201,7 @@ const ProductList = (props: Props) => {
       <div className="p-4 bg-white rounded-lg space-y-8">
         <div>
           <p className=" font-bold uppercase">top cell phones & tablets</p>
-          <p className="font-bold uppercase">{category}</p>
+          <p className="font-bold uppercase">{categorySlug}</p>
         </div>
 
         <div className="flex flex-col md:flex-row gap-4 rounded-lg bg-white ">
@@ -269,7 +256,7 @@ const ProductList = (props: Props) => {
           <div className="rounded-lg p-6 space-y-6 bg-gray ">
             <p className="uppercase font-bold">Categories</p>
             <div>
-              <button className="bg-white cursor-pointer pl-6 pr-2 text-sm font-semibold text- py-2 mt-3 rounded-lg">
+              <button onClick={() => handleCheckboxChange('category', 'All')} className="bg-white cursor-pointer pl-6 pr-2 text-sm font-semibold text- py-2 mt-3 rounded-lg">
                 All Categories
               </button>
 
@@ -280,13 +267,13 @@ const ProductList = (props: Props) => {
               <div className="flex flex-col items-start gap-3">
                 {filterMetaData?.categories.map((item) => {
                   const safeId = `cat-${item.slug}`;
-
                   return (
                     <div key={item.slug} className="flex items-center gap-2">
                       <Checkbox
                         id={safeId}
                         className="bg-white"
-                        value={item.slug}
+                        checked={filters.category?.includes(item.slug)}
+                        onCheckedChange={() => handleCheckboxChange('category', item.slug)}
                       />
                       <Label htmlFor={safeId}>{item.name}</Label>
                     </div>
@@ -297,30 +284,11 @@ const ProductList = (props: Props) => {
           </div>
           <div className="rounded-lg p-6 space-y-6 bg-gray ">
             <div className="flex justify-between">
-              <p className="uppercase font-bold">Categories</p>
-              <p>Reset All</p>
+              <p className="uppercase font-bold">Filters</p>
+              <button onClick={resetFilters} className="text-sm hover:underline">Reset All</button>
             </div>
-            {/* <div>
-              <div className="flex flex-wrap space-x-2 space-y-2  text-right">
-                <div className="flex flex-wrap gap-2 justify-start">
-                  {filters.map((item, index) => (
-                    <button
-                      key={index}
-                      className="bg-white cursor-pointer p-2 px-3 text-xs rounded-lg"
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div> */}
+            
             <p className="my-4 text-sm font-semibold">By Brands</p>
-            {/* <div>
-              <input
-                type="text"
-                className="bg-white p-2 rounded-sm outline-none"
-              />
-            </div> */}
             <div className="flex flex-col items-start gap-3">
               {filterMetaData?.brands.map((item) => {
                 const safeId = `brand-${item.slug}`;
@@ -330,7 +298,8 @@ const ProductList = (props: Props) => {
                     <Checkbox
                       id={safeId}
                       className="bg-white"
-                      value={item.slug}
+                      checked={filters.brand?.includes(item.slug)}
+                      onCheckedChange={() => handleCheckboxChange('brand', item.slug)}
                     />
                     <Label
                       htmlFor={safeId}
@@ -356,126 +325,26 @@ const ProductList = (props: Props) => {
 
             <div className="space-y-4">
               <p className="my-4 text-sm font-semibold">By Price</p>
-              <PriceRangeSlider />
+              <PriceRangeSlider onValueCommit={handlePriceChange} min={filterMetaData?.min_price} max={filterMetaData?.max_price} />
             </div>
             <hr className="h-px bg-gray-300 border-0" />
             {filterMetaData?.ratings && (
               <div>
                 <p className="my-4 text-sm font-semibold">By Rating</p>
                 <div className="flex flex-col space-y-4">
-                  <StarFilter ratings={filterMetaData?.ratings} />
+                  <StarFilter ratings={filterMetaData?.ratings} selectedRatings={filters.rating as string[]} onRatingChange={handleRatingChange} />
                 </div>
               </div>
             )}
 
             <hr className="h-px bg-gray-300 border-0" />
-            {/* <div>
-              <p className="my-4 text-sm font-semibold">By Screen Size</p>
-              <div className="flex flex-col space-y-4">
-                <div className="flex flex-wrap gap-2 justify-start">
-                  {screenSizes.map((item, index) => (
-                    <button
-                      key={index}
-                      className="bg-white cursor-pointer p-2 px-3 text-xs rounded-lg"
-                    >
-                      {item.size}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <hr className="h-px bg-gray-300 border-0" /> */}
             {filterMetaData?.attributes?.map((attr,index) => (
               <div key={index} className="mb-6">
                 <p className="my-4 text-sm font-semibold">{attr.name}</p>
-                <AttributeValues attr={attr} />
+                <AttributeValues attr={attr} filters={filters} onCheckboxChange={handleCheckboxChange} />
+                 <hr className="h-px bg-gray-300 border-0 mt-4" />
               </div>
             ))}
-
-            {/* <div>
-              <p className="my-4 text-sm font-semibold">By Color</p>
-              <div className="flex flex-wrap gap-2">
-                {colors.map((color, index) => (
-                  <button
-                    key={index}
-                    className={`w-8 h-8 rounded-md border-2 border-gray-200 cursor-pointer`}
-                    style={{ backgroundColor: color.hex }}
-                    title={color.name} // hover shows color name
-                  />
-                ))}
-              </div>
-            </div>
-            <hr className="h-px bg-gray-300 border-0" />
-            <div>
-              <p className="my-4 text-sm font-semibold">By Memory</p>
-
-              <div className="grid grid-cols-2 gap-y-3 gap-x-6">
-                {memories.slice(0, 5).map((memory, index) => {
-                  const safeId = `memory-left-${memory.size}-${index}`;
-                  return (
-                    <div key={safeId} className="flex items-center gap-2">
-                      <Checkbox id={safeId} className="bg-white" />
-                      <Label
-                        htmlFor={safeId}
-                        className="flex items-center gap-2 cursor-pointer"
-                      >
-                        <span className="px-3 py-1 rounded-lg text-xs font-medium">
-                          {memory.size}
-                        </span>
-                        <span className="opacity-75">({memory.count})</span>
-                      </Label>
-                    </div>
-                  );
-                })}
-
-                {memories.slice(5).map((memory, index) => {
-                  const safeId = `memory-right-${memory.size}-${index}`;
-                  return (
-                    <div key={safeId} className="flex items-center gap-2">
-                      <Checkbox id={safeId} className="bg-white" />
-                      <Label
-                        htmlFor={safeId}
-                        className="flex items-center gap-2 cursor-pointer"
-                      >
-                        <span className="px-3 py-1 rounded-lg text-xs font-medium">
-                          {memory.size}
-                        </span>
-                        <span className="opacity-75">({memory.count})</span>
-                      </Label>
-                    </div>
-                  );
-                })}
-              </div>
-            </div> */}
-            {/* <hr className="h-px bg-gray-300 border-0" /> */}
-            {/* <div>
-              <p className="my-4 text-sm font-semibold">By Conditions</p>
-
-              <div className="grid grid-cols-1 gap-y-3 gap-x-2">
-                {conditions.map((condition, index) => {
-                  const safeId = `condition-${condition.name}-${index}`;
-
-                  return (
-                    <div key={safeId} className="flex items-center gap-2">
-                      <Checkbox id={safeId} className="bg-white" />
-
-                      <Label
-                        htmlFor={safeId}
-                        className="flex items-center gap-2 cursor-pointer"
-                      >
-                        <span className="px-3 py-1 rounded-lg text-xs font-medium">
-                          {condition.name}
-                        </span>
-
-                        <span className="opacity-75">({condition.count})</span>
-                      </Label>
-                    </div>
-                  );
-                })}
-              </div>
-            </div> */}
-
-            <hr className="h-px bg-gray-300 border-0" />
           </div>
           <div className="my-2 w-full h-[300px] rounded-lg relative">
             <Image
@@ -491,7 +360,6 @@ const ProductList = (props: Props) => {
             <p className="text-lg font-bold uppercase">
               Best seller in this category
             </p>
-            {/* Product Carousel */}
             <ListCardCarousel products={bestProducts?.results || []} />
           </div>
           <HorizontalLine />
@@ -499,9 +367,9 @@ const ProductList = (props: Props) => {
             <div className="flex items-center flex-wrap gap-2 font-normal text-xs text-secondary">
               <div className="flex-1  ">
                 <span className="text-black font-semibold text-[14px]">
-                  1 - 40
+                  {filteredProducts?.results.length > 0 ? `1 - ${filteredProducts.results.length}` : 0}
                 </span>{" "}
-                of 120 results
+                of {filteredProducts?.count || 0} results
               </div>
               <div className="flex-1 flex  items-center gap-2">
                 <div>
@@ -509,14 +377,12 @@ const ProductList = (props: Props) => {
                 </div>
                 <div className="flex flex-row rounded-sm w-30 h-10 bg-gray  justify-around items-center ">
                   <div className="text-black font-semibold text-[14px] ">
-                    1{" "}
+                    {filters.page_size}
                   </div>
-                  <div className="">1 </div>
-                  <div className="">1 </div>
                 </div>
               </div>
               <div className="flex-1 flex items-center gap-2">
-                <div>Show item</div>
+                <div>Sort by</div>
                 <div>
                   <DropDown />
                 </div>
@@ -524,10 +390,16 @@ const ProductList = (props: Props) => {
               <div className="px-2 flex-1 text-center">View As</div>
             </div>
             <div className=" ">
-              <ProductCardList products={filteredProducts?.results ?? []} />
+              <ProductCardList products={filteredProducts?.results ?? []} isLoading={isFilteredLoading} />
 
               <div>
-                <PaginationBar />
+              {filteredProducts && filteredProducts.total_pages > 1 && (
+                  <PaginationBar
+                    currentPage={filteredProducts.current_page}
+                    totalPages={filteredProducts.total_pages}
+                    onPageChange={handlePageChange}
+                  />
+                )}
               </div>
             </div>
           </div>

@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import { AiFillStar } from "react-icons/ai";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
@@ -11,18 +10,17 @@ interface Rating {
 
 interface StarFilterProps {
   ratings: Rating[];
+  selectedRatings?: string[];
+  onRatingChange?: (rating: number) => void;
 }
 
-const StarFilter = ({ ratings }: StarFilterProps) => {
-  const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
+const StarFilter = ({ ratings, selectedRatings = [], onRatingChange }: StarFilterProps) => {
   const starsArray = [1, 2, 3, 4, 5];
 
-  const toggleRating = (rating: number) => {
-    setSelectedRatings((prev) =>
-      prev.includes(rating)
-        ? prev.filter((r) => r !== rating)
-        : [...prev, rating]
-    );
+  const handleRatingChange = (rating: number) => {
+    if (onRatingChange) {
+      onRatingChange(rating);
+    }
   };
 
   return (
@@ -31,8 +29,8 @@ const StarFilter = ({ ratings }: StarFilterProps) => {
         <div key={r.rating} className="flex items-center gap-2">
           <Checkbox
             id={`star-${r.rating}`}
-            checked={selectedRatings.includes(r.rating)}
-            onCheckedChange={() => toggleRating(r.rating)}
+            checked={selectedRatings.includes(String(r.rating))}
+            onCheckedChange={() => handleRatingChange(r.rating)}
             className="bg-white"
           />
           <Label

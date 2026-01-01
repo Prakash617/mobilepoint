@@ -153,7 +153,6 @@ const ProductList = (props: Props) => {
           <div className="w-2/3">
             <HomeCarousel />
           </div>
-
           <div className="w-1/3 rounded-lg relative bg-amber-200">
             <Image
               src="/photo1.png"
@@ -164,7 +163,6 @@ const ProductList = (props: Props) => {
           </div>
         </div>
       </div>
-
       <div className="p-4 bg-white rounded-lg space-y-8 my-2">
         <div>
           <p className=" font-bold uppercase">popular categories</p>
@@ -217,7 +215,6 @@ const ProductList = (props: Props) => {
             />
           </div>
         </div>
-
         <div className="rounded-lg w-full border-2 border-gray p-4 md:w-3/4">
           <div>
             <p className="text-lg font-bold uppercase">
@@ -297,7 +294,6 @@ const ProductList = (props: Props) => {
           </div>
         </div>
       </div>
-
       <Adsrecentview />
     </>
   );

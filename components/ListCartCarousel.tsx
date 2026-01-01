@@ -44,8 +44,8 @@ export const ListCardCarousel = ({ products }: { products: Product[] }) => {
         ))}
       </CarouselContent>
 
-      <CarouselPrevious className="absolute w-[40px] h-[80px]  left-0 top-1/2 -translate-y-1/2 z-10" />
-      <CarouselNext className="absolute  w-[40px] h-[80px] right-0 top-1/2 -translate-y-1/2 z-10" />
+      <CarouselPrevious className="absolute w-10 h-20  left-0 top-1/2 -translate-y-1/2 z-10" />
+      <CarouselNext className="absolute  w-10 h-20 right-0 top-1/2 -translate-y-1/2 z-10" />
     </Carousel>
   );
 }

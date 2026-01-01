@@ -3,7 +3,9 @@ import { FeatureBrandsSkeleton } from "@/components/skeleton/FeatureBrandSkeleto
 
 import { useBrands, useCategories, useFeaturedBrands, useTopCategories } from "@/hooks/useProducts";
 import { Brand } from "@/types/product";
+
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 type Props = {};
@@ -70,12 +72,24 @@ const BrandFeature = (props: Props) => {
           <div className="text-gray-400 font-extralight">View All</div>
         </div>
 
-        <div className="flex flex-row h-full justify-around items-center gap-8">
+        <div className="flex flex-row h-full justify-around items-center gap-8 ">
+          
+          
           {topCategories.map((cat) => (
-            <div key={cat.id} className="text-center flex flex-col items-center gap-2">
+              <Link
+                href={`/shop/${cat.slug}`}
+                key={cat.id}
+                
+              >
+            
+            <div key={cat.id} className="text-center flex flex-col items-center gap-2 bg">
+             
               <Image src={cat.image || ""} alt={cat.name} width={40} height={30} />
-              <p>{cat.name}</p>
-            </div>
+                <p>{cat.name}</p>
+               
+              </div>
+               </Link>
+            
           ))}
         </div>
       </div>

@@ -82,6 +82,7 @@ export default function Navbar() {
 
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1">
+              <Image src="/nep.png" width={15} height={15} alt="Flag" />
               NRP <IoIosArrowDown />
             </div>
 
@@ -119,9 +120,9 @@ export default function Navbar() {
               <Image
                 src={siteSettings?.logo || '/default-logo.png'}
                 alt={siteSettings?.site_name || 'Logo'}
-                width={160}
-                height={80}
-                className="h-12 w-auto"
+                width={300}
+                height={200}
+                className="h-25 w-auto"
               />
             )}
           </div>

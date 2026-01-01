@@ -92,7 +92,7 @@ export interface Product {
 export interface ProductDetail extends Product {
   images: ProductImage[];
   variants: ProductVariant[];
-  // available_attributes: AvailableAttribute[];
+  available_attributes: AvailableAttribute[];
   meta_title: string;
   meta_description: string;
   created_at: string;

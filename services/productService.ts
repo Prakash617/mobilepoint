@@ -7,8 +7,31 @@ import {
   Brand,
   ProductVariant, 
   Deal,
-  RecentlyViewedProduct
+  RecentlyViewedProduct,
+  ProductFilters
 } from '@/types/product';
+import { FiltersMetadata } from '@/types/filters';
+import { getFilteredProducts } from '@/hooks/useProducts';
+
+
+
+// Helper to build query params
+const buildQueryParams = (filters: ProductFilters): string => {
+  const params = new URLSearchParams();
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      if (Array.isArray(value)) {
+        // Handle arrays (e.g., category, brand, color)
+        params.append(key, value.join(','));
+      } else {
+        params.append(key, String(value));
+      }
+    }
+  });
+
+  return params.toString();
+};
 
 export const productService = {
   // Get all products with pagination and filters
@@ -18,6 +41,7 @@ export const productService = {
   category?: string;
   brand?: string;
   is_featured?: boolean;
+  is_popular?: boolean;
   best_seller?: boolean;
   limit?: number;           // dynamic limit
   endpoint?: string;        // e.g., 'new', 'best-sellers'
@@ -37,7 +61,7 @@ export const productService = {
     return data;
   },
   getTopMobileTabletProducts: async (params?: { limit?: number }) => {
-    const { data } = await api.get<Product[]>('/products/top_phones_tablets/', { params });
+    const { data } = await api.get<Product[]>(`/products/top_phones_tablets/`, { params });
     return data;
   },
 
@@ -47,9 +71,18 @@ export const productService = {
     return data;
   },
 
+getBestProduct: async (params?: { category?: string, limit?: number }) => {
+  const url = params?.category 
+    ? `/products/best_seller/?category=${params.category}&limit=${params.limit || 10}` 
+    : `/products/best_seller/`;
+  const { data } = await api.get<PaginatedResponse<Product>>(url);
+  return data;
+},
+
+
   // Get featured products
   getFeaturedProducts: async () => {
-    const { data } = await api.get<Product[]>('/products/featured/');
+    const { data } = await api.get<Product[]>(`/products/featured/`);
     return data;
   },
 
@@ -86,8 +119,20 @@ export const productService = {
     return data;
   },
 
+  getFilteredProducts: async (filters: ProductFilters = {}) => {
+    const queryString = buildQueryParams(filters);
+    const { data } = await api.get<PaginatedResponse<Product>>(
+      `/products/?${queryString}`
+    );
+    return data;
+  },
+
 getFeaturedCategories: async (): Promise<PaginatedResponse<Category>> => {
     const { data } = await api.get<PaginatedResponse<Category>>("/categories/?is_featured=true");
+    return data;
+  },
+getPopularCategories: async ({limit = 10}): Promise<PaginatedResponse<Category>> => {
+    const { data } = await api.get<PaginatedResponse<Category>>("/categories/?is_popular=true", { params: { limit } });
     return data;
   },
 getTopCategories : async (limit = 8): Promise<PaginatedResponse<Category>> => {
@@ -100,7 +145,11 @@ getTopCategories : async (limit = 8): Promise<PaginatedResponse<Category>> => {
     return data;
   },
 
- 
+  getFiltersMetadata: async (category?: string) => {
+    const params = category ? { category } : {};
+    const { data } = await api.get<FiltersMetadata>('/products/filters_metadata/', { params });
+    return data;
+  },
 
   // Get featured categories
 // Get featured brands only

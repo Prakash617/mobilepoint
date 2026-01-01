@@ -1,5 +1,6 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, UseQueryOptions } from '@tanstack/react-query';
 import { productService, recentlyViewedService } from '@/services/productService';
+import { PaginatedResponse, Product, ProductFilters } from '@/types/product';
 type ProductParams = {
   page?: number;
   search?: string;
@@ -7,8 +8,25 @@ type ProductParams = {
   brand?: string;
   is_featured?: boolean;
   best_seller?: boolean;
+  is_popular?: boolean;
   limit?: number;           // dynamic limit
   endpoint?: string;        // e.g. 'new', 'best-sellers', etc.
+};
+
+
+// Query keys
+export const productKeys = {
+  all: ['filtered_products'] as const,
+  lists: () => [...productKeys.all, 'list'] as const,
+  list: (filters: ProductFilters) => [...productKeys.lists(), filters] as const,
+  details: () => [...productKeys.all, 'detail'] as const,
+  detail: (id: number | string) => [...productKeys.details(), id] as const,
+  bestsellers: (category?: string) =>
+    [...productKeys.all, 'bestsellers', category] as const,
+  filterMetadata: (filters: ProductFilters) =>
+    [...productKeys.all, 'metadata', filters] as const,
+  search: (query: string, filters: ProductFilters) =>
+    [...productKeys.all, 'search', query, filters] as const,
 };
 
 // Get all products
@@ -16,6 +34,12 @@ export function useProducts(params?: ProductParams) {
   return useQuery({
     queryKey: ['products', params],
     queryFn: () => productService.getProducts(params),
+  });
+}
+export function useBestProducts(params?: { category?: string, limit?: number }) {
+  return useQuery({
+    queryKey: ['bestproducts', params],
+    queryFn: () => productService.getBestProduct(params),
   });
 }
 export function useRelatedProducts(params?: {
@@ -61,6 +85,22 @@ export function useProductsByCategory(categorySlug: string, page = 1) {
   });
 }
 
+// export function  getFilteredProducts(filters: Record<string, any>) {
+//   return useQuery({
+//     queryKey: ['products', 'filtered', filters],
+//     queryFn: () => productService.getFilteredProducts(filters),
+//   });
+// }
+export function useFilteredProducts(
+  filters: ProductFilters = {},
+  options?: UseQueryOptions<PaginatedResponse<Product>>
+) {
+  return useQuery<PaginatedResponse<Product>>({
+    queryKey: productKeys.list(filters),
+    queryFn: () => productService.getFilteredProducts(filters),
+    ...options,
+  });
+}
 // Get categories
 export function useCategories() {
   return useQuery({
@@ -73,6 +113,12 @@ export const useFeaturedCategories = () => {
   return useQuery({
     queryKey: ["categories", "featured"],
     queryFn: productService.getFeaturedCategories,
+  });
+};
+export const usePopularCategories = ({limit = 10}: {limit?: number}) => {
+  return useQuery({
+    queryKey: ["categories", "popular"],
+    queryFn: () => productService.getPopularCategories({limit}),
   });
 };
 

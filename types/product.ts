@@ -60,7 +60,6 @@ export interface AvailableAttribute {
     image?: string;
   }[];
 }
-
 export interface Product {
   id: number;
   name: string;
@@ -69,30 +68,31 @@ export interface Product {
   short_description: string;
   category: Category;
   brand: Brand;
-  base_price: string;
-  specifications: Record<string, string>;
+  base_price?: string | null;
+  specifications?: Record<string, string>;
   is_active: boolean;
   is_new: boolean;
-  discount: {
-    amount: number;
-    percentage: number;
-  };
   is_featured: boolean;
   free_shipping: boolean;
   free_gift: boolean;
-  primary_image?: string;
+  primary_image?: string | null;
   default_variant?: ProductVariant;
   price_range?: {
     min: number;
     max: number;
     same: boolean;
   };
+  discount?: {
+    amount: number;
+    percentage: number;
+  };
+  available_attributes?: Record<string, string[]>;
 }
 
 export interface ProductDetail extends Product {
   images: ProductImage[];
   variants: ProductVariant[];
-  available_attributes: AvailableAttribute[];
+  // available_attributes: AvailableAttribute[];
   meta_title: string;
   meta_description: string;
   created_at: string;
@@ -114,6 +114,9 @@ export interface PaginatedResponse<T> {
   count: number;
   next: string | null;
   previous: string | null;
+  page_size: number;
+  total_pages: number;
+  current_page: number;
   results: T[];
 }
 
@@ -157,4 +160,24 @@ export interface RecentlyViewedProduct {
   id: number;           // The unique ID of the view record
   product: Product;     // The product data using your interface above
   viewed_at: string;    // ISO timestamp (e.g., "2025-12-26T08:50:58Z")
+}
+
+export interface ProductFilters {
+  category?: string | string[];
+  brand?: string | string[];
+  color?: string | string[];
+  memory?: string | string[];
+  storage?: string | string[];
+  min_price?: number;
+  max_price?: number;
+  rating?: number | string[];
+  screen_size?: string;
+  condition?: string | string[];
+  in_stock?: boolean;
+  on_sale?: boolean;
+  is_bestseller?: boolean;
+  search?: string;
+  ordering?: string;
+  page?: number;
+  page_size?: number;
 }

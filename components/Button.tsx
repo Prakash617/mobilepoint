@@ -6,6 +6,7 @@ type Props = {
   textColor?: string;   // Tailwind text color class, e.g., "text-white"
   size?: "sm" | "md" | "lg";  // predefined sizes
   disabled?: boolean;
+  type?: "button" | "submit" | "reset";
   onClick?: () => void;
   fullWidth?: boolean;  // optional: make button full width
   rounded?: boolean;    // optional: rounded corners
@@ -15,11 +16,13 @@ const Button: React.FC<Props> = ({
   text,
   bgColor = "bg-black",
   textColor = "text-white",
+  
   size = "md",
   disabled = false,
   onClick,
   fullWidth = false,
   rounded = true,
+  type = "button",
 }) => {
   const sizeClasses = {
     sm: "px-3 py-1 text-sm",
@@ -31,6 +34,7 @@ const Button: React.FC<Props> = ({
     <button
       onClick={onClick}
       disabled={disabled}
+       type={type}
       className={`
         ${bgColor} ${textColor} 
         ${sizeClasses[size]} 

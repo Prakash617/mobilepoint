@@ -1,5 +1,10 @@
 "use client";
-
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import { useState, useMemo } from "react";
 import FreeAdvertizemantCard from "@/components/FreeAdvertizemantCard";
 import Longtextmore from "@/app/(root)/products/[slug]/Longtextmore";
@@ -24,6 +29,7 @@ import {
   ProductVariant,
   VariantAttribute,
 } from "@/types/product";
+import Review from "@/components/Review";
 
 type Props = {
   product: ProductDetail;
@@ -505,23 +511,102 @@ const MainProductDetail = ({ product }: Props) => {
       <FrequantlyBrout />
 
       <div className="bg-white my-2  rounded-lg">
-        <div>
-          <div className="flex flex-wrap gap-4 sm:gap-5 lg:gap-8 px-3 pt-8 pb-5">
-            <button className="cursor-pointer font-semibold text-sm sm:font-bold lg:text-xl sm:pl-2">
-              DESCRIPTION
-            </button>
-            <button className="cursor-pointer font-semibold text-sm sm:text-base sm:ml-6 text-[#666666] lg:text-lg">
-              REVIEWS (5)
-            </button>
-            <button className="cursor-pointer font-semibold text-sm sm:text-base sm:ml-6 lg:text-lg text-[#666666]">
-              ADDITIONAL INFORMATION
-            </button>
-          </div>
+   
 
-          <div className="px-5 pt-6 text-base text-justify">
-            <Longtextmore text={product.description} />
-          </div>
-        </div>
+<Tabs defaultValue="description" className="w-full">
+  {/* Header */}
+  <div className="flex flex-wrap gap-4 sm:gap-5 lg:gap-8 px-3 pt-8 pb-5">
+    <TabsList className="flex flex-wrap gap-4 sm:gap-5 lg:gap-8 bg-transparent p-0 shadow-none rounded-none ">
+      <TabsTrigger
+        value="description"
+        className="
+    cursor-pointer
+    font-semibold text-sm sm:font-bold lg:text-xl
+    p-0
+    bg-transparent
+    hover:bg-transparent
+    focus:bg-transparent
+    focus-visible:bg-transparent
+    active:bg-transparent
+    ring-0
+    focus:ring-0
+    focus-visible:ring-0
+    shadow-none
+    text-[#666666]
+    data-[state=active]:text-black
+    data-[state=active]:bg-transparent
+data-[state=active]:shadow-none
+data-[state=active]:after:bg-transparent
+  "
+      >
+        DESCRIPTION
+      </TabsTrigger>
+
+      <TabsTrigger
+        value="reviews"
+        className="
+    cursor-pointer
+    font-semibold text-sm sm:font-bold lg:text-xl
+    p-0
+    bg-transparent
+    hover:bg-transparent
+    focus:bg-transparent
+    focus-visible:bg-transparent
+    active:bg-transparent
+    ring-0
+    focus:ring-0
+    focus-visible:ring-0
+    shadow-none
+    text-[#666666]
+    data-[state=active]:text-black
+  data-[state=active]:bg-transparent
+data-[state=active]:shadow-none
+data-[state=active]:after:bg-transparent
+  "
+        
+      >
+        REVIEWS (5)
+      </TabsTrigger>
+
+      <TabsTrigger
+        value="additional"
+        className="
+    cursor-pointer
+    font-semibold text-sm sm:font-bold lg:text-xl
+    p-0
+    bg-transparent
+    hover:bg-transparent
+    focus:bg-transparent
+    focus-visible:bg-transparent
+    active:bg-transparent
+    ring-0
+    focus:ring-0
+    focus-visible:ring-0
+    shadow-none
+    text-[#666666]
+    data-[state=active]:text-black
+    data-[state=active]:bg-transparent
+data-[state=active]:shadow-none
+data-[state=active]:after:bg-transparent
+  "
+      >
+        ADDITIONAL INFORMATION
+      </TabsTrigger>
+    </TabsList>
+  </div>
+
+  {/* Content */}
+  <TabsContent value="description" className="px-5 pt-6 text-base text-justify">
+    <Longtextmore text={product.description} />
+  </TabsContent>
+
+          <TabsContent value="reviews" className="px-5 pt-6" >  
+            <Review />
+            </TabsContent>
+
+  <TabsContent value="additional" className="px-5 pt-6" />
+</Tabs>
+
       </div>
     </>
   );

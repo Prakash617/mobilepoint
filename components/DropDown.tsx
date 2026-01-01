@@ -13,7 +13,7 @@ import {
 export function DropDown() {
   return (
     <Select >
-      <SelectTrigger className="w-[160px] bg-gray">
+      <SelectTrigger className="w-40 bg-gray">
         <SelectValue placeholder="Select a fruit" />
       </SelectTrigger>
       <SelectContent className="">

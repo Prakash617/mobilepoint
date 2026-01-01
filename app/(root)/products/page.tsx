@@ -14,6 +14,7 @@ import PaginationBar from "@/components/PaginationBar";
 import PriceRangeSlider from "@/components/PriceRangeSlider";
 import HomeCarousel from "@/components/HomeCarousel";
 import { useProducts } from "@/hooks/useProducts";
+import ProductListSkeleton from "@/components/skeleton/ProductsSkeleton/ProductsSkeleton";
 
 type Props = {};
 
@@ -138,11 +139,12 @@ const colors = [
 ];
 
 const ProductList = (props: Props) => {
-  const { data: products, isLoading, error } = useProducts();
+  const { data: products,isLoading, error } = useProducts();
+  
     
     console.log(products);
     if (isLoading) {
-      return <div>Loading...</div>;
+      return <ProductListSkeleton />;
     }
     if (error) {
       return <div>Error: {error.message}</div>;

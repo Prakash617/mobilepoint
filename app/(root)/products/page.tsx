@@ -4,12 +4,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import StarFilter from "@/components/StartFilter";
-import { ListCardCarousel } from "@/components/ListCartCarousel";
 import HorizontalLine from "@/components/HorizontalLine";
 import Adsrecentview from "@/components/Adsrecentview";
 import { FaMinus } from "react-icons/fa";
 import { DropDown } from "@/components/DropDown";
-import ProductCardList from "@/components/ProductCardList";
+import ProductCardList from "@/components/ProductCardList"; // Updated import
 import PaginationBar from "@/components/PaginationBar";
 import PriceRangeSlider from "@/components/PriceRangeSlider";
 import HomeCarousel from "@/components/HomeCarousel";
@@ -29,10 +28,9 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 type Props = {};
 
+const pageSizes = [16, 32, 48]; // Define fixed page size options
 
 const ProductList = (props: Props) => {
-  // const params = useParams();
-
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -56,6 +54,7 @@ const ProductList = (props: Props) => {
   const pageSize = searchParams.get("page_size")
     ? Number(searchParams.get("page_size"))
     : 16;
+  const ordering = searchParams.get("ordering") || "-created_at"; // Default sort order
 
   // Get values from URL
   const filterQuery: any = {};
@@ -67,6 +66,7 @@ const ProductList = (props: Props) => {
   if (ratings?.length) filterQuery.rating = ratings;
   filterQuery.page = page;
   filterQuery.page_size = pageSize;
+  filterQuery.ordering = ordering; // Add ordering to filter query
 
   const category_slug = searchParams.get("category") || "";
   const [defaultSlug] = useState(category_slug);
@@ -80,13 +80,6 @@ const ProductList = (props: Props) => {
     isLoading: isFilteredLoading,
     error: filteredError,
   } = useFilteredProducts(filterQuery);
-  // const pageSizes = [16, 32, 48]; // or make it dynamic
-  const PageSize = filteredProducts?.page_size ?? 16;
-
-  const [currentPageSize, setCurrentPageSize] = useState(pageSize);
-  // const [currentPage, setCurrentPage] = useState(page);
-
-  console.log("searchParams:", searchParams.toString());
 
   const {
     data: bestProducts,
@@ -100,15 +93,24 @@ const ProductList = (props: Props) => {
     error: filterError,
   } = useFiltersMetadata({ category: `${category_slug}` });
 
-  // console.log("slug", category_slug);
-  if (isBestLoading || isFilterLoading) {
+  // Handle loading states
+  if (isBestLoading || isFilterLoading || isFilteredLoading) {
     return <div>Loading...</div>;
   }
+  // Handle error states
   if (bestError) {
     return <div>Error: {bestError.message}</div>;
   }
-  if (isFilteredLoading) {
-    return <div>isFilteredLoadingLoading...</div>;
+  if (filteredError) {
+    return <div>Error: {filteredError.message}</div>;
+  }
+  if (filterError) {
+    return <div>Error: {filterError.message}</div>;
+  }
+
+  // Ensure filteredProducts is not undefined before accessing its properties
+  if (!filteredProducts) {
+    return <div>No products found.</div>;
   }
 
   // Ensure category_slug is a string before rendering CategoriesFilter
@@ -116,24 +118,28 @@ const ProductList = (props: Props) => {
     return <div>Invalid Category Slug</div>; // Or handle this case as appropriate
   }
 
-  const handlePageSize = (pageSize: number) => {
-    // setCurrentPageSize(pageSize);
+  const handlePageSize = (size: number) => {
     const newSearchParams = new URLSearchParams(searchParams.toString());
-    newSearchParams.set("page_size", pageSize.toString());
+    newSearchParams.set("page_size", size.toString());
+    newSearchParams.set("page", "1"); // Reset to page 1 when page size changes
     router.push(`${pathname}?${newSearchParams.toString()}`, { scroll: false });
   };
 
   const handlePageChange = (page: number) => {
     const newSearchParams = new URLSearchParams(searchParams.toString());
-
     newSearchParams.set("page", page.toString());
+    router.push(`${pathname}?${newSearchParams.toString()}`, { scroll: false });
+  };
 
+  const handleSortChange = (value: string) => {
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+    newSearchParams.set("ordering", value);
+    newSearchParams.set("page", "1"); // Reset to page 1 on sort change
     router.push(`${pathname}?${newSearchParams.toString()}`, { scroll: false });
   };
 
   const startRange =
     (filteredProducts.current_page - 1) * filteredProducts.page_size + 1;
-
   const endRange =
     (filteredProducts.current_page - 1) * filteredProducts.page_size +
     filteredProducts.results.length;
@@ -145,8 +151,6 @@ const ProductList = (props: Props) => {
       <div className="p-4 bg-white rounded-lg space-y-8">
         <div>
           <p className=" font-bold uppercase">top {category_slug}</p>
-
-          {/* <p className="font-bold uppercase">{category}</p> */}
         </div>
 
         <div className="flex flex-col md:flex-row gap-4 rounded-lg bg-white ">
@@ -158,11 +162,12 @@ const ProductList = (props: Props) => {
               src="/photo1.png"
               alt="topcell1"
               fill
-              className="bg-cover h-full w-full object-cover rounded-lg"
+              className="object-cover h-full w-full object-cover rounded-lg"
             />
           </div>
         </div>
       </div>
+
       <div className="p-4 bg-white rounded-lg space-y-8 my-2">
         <div>
           <p className=" font-bold uppercase">popular categories</p>
@@ -177,14 +182,12 @@ const ProductList = (props: Props) => {
             >
               <div>
                 <h3 className="font-bold text-sm">{item.name}</h3>
-
                 {item.total_products && (
                   <p className="text-secondary text-xs">
                     {item.total_products} Items
                   </p>
                 )}
               </div>
-
               <div className="relative w-[45px] h-[45px] sm:w-[55px] sm:h-[55px]">
                 <Image
                   src={item.image}
@@ -205,7 +208,6 @@ const ProductList = (props: Props) => {
             defaultslug={defaultSlug}
             filterMetaData={filterMetaData}
           />
-
           <div className="my-2 w-full h-[300px] rounded-lg relative">
             <Image
               src="/ads5.png"
@@ -215,15 +217,13 @@ const ProductList = (props: Props) => {
             />
           </div>
         </div>
+
         <div className="rounded-lg w-full border-2 border-gray p-4 md:w-3/4">
           <div>
             <p className="text-lg font-bold uppercase">
               Best seller in this category
             </p>
-
-            {/* Product Carousel */}
-
-            <ListCardCarousel products={bestProducts?.results || []} />
+            <ProductCardList products={bestProducts?.results || []} isLoading={isBestLoading} />
           </div>
 
           <HorizontalLine />
@@ -241,37 +241,27 @@ const ProductList = (props: Props) => {
                 <div>
                   <p>Show item</p>
                 </div>
-
-                <div className="flex flex-row rounded-sm w-30 h-10 bg-gray  justify-around items-center ">
-                  <button
-                    onClick={() => handlePageSize(currentPageSize || 16)}
-
-                    className={`${pageSize === currentPageSize ? "text-black": "text-secondary"}  font-semibold hover:text-[16px] text-[14px] `}
-                  >
-                    {currentPageSize}
-                  </button>
-
-                  <button
-                    onClick={() => handlePageSize(currentPageSize * 2)}
-                    className={`${pageSize === currentPageSize * 2 ? "text-black": "text-secondary"}  font-semibold hover:text-[16px] text-[14px] `}
-                  >
-                    {currentPageSize * 2}
-                  </button>
-
-                  <button
-                    onClick={() => handlePageSize(currentPageSize * 3)}
-                    className={`${pageSize === currentPageSize * 3 ? "text-black": "text-secondary"}  font-semibold hover:text-[16px] text-[14px] `}
-                  >
-                    {currentPageSize * 3}
-                  </button>
+                <div className="flex flex-row rounded-sm w-30 h-10 bg-gray justify-around items-center ">
+                  {pageSizes.map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => handlePageSize(size)}
+                      className={`font-semibold text-[14px] px-2 ${
+                        pageSize === size
+                          ? "text-black"
+                          : "text-gray-500 hover:text-black"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
                 </div>
               </div>
 
               <div className="flex-1 flex items-center gap-2">
                 <div>Sort By</div>
-
                 <div>
-                  <DropDown />
+                  <DropDown value={ordering} onValueChange={handleSortChange} />
                 </div>
               </div>
 
@@ -294,6 +284,7 @@ const ProductList = (props: Props) => {
           </div>
         </div>
       </div>
+
       <Adsrecentview />
     </>
   );

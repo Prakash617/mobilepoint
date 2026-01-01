@@ -11,7 +11,6 @@ import {
   ProductFilters
 } from '@/types/product';
 import { FiltersMetadata } from '@/types/filters';
-import { getFilteredProducts } from '@/hooks/useProducts';
 
 
 

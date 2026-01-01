@@ -86,7 +86,7 @@ export interface Product {
     amount: number;
     percentage: number;
   };
-  available_attributes?: Record<string, string[]>;
+  available_attributes?: AvailableAttribute[];
 }
 
 export interface ProductDetail extends Product {

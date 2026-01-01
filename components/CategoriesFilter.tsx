@@ -3,17 +3,23 @@ import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import PriceRangeSlider from "./PriceRangeSlider";
 import StarFilter from "./StartFilter";
-import { CategoryFilter, FiltersMetaData } from "@/types/filtersmetadata";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { AttributeFilter, CategoryFilter, FiltersMetaData } from "@/types/filtersmetadata";
+import { usePathname, useRouter, useSearchParams, ReadonlyURLSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 
 type Props = {
   slug: string;
-  filterMetaData: FiltersMetaData | null;
+  filterMetaData: FiltersMetaData | null | undefined;
   defaultslug: string;
 };
 
-const AttributeValues = ({ attr, searchParams, handleFilterChange }) => {
+type AttributeValuesProps = {
+  attr: AttributeFilter;
+  searchParams: ReadonlyURLSearchParams;
+  handleFilterChange: (paramName: string, value: string | number) => void;
+};
+
+const AttributeValues = ({ attr, searchParams, handleFilterChange }: AttributeValuesProps) => {
   const selectedValues = searchParams.get(attr.slug)?.split(',') || [];
 
   if (attr.slug === "color") {

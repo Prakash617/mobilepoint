@@ -61,7 +61,7 @@ const HomeCarouselSection = (props: Props) => {
   <p className="text-red-600 font-semibold text-sm">Sale 40% Off</p>
   {categories?.results?.map((category) => (
     <Link
-      href={`/shop/${category.slug}`}
+      href={`/products/?category=${category.slug}`}
       key={category.id}
       className="text-sm hover:underline cursor-pointer"
     >
@@ -107,7 +107,7 @@ const HomeCarouselSection = (props: Props) => {
             <p className="text-red-600 font-semibold">Sale 40% Off</p>
             {categories?.results?.map((category) => (
               <Link
-                href={`/shop/${category.slug}`}
+                href={`/products/?category=${category.slug}`}
                 key={category.id}
                 className="text-sm hover:underline cursor-pointer block"
               >

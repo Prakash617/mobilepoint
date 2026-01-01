@@ -1,97 +1,99 @@
-"use client"
-import { useState, useEffect } from 'react';
-import { Slider } from "@/components/ui/slider"
+import { Slider } from "@/components/ui/slider";
+import React from "react";
 
 type PriceRangeSliderProps = {
-  min?: number;
-  max?: number;
-  onValueCommit?: (value: [number, number]) => void;
+  minPrice: number;
+  maxPrice: number;
+  onPriceChange: (values: { min: number; max: number }) => void;
+  onGoClick: () => void;
   className?: string;
 };
 
-export default function PriceRangeSlider({ 
-  min = 0, 
-  max = 100000, 
-  onValueCommit, 
-  className 
+export default function PriceRangeSlider({
+  minPrice,
+  maxPrice,
+  onPriceChange,
+  onGoClick,
+  className,
+  ...props
 }: PriceRangeSliderProps) {
-  const [localMin, setLocalMin] = useState(min);
-  const [localMax, setLocalMax] = useState(max);
-
-  useEffect(() => {
-    setLocalMin(min);
-    setLocalMax(max);
-  }, [min, max]);
-
-  const handleSliderCommit = (value: number[]) => {
-    if (onValueCommit) {
-      onValueCommit([value[0], value[1]]);
-    }
-  };
+  const overallMin = 0;
+  const overallMax = 10000;
 
   const handleSliderChange = (value: number[]) => {
-    setLocalMin(value[0]);
-    setLocalMax(value[1]);
+    const min = Math.round((value[0] / 100) * overallMax);
+    const max = Math.round((value[1] / 100) * overallMax);
+    onPriceChange({ min, max });
   };
 
   const handleMinInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value) || 0;
-    setLocalMin(value);
+    onPriceChange({ min: value, max: maxPrice });
   };
 
   const handleMaxInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value) || 0;
-    setLocalMax(value);
+    onPriceChange({ min: minPrice, max: value });
   };
 
-  const handleInputBlur = () => {
-    if (onValueCommit) {
-      onValueCommit([localMin, localMax]);
-    }
-  };
+  const range = [(minPrice / overallMax) * 100, (maxPrice / overallMax) * 100];
 
   return (
     <div className="w-full">
       <Slider
-        min={min}
-        max={max}
-        value={[localMin, localMax]}
+        value={range}
         onValueChange={handleSliderChange}
-        onValueCommit={handleSliderCommit}
-        step={100}
-        className={`w-full mb-4 ${className || ''}`}
+        max={100}
+        step={1}
+        className={`w-full mb-4 ${className || ""}`}
+        {...props}
       />
-      <div className="flex items-center flex-wrap gap-2">
-        <div className="bg-white border border-gray-300 p-3 gap-2 flex rounded-md font-semibold">
-          <p>Rs.</p>
+      <div className="flex items-center justify-between flex-nowrap w-full">
+        <div className="bg-white border border-gray-300 p-3 gap-2 text-[12px] flex rounded-md font-semibold shrink-0">
+          <span>Rs.</span>
           <input
-            type="number"
-            min={min}
-            max={max}
-            value={localMin}
+            type="text"
+            min={overallMin}
+            max={overallMax}
+            value={minPrice}
             onChange={handleMinInputChange}
-            onBlur={handleInputBlur}
-            className="w-24 outline-none"
+            className="w-8 outline-none"
           />
         </div>
-        <div className="text-gray-400">
-          <svg width="12" height="2" viewBox="0 0 12 2" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line y1="1" x2="12" y2="1" stroke="currentColor" strokeWidth="2"/>
+
+        <div className="text-gray-400 shrink-0">
+          <svg
+            width="12"
+            height="2"
+            viewBox="0 0 12 2"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <line y1="1" x2="12" y2="1" stroke="currentColor" strokeWidth="2" />
           </svg>
         </div>
-        <div className="bg-white border border-gray-300 p-3 gap-2 flex rounded-md font-semibold">
-          <p>Rs.</p>
+
+        <div className="bg-white border border-gray-300 p-3 pr-1 text-[12px] flex rounded-md font-semibold shrink-0">
+          <span>Rs.</span>
           <input
-            type="number"
-            min={min}
-            max={max}
-            value={localMax}
+            type="text"
+            min={overallMin}
+            max={overallMax}
+            value={maxPrice}
             onChange={handleMaxInputChange}
-            onBlur={handleInputBlur}
-            className="w-24 outline-none"
+            className="w-12 outline-none"
           />
+        </div>
+
+        <div className="shrink-0">
+          <button
+            onClick={onGoClick}
+            className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg font-semibold"
+          >
+            Go
+          </button>
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from "react";
 
 import {
   Select,
@@ -8,23 +8,27 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
-export function DropDown() {
+type DropDownProps = {
+  value: string;
+  onValueChange: (value: string) => void;
+};
+
+export function DropDown({ value, onValueChange }: DropDownProps) {
   return (
-    <Select >
+    <Select value={value} onValueChange={onValueChange}>
       <SelectTrigger className="w-[160px] bg-gray">
         <SelectValue placeholder="Default" />
       </SelectTrigger>
       <SelectContent className="">
         <SelectGroup>
-          <SelectLabel>Filter by</SelectLabel>
-          <SelectItem value="price-low-to-high">Price: low to high</SelectItem>
-          <SelectItem value="newest">Newest</SelectItem>
-          <SelectItem value="price-high-to-low">Price: high to low</SelectItem>
-        
+          <SelectLabel>Sort by</SelectLabel>
+          <SelectItem value="price">Price: low to high</SelectItem>
+          <SelectItem value="-created_at">Newest</SelectItem>
+          <SelectItem value="-price">Price: high to low</SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>
-  )
+  );
 }

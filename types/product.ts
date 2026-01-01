@@ -170,7 +170,7 @@ export interface ProductFilters {
   storage?: string | string[];
   min_price?: number;
   max_price?: number;
-  rating?: number | string[];
+  rating?: number | number[];
   screen_size?: string;
   condition?: string | string[];
   in_stock?: boolean;

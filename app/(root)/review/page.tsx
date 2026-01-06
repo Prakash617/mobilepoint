@@ -9,6 +9,7 @@ import { Review } from "@/types/review";
 
 /* 🔹 TEMP SLUG FOR TESTING */
 const TEST_SLUG = "airbuds";
+const TEMP_USER = "guest@gowell.com";
 
 const ReviewComponent = () => {
   const slug = TEST_SLUG;
@@ -16,8 +17,7 @@ const ReviewComponent = () => {
   const [rating, setRating] = useState(0);
   const [showAll, setShowAll] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
+   
     comment: "",
   });
 
@@ -43,32 +43,40 @@ const ReviewComponent = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const TEMP_USER = "guest@gowell.com";
 
-    if (!rating || !formData.comment) {
-      alert("Rating and review required");
-      return;
+const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
+
+  if (!rating || !formData.comment) {
+    alert("Rating and review are required");
+    return;
+  }
+
+  addReview.mutate(
+    {
+      rating,
+      comment: formData.comment,
+      product_slug: slug,
+      user: TEMP_USER,
+    },
+    {
+      onSuccess: () => {
+        setRating(0);
+        setFormData({ comment: "" });
+        setShowAll(true);
+      },
+      onError: () => {
+        alert("Failed to submit review");
+      },
     }
+  );
+};
 
-    addReview.mutate(
-      { rating, comment: formData.comment },
-      {
-        onSuccess: () => {
-          setRating(0);
-          setFormData({ name: "", email: "", comment: "" });
-          setShowAll(true);
-        },
-        onError: () => {
-          alert("Failed to submit review");
-        },
-      }
-    );
-  };
 
   return (
     <>
-      {/* ================= SAME UI ================= */}
+     
       <div className="flex flex-col lg:flex-row sm:gap-30 w-full px-4 sm:px-6 lg:px-20 py-6">
         {/* Left: Ratings */}
         <div className="w-full lg:w-1/2 max-w-md p-5">
@@ -156,31 +164,6 @@ const ReviewComponent = () => {
       />
     </div>
 
-    {/* Name input */}
-    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-5">
-      <label className="w-full sm:w-32 text-sm font-bold text-gray-700">
-        Name<span className="text-red-600">*</span>
-      </label>
-      <input
-        name="name"
-        value={formData.name}
-        onChange={handleChange}
-        className="flex-1 rounded-3xl border border-gray-300 px-3 py-3 text-sm"
-      />
-    </div>
-
-    {/* Email input */}
-    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-5 w-full">
-      <label className="w-full sm:w-32 text-sm font-bold text-gray-700">
-        Email<span className="text-red-600">*</span>
-      </label>
-      <input
-        name="email"
-        value={formData.email}
-        onChange={handleChange}
-        className="flex-1 rounded-3xl border border-gray-300 px-3 py-3 text-sm"
-      />
-    </div>
 
     {/* Submit button */}
     <div className="flex justify-start sm:pl-32">

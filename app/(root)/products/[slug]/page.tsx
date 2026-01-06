@@ -112,7 +112,7 @@ export default async function ProductDetail({ params }: Props) {
       <DynamicBreadcrumb />
 
       
-      <MainProductDetail product={product} />
+      <MainProductDetail slug={slug} product={product} />
       
       <RelatedProduct  slug={slug}/>
       <Adsrecentview />

@@ -25,6 +25,8 @@ import { useState } from "react";
 import { FiltersMetaData } from "@/types/filtersmetadata";
 import { FiltersMetadata } from "@/types/filters";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import FilterMetaDataSkeleton from "@/components/skeleton/ProductsSkeleton/FilterMetaDataSkeleton";
+import ProductListSkeleton from "@/components/skeleton/ProductsSkeleton/ProductsSkeleton";
 
 type Props = {};
 
@@ -77,7 +79,7 @@ const ProductList = (props: Props) => {
   } = usePopularCategories({ limit: 10 });
   const {
     data: filteredProducts,
-    isLoading: isFilteredLoading,
+    isLoading: isFilteredProductLoading,
     error: filteredError,
   } = useFilteredProducts(filterQuery);
 
@@ -89,13 +91,13 @@ const ProductList = (props: Props) => {
 
   const {
     data: filterMetaData,
-    isLoading: isFilterLoading,
+    isLoading: isfilterMetaDataLoading,
     error: filterError,
   } = useFiltersMetadata({ category: `${category_slug}` });
 
   // Handle loading states
-  if (isBestLoading || isFilterLoading || isFilteredLoading) {
-    return <div>Loading...</div>;
+  if (isBestLoading || isPopularLoading|| isFilteredProductLoading||isfilterMetaDataLoading) {
+    return <ProductListSkeleton />;
   }
   // Handle error states
   if (bestError) {
@@ -109,9 +111,12 @@ const ProductList = (props: Props) => {
   }
 
   // Ensure filteredProducts is not undefined before accessing its properties
-  if (!filteredProducts) {
-    return <div>No products found.</div>;
-  }
+  // if (isFilteredLoading) {
+  //   return <div>isFilteredLoading</div>;
+  // }
+  //  if (isBestLoading) {
+  //   return <div>isbestLoading</div>;
+  // }
 
   // Ensure category_slug is a string before rendering CategoriesFilter
   if (typeof category_slug !== "string") {
@@ -162,7 +167,7 @@ const ProductList = (props: Props) => {
               src="/photo1.png"
               alt="topcell1"
               fill
-              className="object-cover h-full w-full object-cover rounded-lg"
+              className="object-cover h-full w-full  rounded-lg"
             />
           </div>
         </div>
@@ -176,7 +181,7 @@ const ProductList = (props: Props) => {
         <div className="w-full  grid md:grid-cols-5 grid-cols-2 sm:grid-cols-3 gap-4 place-items-center">
           {popularCategories?.results.map((item) => (
             <Link
-              href={`/shop/?category=${item.slug}`}
+              href={`/products/?category=${item.slug}`}
               key={item.id}
               className="flex w-full items-center justify-between bg-white rounded-lg p-2 sm:p-3  hover:shadow transition"
             >
@@ -202,6 +207,8 @@ const ProductList = (props: Props) => {
       </div>
 
       <div className="bg-white my-2  flex flex-col md:flex-row gap-4 p-4  rounded-lg">
+        {isfilterMetaDataLoading ? <FilterMetaDataSkeleton /> :
+       
         <div className="md:w-1/4 w-full space-y-4 ">
           <CategoriesFilter
             slug={category_slug}
@@ -217,6 +224,7 @@ const ProductList = (props: Props) => {
             />
           </div>
         </div>
+           }
 
         <div className="rounded-lg w-full border-2 border-gray p-4 md:w-3/4">
           <div>
@@ -269,7 +277,7 @@ const ProductList = (props: Props) => {
             </div>
 
             <div className=" ">
-              <ProductCardList products={filteredProducts?.results ?? []} />
+              <ProductCardList isLoading={isFilteredProductLoading} products={filteredProducts?.results ?? []} />
 
               <div className="my-4">
                 {filteredProducts && filteredProducts.results.length > 0 && (

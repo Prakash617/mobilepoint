@@ -1,4 +1,6 @@
 "use client";
+
+
 import {
   Tabs,
   TabsContent,
@@ -33,9 +35,13 @@ import Review from "@/components/Review";
 
 type Props = {
   product: ProductDetail;
+  slug: string;
 };
 
-const MainProductDetail = ({ product }: Props) => {
+
+
+
+const MainProductDetail = ({ product,slug }: Props) => {
   // State for selected variant attributes
   const [selectedAttributes, setSelectedAttributes] = useState<
     Record<string, string>
@@ -601,7 +607,7 @@ data-[state=active]:after:bg-transparent
   </TabsContent>
 
           <TabsContent value="reviews" className="px-5 pt-6" >  
-            <Review />
+            <Review  />
             </TabsContent>
 
   <TabsContent value="additional" className="px-5 pt-6" />

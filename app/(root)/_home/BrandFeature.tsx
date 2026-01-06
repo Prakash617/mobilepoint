@@ -77,7 +77,7 @@ const BrandFeature = (props: Props) => {
           
           {topCategories.map((cat) => (
               <Link
-                href={`/shop/${cat.slug}`}
+                href={`/products/?category=${cat.slug}`}
                 key={cat.id}
                 
               >

@@ -1,4 +1,5 @@
 "use client";
+import { useTopCategories } from "@/hooks/useProducts";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,6 +14,7 @@ import {
 } from "react-icons/fa";
 
 const Footer = () => {
+   const { data: top, isLoading: loadingTop } = useTopCategories({ limit: 9 });
   const {
     data: sidesettingdata,
     isLoading,
@@ -20,7 +22,7 @@ const Footer = () => {
     error,
   } = useSiteSettings();
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <p>foopter Loading...</p>;
   if (isError) return <p>Error: {(error as Error).message}</p>;
 
   return (
@@ -117,21 +119,17 @@ const Footer = () => {
         <div className="w-full lg:w-3/4 p-1 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           <div className="text-left space-y-4">
             <p className="uppercase font-bold">top Categories</p>
-            <div className="text-secondary text-sm space-y-2">
-              {[
-                "Laptops",
-                "PC & Computers",
-                "Cell Phones",
-                "Tablets",
-                "Gaming & VR",
-                "Networks",
-                "Cameras",
-                "Sounds",
-                "Office",
-              ].map((item) => (
-                <p key={item} className="text-secondary hover:text-black cursor-pointer">{item}</p>
-              ))}
-            </div>
+           <div className="text-secondary text-sm space-y-2">
+  {top?.results?.map((category) => (
+    <Link
+      key={category.id}
+      href={`/products/?category=${category.slug}`}
+      className="block hover:underline cursor-pointer"
+    >
+      {category.name}
+    </Link>
+  ))}
+</div>
           </div>
 
           <div className="text-left space-y-4">

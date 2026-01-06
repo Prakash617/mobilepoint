@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import SearchBox from "@/components/SearchBox";
 import { Providers } from "./providers";
-import { Suspense } from 'react';
+// import { Suspense } from 'react';
 
 
 // Inter regular font
@@ -39,9 +39,9 @@ export default function RootLayout({
         {/* <div className="p-2 md:mx-auto"> */}
         <Navbar/>
         <SearchBox />
-        <Suspense fallback={<div>Loading...</div>}>
+        {/* <Suspense fallback={<div>Loading...</div>}> */}
           {children}
-        </Suspense>
+        {/* </Suspense> */}
         </div>
           <Footer/>
       </Providers>

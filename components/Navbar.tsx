@@ -22,6 +22,7 @@ import { GoPerson } from 'react-icons/go'
 import { IoIosArrowDown } from 'react-icons/io'
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { NavigationMenuDemo } from "./NavMenu";
+import Link from "next/link";
 
 export default function Navbar() {
   const { data: siteSettings, isLoading } = useSiteSettings();
@@ -108,6 +109,7 @@ export default function Navbar() {
           </button>
 
           {/* Logo */}
+          <Link href={'./'}>
           <div className="flex items-center">
             {isLoading ? (
               <div className="flex items-center justify-center">
@@ -125,7 +127,8 @@ export default function Navbar() {
                 className="h-25 w-auto"
               />
             )}
-          </div>
+            </div>
+            </Link>
 
           {/* Desktop Menu */}
           <div className="hidden lg:flex">

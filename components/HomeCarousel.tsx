@@ -13,7 +13,8 @@ import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import { useCarousels } from "@/hooks/useCarousels";
 import Link from "next/link";
 import type { Carousel as CarouselType, CarouselSlide } from "@/types/carousel"; // type alias
-import CarouselSkeleton from "./skeleton/HomeCarouselSkeleton";
+import { Skeleton } from "@/components/ui/skeleton";
+import { resolveImageUrl } from "@/lib/utils";
 
 const HomeCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -53,7 +54,7 @@ const carouselData: CarouselSlide[] =
 
   /** ✅ Render logic AFTER hooks */
   if (isLoading) {
-    return <CarouselSkeleton />;
+    return <Skeleton className="w-full h-full min-h-[300px] rounded-lg bg-gray-200" />;
   }
 
   if (error) {
@@ -65,26 +66,23 @@ const carouselData: CarouselSlide[] =
   }
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full h-full">
       <Carousel
         plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
         setApi={setApi}
-        className="w-full"
+        className="w-full h-full"
         opts={{ align: "start" }}
       >
-        <CarouselContent>
+        <CarouselContent className="h-full">
           {carouselData.map((item:CarouselSlide, index:number) => (
-            <CarouselItem key={index}>
-              <div className="relative w-full h-[310px] rounded-lg">
-                {item.image && (
-                  
+            <CarouselItem key={index} className="h-full">
+              <div className="relative w-full h-[350px] rounded-lg">
                 <Image
-                  src={item.image}
+                  src={resolveImageUrl(item.image?.url)}
                   alt={item.title}
                   fill
-                  className="object-cover -z-10 rounded-lg"
+                  className="object-cover rounded-lg"
                 />
-                )}
 
                 <div className="w-1/2 space-y-7 px-10 text-white font-bold absolute top-1/2 left-8 -translate-y-1/2">
                   <p className="text-2xl">

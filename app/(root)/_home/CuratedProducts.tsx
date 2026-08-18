@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import Navigation from "@/components/Navigation";
+import { resolveImageUrl } from "@/lib/utils";
 import {
   Carousel,
   CarouselContent,
@@ -43,7 +44,7 @@ const CuratedProductsCarousel = () => {
       <Carousel opts={{ align: "start" }} setApi={setApi} className="w-full">
         <CarouselContent className="-ml-4 my-1">
           {products.map((product) =>
-            product.image ? (
+            (
               <CarouselItem
                 key={product.id}
                 className="pl-4 basis-full sm:basis-1/2 lg:basis-1/4"
@@ -52,7 +53,7 @@ const CuratedProductsCarousel = () => {
                   {/* IMAGE */}
                   <div className="relative h-[230px] flex items-center justify-center p-4">
                     <Image
-                      src={product.image}
+                      src={resolveImageUrl(product.image)}
                       alt={product.title || "curated item"}
                       fill
                       className="object-cover"
@@ -79,7 +80,7 @@ const CuratedProductsCarousel = () => {
                   </div>
                 </div>
               </CarouselItem>
-            ) : null
+            )
           )}
         </CarouselContent>
       </Carousel>

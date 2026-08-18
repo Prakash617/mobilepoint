@@ -5,6 +5,8 @@ export interface SiteSettings {
   site_description: string | null;
   logo: string | null;
   favicon: string | null;
+  shipping_cost: string;
+  tax: string;
   email: string | null;
   phone: string | null;
   address: string | null;

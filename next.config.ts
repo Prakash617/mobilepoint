@@ -32,6 +32,17 @@ const nextConfig: NextConfig = {
         hostname: "placehold.co",
         pathname: "/**",
       },
+      // Admin panel media (carousel/uploads)
+      {
+        protocol: "http",
+        hostname: "mobilepoint-admin.sayathari.com",
+        pathname: "/media/**",
+      },
+      {
+        protocol: "https",
+        hostname: "mobilepoint-admin.sayathari.com",
+        pathname: "/media/**",
+      },
     ],
   },
 };

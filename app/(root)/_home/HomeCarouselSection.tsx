@@ -3,6 +3,8 @@ import HomeCarousel from "@/components/HomeCarousel";
 import HomeCarouselSectionSkeleton from "@/components/skeleton/HomeCarouselSkeleton";
 import { useAdvertisements } from "@/hooks/useAds";
 import { useCategories } from "@/hooks/useProducts";
+import { getAdsWithFallback } from "@/lib/adFallback";
+import { resolveImageUrl } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -21,16 +23,12 @@ const HomeCarouselSection = (props: Props) => {
     is_active: true,
   });
 
-  const ads = data?.results || [];
+  const ads = getAdsWithFallback(data?.results || [], 4);
   const ad1 = ads[0];
   const ad2 = ads[1];
   const ad3 = ads[2];
   const ad4 = ads[3];
 
-  console.log("Advertisements1:", ads[0]);
-  console.log("Advertisements2:", ads[1]);
-  console.log("Advertisements3:", ads[2]);
-  console.log("Advertisements4:", ads[3]);
    if (isLoading || isAdsLoading) {
   return <HomeCarouselSectionSkeleton slides={3} categoriesCount={5} adsCount={4} />;
 }
@@ -81,7 +79,7 @@ const HomeCarouselSection = (props: Props) => {
             >
               {ad.image?.trim() ? (
                 <Image
-                  src={ad.image}
+                  src={resolveImageUrl(ad.image)}
                   alt={ad.title || `ad-banner-${index + 1}`}
                   fill
                   className="object-cover"
@@ -89,7 +87,7 @@ const HomeCarouselSection = (props: Props) => {
               ) : (
                 // optional fallback if image is missing
                 <Image
-                  src={`/ads-fallback.png`}
+                  src={`/ads1.png`}
                   alt={`fallback-ad-${index + 1}`}
                   fill
                   className="object-cover"
@@ -122,51 +120,51 @@ const HomeCarouselSection = (props: Props) => {
 
           {ad3?.image && (
             <Link
-              href={ad3.link_url}
-              className="area-main-left my-border relative"
+              href={ad3.link_url || "#"}
+              className="area-main-left relative block rounded-lg overflow-hidden h-full w-full"
             >
               <Image
-                src={ad3.image}
+                src={resolveImageUrl(ad3.image)}
                 alt={ad3.title || "ad-banner"}
                 fill
-                className="rounded-lg object-cover"
+                className="object-cover"
               />
             </Link>
           )}
 
           {ad4?.image && (
             <Link
-              href={ad4.link_url}
-              className="area-main-right my-border relative"
+              href={ad4.link_url || "#"}
+              className="area-main-right relative block rounded-lg overflow-hidden h-full w-full"
             >
               <Image
-                src={ad4.image}
+                src={resolveImageUrl(ad4.image)}
                 alt={ad4.title || "ad-banner"}
                 fill
-                className="rounded-lg object-cover w-full"
+                className="object-cover"
               />
             </Link>
           )}
 
-          <div className="area-right-side grid grid-rows-2 gap-2">
+          <div className="area-right-side grid grid-rows-2 gap-2 h-full">
             {ad1?.image && (
-              <Link href={ad1.link_url} className="my-border relative">
+              <Link href={ad1.link_url || "#"} className="relative block rounded-lg overflow-hidden h-full w-full">
                 <Image
-                  src={ad1.image}
+                  src={resolveImageUrl(ad1.image)}
                   alt={ad1.title || "ad-banner"}
                   fill
-                  className="rounded-lg object-cover w-full"
+                  className="object-cover"
                 />
               </Link>
             )}
 
             {ad2?.image && (
-              <Link href={ad2.link_url} className="my-border relative">
+              <Link href={ad2.link_url || "#"} className="relative block rounded-lg overflow-hidden h-full w-full">
                 <Image
-                  src={ad2.image}
+                  src={resolveImageUrl(ad2.image)}
                   alt={ad2.title || "ad-banner"}
                   fill
-                  className="rounded-lg object-cover w-full"
+                  className="object-cover"
                 />
               </Link>
             )}

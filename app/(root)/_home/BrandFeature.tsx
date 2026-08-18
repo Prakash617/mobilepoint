@@ -3,6 +3,7 @@ import { FeatureBrandsSkeleton } from "@/components/skeleton/FeatureBrandSkeleto
 
 import { useBrands, useCategories, useFeaturedBrands, useTopCategories } from "@/hooks/useProducts";
 import { Brand } from "@/types/product";
+import { resolveImageUrl } from "@/lib/utils";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -33,13 +34,13 @@ type Props = {};
 const BrandFeature = (props: Props) => {
   // const { data: categories, isLoading, error } = useCategories();
   const { data: brands, isLoading: loadingBrands, error } = useFeaturedBrands();
-  const { data: top, isLoading: loadingTop } = useTopCategories({ limit: 4 });
+  const { data: top, isLoading: loadingTop } = useTopCategories({ limit: 10 });
   
   if (loadingBrands || loadingTop) return <div><FeatureBrandsSkeleton/></div>;
   if (error) return <div>Something went wrong</div>;
 
   // const featureBrands = brands?.results.slice(0, 8);
-  const featureBrands = brands?.results.filter((brand: Brand)=> brand.is_featured).slice(0, 10) || [];
+  const featureBrands = brands?.results.slice(0, 10) || [];
   const topCategories = top?.results || [];
   // const featured
   return (
@@ -55,7 +56,7 @@ const BrandFeature = (props: Props) => {
           {featureBrands.map((item) => (
             <Image
               key={item.id}
-              src={item?.logo || ""}
+              src={resolveImageUrl(item?.logo)}
               alt="feature-brand"
               width={81}
               height={31}
@@ -72,24 +73,22 @@ const BrandFeature = (props: Props) => {
           <div className="text-gray-400 font-extralight">View All</div>
         </div>
 
-        <div className="flex flex-row h-full justify-around items-center gap-8 ">
-          
-          
+        <div className="grid grid-cols-2 sm:grid-cols-5 place-content-center gap-4 mt-6">
           {topCategories.map((cat) => (
-              <Link
-                href={`/shop/${cat.slug}`}
-                key={cat.id}
-                
-              >
-            
-            <div key={cat.id} className="text-center flex flex-col items-center gap-2 bg">
-             
-              <Image src={cat.image || ""} alt={cat.name} width={40} height={30} />
-                <p>{cat.name}</p>
-               
-              </div>
-               </Link>
-            
+            <Link
+              href={`/shop/${cat.slug}`}
+              key={cat.id}
+              className="flex flex-col items-center gap-2 text-center hover:opacity-80"
+            >
+              <Image
+                src={resolveImageUrl(cat.image)}
+                alt={cat.name}
+                width={48}
+                height={36}
+                className="object-contain"
+              />
+              <p className="text-sm">{cat.name}</p>
+            </Link>
           ))}
         </div>
       </div>

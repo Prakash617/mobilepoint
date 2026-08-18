@@ -6,6 +6,7 @@ import StarFilter from "./StartFilter";
 import { AttributeFilter, CategoryFilter, FiltersMetaData } from "@/types/filtersmetadata";
 import { usePathname, useRouter, useSearchParams, ReadonlyURLSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
+import { resolveImageUrl } from "@/lib/utils";
 
 type Props = {
   slug: string;
@@ -66,10 +67,15 @@ const AttributeValues = ({ attr, searchParams, handleFilterChange }: AttributeVa
   );
 };
 
+import { useCategories, useBrands } from "@/hooks/useProducts";
+
 const CategoriesFilter = ({ slug: category_slug, filterMetaData, defaultslug }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const { data: categoriesData } = useCategories();
+  const { data: brandsData } = useBrands();
 
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(10000); // Assuming 10000 is the max for the slider
@@ -124,80 +130,101 @@ const CategoriesFilter = ({ slug: category_slug, filterMetaData, defaultslug }: 
   const selectedBrands = searchParams.get("brand")?.split(',') || [];
   const selectedRatings = searchParams.get("rating")?.split(',') || [];
 
+  const categoriesToRender = filterMetaData?.categories || categoriesData?.results || [];
+  const brandsToRender = filterMetaData?.brands || brandsData?.results || [];
+
   return (
     <>
-      <div className="rounded-lg p-6 space-y-6 bg-gray ">
-        <p className="uppercase font-bold">Categories</p>
-        <div>
-          <button className="bg-white cursor-pointer pl-6 pr-2 text-sm font-semibold text- py-2 mt-3 rounded-lg">
-            All Categories
+      <div className="rounded-xl p-5 mb-4 bg-[#f8f9fc] border border-gray-100 shadow-sm">
+        <p className="uppercase font-bold text-gray-800 tracking-wide mb-5">Categories</p>
+        
+        <div className="space-y-4">
+          <button 
+            onClick={handleResetAll} 
+            className="flex items-center gap-2 bg-white hover:bg-gray-50 border border-gray-200 transition-colors w-full text-left px-4 text-[13px] font-semibold text-gray-700 py-2.5 rounded-lg"
+          >
+            <span className="text-lg">‹</span> All Categories
           </button>
 
-          <p className="my-4 text-sm font-semibold uppercase">
-            {category_slug}
-          </p>
+          {category_slug && (
+            <p className="text-[13px] font-bold text-primary uppercase pl-2">
+              {category_slug.replace('-', ' ')}
+            </p>
+          )}
 
-          <div className="flex flex-col items-start gap-3">
-            {filterMetaData?.categories.map((item: CategoryFilter) => {
+          <div className="flex flex-col items-start gap-3 mt-2 pl-2">
+            {categoriesToRender.map((item: any) => {
               const safeId = `cat-${item.slug}`;
               return (
-                <div key={item.slug} className="flex items-center gap-2">
+                <div key={item.slug} className="flex items-center gap-3">
                   <Checkbox
                     onCheckedChange={() => handleFilterChange('category', item.slug)}
                     id={safeId}
-                    className="bg-white"
+                    className="bg-white rounded-full w-4 h-4 border-gray-300 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                     checked={selectedCategories.includes(item.slug)}
                   />
-                  <Label htmlFor={safeId}>{item.name}</Label>
+                  <Label htmlFor={safeId} className="text-[13px] font-medium text-gray-600 hover:text-black cursor-pointer transition-colors">
+                    {item.name}
+                  </Label>
                 </div>
               );
             })}
           </div>
         </div>
       </div>
-      <div className="rounded-lg p-6 space-y-6 bg-gray ">
-        <div className="flex justify-between">
-          <p className="uppercase font-bold">Categories</p>
-          <button onClick={handleResetAll} className="cursor-pointer">Reset All</button>
+
+      <div className="rounded-xl p-5 space-y-6 bg-[#f8f9fc] border border-gray-100 shadow-sm">
+        <div className="flex justify-between items-center mb-2">
+          <p className="uppercase font-bold text-gray-800 tracking-wide">Filters</p>
+          <button 
+            onClick={handleResetAll} 
+            className="cursor-pointer text-primary hover:text-primary/80 text-[13px] font-semibold transition-colors"
+          >
+            Reset All
+          </button>
         </div>
         
-        <p className="my-4 text-sm font-semibold">By Brands</p>
-    
-        <div className="flex flex-col items-start gap-3">
-          {filterMetaData?.brands.map((item) => {
-            const safeId = `brand-${item.slug}`;
-            return (
-              <div key={item.slug} className="flex items-center gap-2">
-                <Checkbox
-                  id={safeId}
-                  className="bg-white"
-                  checked={selectedBrands.includes(item.slug)}
-                  onCheckedChange={() => handleFilterChange('brand', item.slug)}
-                />
-                <Label
-                  htmlFor={safeId}
-                  className="flex items-center gap-2 text-secondary"
-                >
-                  {item.logo && (
-                    <Image
-                      src={item.logo}
-                      width={80}
-                      height={25}
-                      alt={item.name}
-                    />
-                  )}
-                  <span>{item.name}</span>
-                  <span className="opacity-75">({item.product_count})</span>
-                </Label>
-              </div>
-            );
-          })}
+        <div>
+          <p className="mb-4 text-[13px] uppercase font-bold text-gray-700">By Brands</p>
+          <div className="flex flex-col items-start gap-3 max-h-60 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+            {brandsToRender.map((item: any) => {
+              const safeId = `brand-${item.slug}`;
+              return (
+                <div key={item.slug} className="flex items-center gap-3">
+                  <Checkbox
+                    id={safeId}
+                    className="bg-white rounded-md w-4 h-4 border-gray-300 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                    checked={selectedBrands.includes(item.slug)}
+                    onCheckedChange={() => handleFilterChange('brand', item.slug)}
+                  />
+                  <Label
+                    htmlFor={safeId}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    {item.logo && (
+                      <div className="bg-white border border-gray-100 p-0.5 rounded shadow-sm flex items-center justify-center w-10 h-6">
+                        <Image
+                          src={resolveImageUrl(item.logo)}
+                          width={32}
+                          height={16}
+                          alt={item.name}
+                          className="object-contain"
+                        />
+                      </div>
+                    )}
+                    <span className="text-[13px] font-medium text-gray-600 hover:text-black transition-colors">{item.name}</span>
+                    <span className="text-[11px] text-gray-400">({item.product_count || item.total_products || 0})</span>
+                  </Label>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
-        <hr className="h-px bg-gray-300 border-0" />
+        <div className="w-full h-px bg-gray-200" />
 
         <div className="space-y-4">
-          <p className="my-4 text-sm font-semibold">By Price</p>
+          <p className="mb-4 text-[13px] uppercase font-bold text-gray-700">By Price</p>
           <PriceRangeSlider
             minPrice={minPrice}
             maxPrice={maxPrice}
@@ -205,30 +232,35 @@ const CategoriesFilter = ({ slug: category_slug, filterMetaData, defaultslug }: 
             onGoClick={handlePriceGoClick}
           />
         </div>
-        <hr className="h-px bg-gray-300 border-0" />
-        {filterMetaData?.ratings && (
-          <div>
-            <p className="my-4 text-sm font-semibold">By Rating</p>
-            <div className="flex flex-col space-y-4">
-              <StarFilter
-                ratings={filterMetaData?.ratings}
-                onRatingChange={(rating) => handleFilterChange('rating', rating)}
-                selectedRatings={selectedRatings}
-              />
+
+        <div className="w-full h-px bg-gray-200" />
+        
+        <div>
+          <p className="mb-4 text-[13px] uppercase font-bold text-gray-700">By Rating</p>
+          <div className="flex flex-col space-y-4">
+            <StarFilter
+              ratings={filterMetaData?.ratings || [
+                { value: '5', count: 0 },
+                { value: '4', count: 0 },
+                { value: '3', count: 0 },
+                { value: '2', count: 0 },
+                { value: '1', count: 0 },
+              ]}
+              onRatingChange={(rating) => handleFilterChange('rating', rating)}
+              selectedRatings={selectedRatings}
+            />
+          </div>
+        </div>
+
+        {filterMetaData?.attributes?.filter(attr => attr.values && attr.values.length > 0).map((attr, index) => (
+          <div key={`attr-wrapper-${index}`}>
+            <div className="w-full h-px bg-gray-200 mb-6" />
+            <div className="mb-6">
+              <p className="mb-4 text-[13px] uppercase font-bold text-gray-700">{attr.name}</p>
+              <AttributeValues attr={attr} searchParams={searchParams} handleFilterChange={handleFilterChange} />
             </div>
           </div>
-        )}
-
-        <hr className="h-px bg-gray-300 border-0" />
-        
-        {filterMetaData?.attributes?.filter(attr => attr.values && attr.values.length > 0).map((attr, index) => (
-          <div key={index} className="mb-6">
-            <p className="my-4 text-sm font-semibold">{attr.name}</p>
-            <AttributeValues attr={attr} searchParams={searchParams} handleFilterChange={handleFilterChange} />
-          </div>
         ))}
-
-        <hr className="h-px bg-gray-300 border-0" />
       </div>
     </>
   );

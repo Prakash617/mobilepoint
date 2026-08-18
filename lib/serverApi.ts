@@ -1,6 +1,6 @@
 import { ProductDetail, Product, PaginatedResponse } from '@/types/product';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api';
 
 // Server-side fetch with error handling
 async function fetchApi<T>(endpoint: string): Promise<T> {

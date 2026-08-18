@@ -4,3 +4,13 @@ import { twMerge } from "tailwind-merge"
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
+
+// Resolves relative /media/... paths from the API into absolute URLs.
+export function resolveImageUrl(src?: string | null): string {
+  if (!src) return "/placeholder.png";
+  if (/^https?:\/\//i.test(src)) return src;
+  if (src.startsWith("/media/")) return `${API_BASE_URL.replace(/\/api\/?$/, "")}${src}`;
+  return src;
+}

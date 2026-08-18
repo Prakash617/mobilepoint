@@ -38,8 +38,16 @@ export default function RootLayout({
         <div className="w-full md:w-5/6 md:mx-auto">
         {/* <div className="p-2 md:mx-auto"> */}
         <Navbar/>
-        <SearchBox />
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div className="h-16 w-full bg-gray-100 animate-pulse rounded-lg my-2"></div>}>
+          <SearchBox />
+        </Suspense>
+        <Suspense fallback={
+          <div className="flex flex-col space-y-4 p-4 min-h-screen">
+            <div className="w-full h-64 bg-gray-100 animate-pulse rounded-lg"></div>
+            <div className="w-full h-64 bg-gray-100 animate-pulse rounded-lg"></div>
+            <div className="w-full h-64 bg-gray-100 animate-pulse rounded-lg"></div>
+          </div>
+        }>
           {children}
         </Suspense>
         </div>

@@ -37,6 +37,9 @@
 .html-content li {
   margin: 0.4rem 0;
 }
+.html-content li p {
+  margin: 0;
+}
 
 /* Links */
 .html-content a {

@@ -71,10 +71,9 @@ export const productService = {
   },
 
 getBestProduct: async (params?: { category?: string, limit?: number }) => {
-  const url = params?.category 
-    ? `/products/best_seller/?category=${params.category}&limit=${params.limit || 10}` 
-    : `/products/best_seller/`;
-  const { data } = await api.get<PaginatedResponse<Product>>(url);
+  const { data } = await api.get<PaginatedResponse<Product>>('/products/best_seller/', {
+    params,
+  });
   return data;
 },
 
@@ -131,7 +130,7 @@ getFeaturedCategories: async (): Promise<PaginatedResponse<Category>> => {
     return data;
   },
 getPopularCategories: async ({limit = 10}): Promise<PaginatedResponse<Category>> => {
-    const { data } = await api.get<PaginatedResponse<Category>>("/categories/?is_popular=true", { params: { limit } });
+    const { data } = await api.get<PaginatedResponse<Category>>("/categories/?top=true", { params: { limit } });
     return data;
   },
 getTopCategories : async (limit = 8): Promise<PaginatedResponse<Category>> => {
@@ -153,9 +152,7 @@ getTopCategories : async (limit = 8): Promise<PaginatedResponse<Category>> => {
   // Get featured categories
 // Get featured brands only
 getFeaturedBrands: async (): Promise<PaginatedResponse<Brand>> => {
-  const { data } = await api.get<PaginatedResponse<Brand>>(
-    "/brands/?is_featured=true"
-  );
+  const { data } = await api.get<PaginatedResponse<Brand>>("/brands/");
   return data;
 },
 
@@ -176,8 +173,13 @@ getDeals : async (): Promise<PaginatedResponse<Deal>> => {
 export const recentlyViewedService = {
   getRecentlyViewed: async (params?: { limit?: number }) => {
     const { data } = await api.get<RecentlyViewedProduct[]>(
-      `/recently-viewed/list_recent/?limit=${params?.limit}`
+      `/recently-viewed/list_recent/`,
+      { params }
     );
     return data;
+  },
+
+  track: async (slug: string) => {
+    await api.post(`/recently-viewed/track/`, { product: slug });
   },
 };

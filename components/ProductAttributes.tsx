@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState, useMemo, useEffect } from "react";
+import { resolveImageUrl } from "@/lib/utils";
 
 type AttributeValue = {
   id: number;
@@ -95,7 +96,7 @@ export default function ProductAttributes({ availableAttributes, variants }: Pro
                   {v.image && (
                     <div>
                       <Image
-                        src={v.image}
+                        src={resolveImageUrl(v.image)}
                         alt={v.value}
                         width={70}
                         height={70}

@@ -10,6 +10,8 @@ import {
 } from "@/hooks/useProducts";
 import { Category } from "@/types/product";
 import { useAdvertisements } from "@/hooks/useAds";
+import { getAdsWithFallback } from "@/lib/adFallback";
+import { resolveImageUrl } from "@/lib/utils";
 import Link from "next/link";
 import CardCarouselSkeleton from "@/components/skeleton/TopCellCarouselSkeleton";
 import TopCellPhoneSkeleton from "@/components/skeleton/TopcellPhoneSkeleton";
@@ -33,7 +35,7 @@ const TopCellPhone = () => {
     error: isAdsError,
   } = useAdvertisements();
 
-  const advertisements = ads?.results || [];
+  const advertisements = getAdsWithFallback(ads?.results || [], 6);
   const ad6 = advertisements[5];
 
   if (isAdsLoading) return <TopCellPhoneSkeleton />;
@@ -73,7 +75,7 @@ const TopCellPhone = () => {
           {ad6?.image && (
             <div className="w-full md:w-1/2 h-[220px] relative">
               <Image
-                src={ad6.image}
+                src={resolveImageUrl(ad6.image)}
                 alt={ad6.title || "Advertisement6"}
                 fill
                 className="object-cover rounded-lg"
@@ -83,10 +85,6 @@ const TopCellPhone = () => {
                 <p className="text-xl sm:text-2xl font-semibold uppercase">
                   {ad6.title}
                 </p>
-                <div
-                  className="text-secondary text-xs sm:text-sm"
-                  dangerouslySetInnerHTML={{ __html: ad6?.html_content }}
-                />
                 <Link href={ad6?.link_url || "#"}>
                   <Button
                     text="Shop Now"
@@ -116,7 +114,7 @@ const TopCellPhone = () => {
 
                 <div className="relative w-[45px] h-[45px] sm:w-[55px] sm:h-[55px]">
                   <Image
-                    src={item.image}
+                    src={resolveImageUrl(item.image)}
                     alt={item.name}
                     fill
                     className="object-contain"

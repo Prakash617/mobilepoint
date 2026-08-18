@@ -8,8 +8,10 @@ import HorizontalLine from "@/components/HorizontalLine";
 import Adsrecentview from "@/components/Adsrecentview";
 import { FaMinus } from "react-icons/fa";
 import { DropDown } from "@/components/DropDown";
-import ProductCardList from "@/components/ProductCardList"; // Updated import
+import ProductCardList from "@/components/ProductCardList";
+import { CardCarousel } from "@/components/CardCarousel";
 import PaginationBar from "@/components/PaginationBar";
+import { resolveImageUrl } from "@/lib/utils";
 import PriceRangeSlider from "@/components/PriceRangeSlider";
 import HomeCarousel from "@/components/HomeCarousel";
 import {
@@ -55,6 +57,7 @@ const ProductList = (props: Props) => {
     ? Number(searchParams.get("page_size"))
     : 16;
   const ordering = searchParams.get("ordering") || "-created_at"; // Default sort order
+  const searchQuery = searchParams.get("search") || undefined; // Extract search query
 
   // Get values from URL
   const filterQuery: any = {};
@@ -64,6 +67,7 @@ const ProductList = (props: Props) => {
   if (minPrice !== undefined) filterQuery.min_price = minPrice;
   if (maxPrice !== undefined) filterQuery.max_price = maxPrice;
   if (ratings?.length) filterQuery.rating = ratings;
+  if (searchQuery) filterQuery.search = searchQuery; // Add search to filter query
   filterQuery.page = page;
   filterQuery.page_size = pageSize;
   filterQuery.ordering = ordering; // Add ordering to filter query
@@ -87,30 +91,18 @@ const ProductList = (props: Props) => {
     error: bestError,
   } = useBestProducts({ limit: 10, category: `${category_slug}` });
 
+  const brand_slug = brands?.join(",") || "";
   const {
     data: filterMetaData,
     isLoading: isFilterLoading,
-    error: filterError,
-  } = useFiltersMetadata({ category: `${category_slug}` });
+  } = useFiltersMetadata({ category: `${category_slug}`, brand: brand_slug });
 
-  // Handle loading states
-  if (isBestLoading || isFilterLoading || isFilteredLoading) {
-    return <div>Loading...</div>;
-  }
   // Handle error states
   if (bestError) {
     return <div>Error: {bestError.message}</div>;
   }
   if (filteredError) {
     return <div>Error: {filteredError.message}</div>;
-  }
-  if (filterError) {
-    return <div>Error: {filterError.message}</div>;
-  }
-
-  // Ensure filteredProducts is not undefined before accessing its properties
-  if (!filteredProducts) {
-    return <div>No products found.</div>;
   }
 
   // Ensure category_slug is a string before rendering CategoriesFilter
@@ -138,11 +130,13 @@ const ProductList = (props: Props) => {
     router.push(`${pathname}?${newSearchParams.toString()}`, { scroll: false });
   };
 
-  const startRange =
-    (filteredProducts.current_page - 1) * filteredProducts.page_size + 1;
-  const endRange =
-    (filteredProducts.current_page - 1) * filteredProducts.page_size +
-    filteredProducts.results.length;
+  const startRange = filteredProducts
+    ? (filteredProducts.current_page - 1) * filteredProducts.page_size + 1
+    : 0;
+  const endRange = filteredProducts
+    ? (filteredProducts.current_page - 1) * filteredProducts.page_size +
+      filteredProducts.results.length
+    : 0;
 
   return (
     <>
@@ -174,11 +168,11 @@ const ProductList = (props: Props) => {
         </div>
 
         <div className="w-full  grid md:grid-cols-5 grid-cols-2 sm:grid-cols-3 gap-4 place-items-center">
-          {popularCategories?.results.map((item) => (
+          {popularCategories?.results?.map((item) => (
             <Link
-              href={`/shop/?category=${item.slug}`}
+              href={`/products/?category=${item.slug}`}
               key={item.id}
-              className="flex w-full items-center justify-between bg-white rounded-lg p-2 sm:p-3  hover:shadow transition"
+              className="flex w-full items-center justify-between bg-white rounded-lg p-2 sm:p-3 hover:shadow transition"
             >
               <div>
                 <h3 className="font-bold text-sm">{item.name}</h3>
@@ -190,7 +184,7 @@ const ProductList = (props: Props) => {
               </div>
               <div className="relative w-[45px] h-[45px] sm:w-[55px] sm:h-[55px]">
                 <Image
-                  src={item.image}
+                  src={resolveImageUrl(item.image)}
                   alt={item.name}
                   fill
                   className="object-contain"
@@ -202,7 +196,7 @@ const ProductList = (props: Props) => {
       </div>
 
       <div className="bg-white my-2  flex flex-col md:flex-row gap-4 p-4  rounded-lg">
-        <div className="md:w-1/4 w-full space-y-4 ">
+        <div className="md:w-1/4 w-full space-y-4 md:sticky md:top-4 md:self-start md:max-h-[calc(100vh-2rem)] md:overflow-y-auto md:pr-1">
           <CategoriesFilter
             slug={category_slug}
             defaultslug={defaultSlug}
@@ -220,10 +214,10 @@ const ProductList = (props: Props) => {
 
         <div className="rounded-lg w-full border-2 border-gray p-4 md:w-3/4">
           <div>
-            <p className="text-lg font-bold uppercase">
+            <p className="text-lg font-bold uppercase mb-4">
               Best seller in this category
             </p>
-            <ProductCardList products={bestProducts?.results || []} isLoading={isBestLoading} />
+            <CardCarousel products={bestProducts?.results || []} isLoading={isBestLoading} />
           </div>
 
           <HorizontalLine />
@@ -269,7 +263,7 @@ const ProductList = (props: Props) => {
             </div>
 
             <div className=" ">
-              <ProductCardList products={filteredProducts?.results ?? []} />
+              <ProductCardList products={filteredProducts?.results ?? []} isLoading={isFilteredLoading} />
 
               <div className="my-4">
                 {filteredProducts && filteredProducts.results.length > 0 && (

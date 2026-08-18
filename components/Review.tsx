@@ -1,33 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Star } from "lucide-react";
+import { Star, Loader2 } from "lucide-react";
 import Button from "./Button";
+import { useReviews, useAddReview } from "@/hooks/useReviews";
 
-// Initial static reviews
-const initialReviews = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john@example.com",
-    rating: 5,
-    comment: "Amazing product. Totally worth the price!",
-    date: "2024-12-01",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    email: "jane@example.com",
-    rating: 4,
-    comment: "Good quality, but delivery was slow.",
-    date: "2024-12-03",
-  },
-];
+type Props = {
+  productSlug?: string;
+};
 
-// Component
-const Review = () => {
+const Review = ({ productSlug }: Props) => {
   const [rating, setRating] = useState(0);
-  const [reviewList, setReviewList] = useState(initialReviews);
   const [showAll, setShowAll] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -36,24 +19,18 @@ const Review = () => {
     comment: "",
   });
 
-  // Derived review summary
-  const reviewSummary = (() => {
-    const ratingsCount: Record<number, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-    let totalStars = 0;
+  const { data: reviewsData, isLoading } = useReviews(productSlug || "");
+  const { mutate: addReview, isPending } = useAddReview();
 
-    reviewList.forEach((r) => {
-      ratingsCount[r.rating] = (ratingsCount[r.rating] || 0) + 1;
-      totalStars += r.rating;
-    });
+  // Fallbacks if data isn't loaded yet
+  const reviewList = reviewsData?.results || [];
+  const reviewSummary = {
+    totalReviews: reviewsData?.total_reviews || 0,
+    average: reviewsData?.average_rating || 0,
+    ratings: reviewsData?.star_counts || { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+  };
 
-    const totalReviews = reviewList.length;
-    const average = totalReviews === 0 ? 0 : +(totalStars / totalReviews).toFixed(1);
-
-    return { ratings: ratingsCount, totalReviews, average };
-  })();
-
-  const maxCount = Math.max(...Object.values(reviewSummary.ratings));
-
+  const maxCount = Math.max(...Object.values(reviewSummary.ratings), 1); // fallback to 1 to avoid / 0
   const visibleReviews = showAll ? reviewList : reviewList.slice(0, 3);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -63,33 +40,44 @@ const Review = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!productSlug) {
+      alert("Error: Product slug is missing.");
+      return;
+    }
+
     if (!formData.name || !formData.email || !formData.comment || rating === 0) {
       alert("Please fill all fields and select a rating!");
       return;
     }
 
-    const newReview = {
-      id: reviewList.length + 1,
-      name: formData.name,
-      email: formData.email,
+    addReview({
+      product_slug: productSlug,
       rating,
       comment: formData.comment,
-      date: new Date().toISOString().split("T")[0],
-    };
-
-    setReviewList((prev) => [newReview, ...prev]);
-
-    setFormData({ name: "", email: "", comment: "" });
-    setRating(0);
-    setShowAll(true);
+      title: "Review", // Default title since we don't have a title field
+    }, {
+      onSuccess: () => {
+        setFormData({ name: "", email: "", comment: "" });
+        setRating(0);
+        setShowAll(true);
+      }
+    });
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <Loader2 className="animate-spin w-8 h-8 text-gray-500" />
+      </div>
+    );
+  }
 
   return (
     <>
-      <div className="flex flex-col lg:flex-row sm:gap-30 w-full px-4 sm:px-6 lg:px-20 py-6">
+      <div className="flex flex-col lg:flex-row gap-12 w-full px-4 sm:px-6 lg:px-20 py-6">
         {/* Left: Overall Rating & Bars */}
         <div className="w-full lg:w-1/2 max-w-md p-5">
-          <h1 className="mb-5">Based on {reviewSummary.totalReviews} reviews</h1>
+          <h2 className="mb-5 font-semibold text-gray-800 text-xl">Based on {reviewSummary.totalReviews} reviews</h2>
 
           {/* Average rating */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6 w-full">
@@ -116,7 +104,7 @@ const Review = () => {
                   <div
                     className="h-2 bg-yellow-400 rounded-full"
                     style={{
-                      width: `${maxCount === 0 ? 0 : (reviewSummary.ratings[star] / maxCount) * 100}%`,
+                      width: `${(reviewSummary.ratings[star] / maxCount) * 100}%`,
                     }}
                   />
                 </div>
@@ -129,7 +117,7 @@ const Review = () => {
         {/* Right: Add Review Form */}
         <div className="w-full lg:w-1/2 p-4">
           <form className="space-y-6 mt-6 w-full" onSubmit={handleSubmit}>
-            <h3 className="text-lg">Add a Review</h3>
+            <h2 className="text-xl font-bold text-gray-900">Add a Review</h2>
 
             {/* Rating */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-5">
@@ -157,7 +145,7 @@ const Review = () => {
                 rows={3}
                 value={formData.comment}
                 onChange={handleChange}
-                className="flex-1 rounded-3xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-0.5 focus:ring-primary focus:border-primary resize-none"
+                className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0073bc]/30 focus:border-[#0073bc] resize-none"
               />
             </div>
 
@@ -172,7 +160,7 @@ const Review = () => {
                 type="text"
                 value={formData.name}
                 onChange={handleChange}
-                className="flex-1 rounded-3xl border border-gray-300 px-3 py-3 text-sm focus:outline-none focus:ring-0.5 focus:ring-primary focus:border-primary"
+                className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0073bc]/30 focus:border-[#0073bc]"
               />
             </div>
 
@@ -187,13 +175,13 @@ const Review = () => {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="flex-1 rounded-3xl border border-gray-300 px-3 py-3 text-sm focus:outline-none focus:ring-0.5 focus:ring-primary focus:border-primary w-full"
+                className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0073bc]/30 focus:border-[#0073bc] w-full"
               />
             </div>
 
             {/* Submit */}
             <div className="flex justify-start sm:pl-37">
-              <Button text="Add review" bgColor="bg-success" type="submit" />
+              <Button text={isPending ? "Submitting..." : "Add review"} bgColor="bg-success" type="submit" disabled={isPending} />
             </div>
           </form>
         </div>
@@ -202,7 +190,7 @@ const Review = () => {
       {/* Reviews list */}
       <div className="flex flex-row w-full px-4 sm:px-2 lg:px-20 py-6">
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-20 py-6 space-y-6">
-          {visibleReviews.map((review) => (
+          {visibleReviews.map((review: any) => (
             <div key={review.id} className="w-full p-2">
               <div className="flex gap-1 mb-2">
                 {[1, 2, 3, 4, 5].map((i) => (
@@ -215,14 +203,20 @@ const Review = () => {
               </div>
               <p className="text-gray-700 text-sm sm:text-base">{review.comment}</p>
               <p className="mt-2 text-gray-500 text-sm font-medium">
-                {review.name} - {review.date}
+                {review.user || "Anonymous"} - {review.created_at ? new Date(review.created_at).toISOString().split("T")[0] : ""}
               </p>
-              <div className="h-0.5 w-full bg-gray-100 rounded-full" />
+              <div className="h-0.5 w-full bg-gray-100 rounded-full mt-4" />
             </div>
           ))}
 
+          {reviewList.length === 0 && (
+            <div className="text-center text-gray-500 italic py-4">
+              No reviews yet. Be the first to review!
+            </div>
+          )}
+
           {reviewList.length > 3 && (
-            <div className="flex justify-center">
+            <div className="flex justify-center mt-4">
               <button
                 onClick={() => setShowAll(!showAll)}
                 className="text-blue-600 font-medium hover:underline"

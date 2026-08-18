@@ -113,7 +113,7 @@ export default async function ProductDetail({ params }: Props) {
 
       
       <MainProductDetail product={product} />
-      
+
       <RelatedProduct  slug={slug}/>
       <Adsrecentview />
     </>

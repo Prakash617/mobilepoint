@@ -117,21 +117,21 @@ body {
     display: grid;
     grid-template-areas:
       "left-side mid-main mid-main right-side"
-      "left-side main-down main-down right-side";
+      "left-side main-left main-right right-side";
 
     grid-template-columns: 278px 1fr 1fr 280px;
 
-    /* FIX: Set explicit row heights */
-    grid-template-rows: 300px 100px;
+    /* Fixed row heights for correct alignment */
+    grid-template-rows: 350px 160px;
 
     gap: 0.5rem;
   }
 
-  .area-left-side { grid-area: left-side; }
-  .area-mid-main { grid-area: mid-main; }
-  .area-main-down { grid-area: main-down; }
-
-  .area-right-side { grid-area: right-side; }
+  .area-left-side { grid-area: left-side; height: 100%; overflow: hidden; }
+  .area-mid-main { grid-area: mid-main; height: 100%; overflow: hidden; }
+  .area-main-left { grid-area: main-left; height: 100%; overflow: hidden; }
+  .area-main-right { grid-area: main-right; height: 100%; overflow: hidden; }
+  .area-right-side { grid-area: right-side; height: 100%; overflow: hidden; }
 }
 
 .dark {

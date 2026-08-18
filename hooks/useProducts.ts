@@ -1,5 +1,7 @@
-import { useQuery, useMutation, UseQueryOptions } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
 import { productService, recentlyViewedService } from '@/services/productService';
+import { wishlistService } from '@/services/wishlistService';
+import { menuService, Menu } from '@/services/menuService';
 import { PaginatedResponse, Product, ProductFilters } from '@/types/product';
 type ProductParams = {
   page?: number;
@@ -165,10 +167,72 @@ export const useDeals = () => {
 };
 
 
-export const useRecentlyViewed = ({ limit = 10 }: { limit?: number }) => {
+export const useRecentlyViewed = ({ limit = 10, enabled = true }: { limit?: number; enabled?: boolean }) => {
   return useQuery({
     queryKey: ["recently-viewed", { limit }],
     queryFn: () => recentlyViewedService.getRecentlyViewed({ limit }),
     staleTime: 1000 * 60 * 5, // cache 5 minutes
+    enabled,
+  });
+};
+
+export const wishlistKeys = {
+  all: ["wishlist"] as const,
+  list: () => [...wishlistKeys.all, "list"] as const,
+};
+
+export const useWishlist = (enabled = true) => {
+  return useQuery({
+    queryKey: wishlistKeys.list(),
+    queryFn: wishlistService.getWishlist,
+    enabled,
+    staleTime: 1000 * 30,
+  });
+};
+
+export const useWishlistMutations = () => {
+  const queryClient = useQueryClient();
+  const invalidate = () =>
+    queryClient.invalidateQueries({ queryKey: wishlistKeys.all });
+
+  const addWishlistItem = useMutation({
+    mutationFn: ({
+      productVariantId,
+      productId,
+    }: {
+      productVariantId?: number;
+      productId?: number;
+    }) => wishlistService.addItem(productVariantId, productId),
+    onSuccess: invalidate,
+  });
+
+  const removeWishlistItem = useMutation({
+    mutationFn: (id: number) => wishlistService.removeItem(id),
+    onSuccess: invalidate,
+  });
+
+  const clearWishlist = useMutation({
+    mutationFn: () => wishlistService.clearWishlist(),
+    onSuccess: invalidate,
+  });
+
+  const moveWishlistItemToCart = useMutation({
+    mutationFn: (id: number) => wishlistService.moveToCart(id),
+    onSuccess: invalidate,
+  });
+
+  return {
+    addWishlistItem,
+    removeWishlistItem,
+    clearWishlist,
+    moveWishlistItemToCart,
+  };
+};
+
+export const useMenu = (location: string) => {
+  return useQuery<Menu[]>({
+    queryKey: ["menu", location],
+    queryFn: () => menuService.getByLocation(location),
+    staleTime: 1000 * 60 * 10,
   });
 };

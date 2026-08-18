@@ -12,9 +12,13 @@ import Autoplay from "embla-carousel-autoplay";
 import { useRecentlyViewed } from "@/hooks/useProducts";
 import Link from "next/link";
 import RecentlyViewedSkeleton from "./skeleton/AdsRecentViewSkeleton";
+import { resolveImageUrl } from "@/lib/utils";
+
+import { useAuthStore, selectIsAuthenticated } from "@/stores/authStore";
 
 function Adsrecentview() {
-  const { data, isLoading, error } = useRecentlyViewed({ limit: 10 });
+  const isAuthenticated = useAuthStore(selectIsAuthenticated);
+  const { data, isLoading, error } = useRecentlyViewed({ limit: 10, enabled: isAuthenticated });
 
   const [api, setApi] = React.useState<CarouselApi>();
   const plugin = React.useRef(
@@ -26,15 +30,14 @@ function Adsrecentview() {
   }, [api]);
 
   // 🔒 NOT logged in or forbidden → don't show component
-  if (error) return <p className="text-xs text-gray-500">
-            Need to be logged in to see recently viewed products.
-          </p>;
+  if (error) return null;
 
   // ⏳ loading → don't show component
   if (isLoading) return <RecentlyViewedSkeleton />;
 
   // 📭 no recently viewed items
-  if (!data || data.length === 0) return null;
+  const items = Array.isArray(data) ? data : (data as any)?.results;
+  if (!items || items.length === 0) return null;
 
   return (
     <div className="pb-2">
@@ -67,16 +70,16 @@ function Adsrecentview() {
           plugins={[plugin.current]}
         >
           <CarouselContent className="-ml-4">
-            {data.map((item) => {
+            {items.map((item: any) => {
               const product = item.product;
               const variant = product.default_variant;
 
               return (
                 <CarouselItem
                   key={item.id}
-                  className="pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4"
+                  className="pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6"
                 >
-                  <Link href={`/products/${product.slug}`} className="flex flex-col md:flex-row items-center rounded-lg p-3 h-full">
+                  <Link href={`/products/${product.slug}`} className="flex flex-col items-center rounded-lg p-3 h-full border border-gray-100 hover:shadow-md transition-shadow">
                     <div className="relative">
                       {product.is_new && (
                         <span className="absolute top-4 left-1 z-10 bg-black text-white text-[10px] px-2 py-1 rounded-sm">
@@ -90,16 +93,14 @@ function Adsrecentview() {
                           {product.discount.percentage}%
                         </span>
                       )}
-                      {product.primary_image && (
                       <div className="relative w-[90px] h-[90px] mx-auto mt-5">
                         <Image
-                          src={product.primary_image}
+                          src={resolveImageUrl(product.primary_image)}
                           alt={product.name}
                           fill
                           className="object-contain"
                         />
                       </div>
-            )}
                     </div>
 
                     <div className="mt-3 text-left">

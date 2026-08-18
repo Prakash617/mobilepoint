@@ -3,7 +3,7 @@ import { SiteSettings } from '@/types/siteSettings';
 
 export const siteSettingsService = {
   getSiteSettings: async () => {
-    const { data } = await api.get<SiteSettings>('/site-settings/');
+    const { data } = await api.get<SiteSettings>('/site-settings/current/');
     return data;
   },
 };

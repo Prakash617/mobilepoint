@@ -1,20 +1,25 @@
-import { Product } from "./product";
+export interface CarouselImage {
+  id: number;
+  url: string;
+  name: string;
+  size: number;
+  width: number;
+  height: number;
+  display_name: string;
+}
 
 export interface CarouselSlide {
   id: number;
   title: string;
   subtitle: string | null;
   description: string | null;
-  image: string;
-  mobile_image: string | null;
+  image: CarouselImage | null;
   link_url: string | null;
   link_text: string | null;
-  open_in_new_tab: boolean;
-  product: Product | null; // replace `any` with your Product type if available
+  product: number | null;
   order: number;
   is_active: boolean;
 }
-
 
 export interface Carousel {
   id: number;

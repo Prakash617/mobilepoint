@@ -1,0 +1,582 @@
+"use client";
+
+import { useState } from "react";
+import {
+  FaCheckCircle,
+  FaTruck,
+  FaCreditCard,
+  FaClipboardCheck,
+  FaArrowLeft,
+  FaArrowRight,
+} from "react-icons/fa";
+import { CartItem } from "@/stores/cartStore";
+import {
+  orderService,
+  OrderDetailResult,
+  PaymentMethod,
+} from "@/services/orderService";
+
+interface CheckoutFormProps {
+  items: CartItem[];
+  subtotal: number;
+  shippingCost: number;
+  taxRate: number;
+  tax: number;
+  total: number;
+  onSuccess: (order: OrderDetailResult) => void;
+  onCancel: () => void;
+}
+
+const PAYMENT_METHODS: { value: PaymentMethod; label: string; hint: string }[] =
+  [
+    { value: "cod", label: "Cash on Delivery", hint: "Pay when your order arrives" },
+    { value: "khalti", label: "Khalti", hint: "Pay via Khalti wallet" },
+    { value: "esewa", label: "eSewa", hint: "Pay via eSewa wallet" },
+    { value: "bank_transfer", label: "Bank Transfer", hint: "Manual bank deposit" },
+  ];
+
+const inputCls =
+  "w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0073bc]/30 focus:border-[#0073bc] transition";
+const labelCls = "block text-xs font-semibold text-gray-600 mb-1.5 uppercase";
+
+interface ShippingFields {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+}
+
+interface BillingFields {
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+}
+
+const STEPS = [
+  { id: 1, label: "Shipping" },
+  { id: 2, label: "Payment" },
+  { id: 3, label: "Review" },
+];
+
+export default function CheckoutForm({
+  items,
+  subtotal,
+  shippingCost,
+  taxRate,
+  tax,
+  total,
+  onSuccess,
+  onCancel,
+}: CheckoutFormProps) {
+  const [step, setStep] = useState(1);
+  const [paymentMethod, setPaymentMethod] =
+    useState<PaymentMethod>("cod");
+  const [paymentTransactionId, setPaymentTransactionId] = useState("");
+  const [sameAsShipping, setSameAsShipping] = useState(true);
+
+  const [shipping, setShipping] = useState<ShippingFields>({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    zip: "",
+    country: "",
+  });
+  const [billing, setBilling] = useState<BillingFields>({
+    name: "",
+    address: "",
+    city: "",
+    state: "",
+    zip: "",
+    country: "",
+  });
+  const [notes, setNotes] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [authRequired, setAuthRequired] = useState(false);
+
+  const setShippingField = (key: keyof ShippingFields, value: string) =>
+    setShipping((s) => ({ ...s, [key]: value }));
+  const setBillingField = (key: keyof BillingFields, value: string) =>
+    setBilling((b) => ({ ...b, [key]: value }));
+
+  const billingData = sameAsShipping
+    ? {
+        name: shipping.name,
+        address: shipping.address,
+        city: shipping.city,
+        state: shipping.state,
+        zip: shipping.zip,
+        country: shipping.country,
+      }
+    : billing;
+
+  const goNext = () => setStep((s) => Math.min(s + 1, STEPS.length));
+  const goBack = () => setStep((s) => Math.max(s - 1, 1));
+
+  const handlePlaceOrder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setAuthRequired(false);
+
+    setLoading(true);
+    try {
+      const order = await orderService.createOrder({
+        items: orderService.buildItems(items),
+        payment_method: paymentMethod,
+        payment_transaction_id:
+          paymentMethod !== "cod" && paymentTransactionId
+            ? paymentTransactionId
+            : undefined,
+        shipping_name: shipping.name,
+        shipping_email: shipping.email,
+        shipping_phone: shipping.phone,
+        shipping_address: shipping.address,
+        shipping_city: shipping.city,
+        shipping_state: shipping.state,
+        shipping_zip: shipping.zip,
+        shipping_country: shipping.country,
+        billing_name: billingData.name,
+        billing_address: billingData.address,
+        billing_city: billingData.city,
+        billing_state: billingData.state,
+        billing_zip: billingData.zip,
+        billing_country: billingData.country,
+        notes: notes || undefined,
+      });
+      onSuccess(order);
+    } catch (err: unknown) {
+      const status = (err as { response?: { status?: number } })
+        ?.response?.status;
+      if (status === 401) {
+        setAuthRequired(true);
+      } else {
+        const data = (err as { response?: { data?: unknown } })?.response
+          ?.data;
+        setError(
+          typeof data === "object" && data !== null
+            ? Object.values(data as Record<string, unknown>)
+                .flat()
+                .filter((v) => typeof v === "string")
+                .join(", ") || "Something went wrong. Please try again."
+            : "Something went wrong. Please try again."
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStepSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (step < 3) {
+      goNext();
+    } else {
+      handlePlaceOrder(e);
+    }
+  };
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="border-b border-gray-200 px-6 md:px-8 py-5 flex items-center justify-between">
+        <h3 className="text-lg font-bold text-gray-900">Checkout</h3>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="text-sm text-gray-500 hover:text-gray-700"
+        >
+          Cancel
+        </button>
+      </div>
+
+      {/* Stepper */}
+      <div className="px-6 md:px-8 pt-6">
+        <ol className="flex items-center w-full">
+          {STEPS.map((s, i) => {
+            const active = step === s.id;
+            const complete = step > s.id;
+            return (
+              <li
+                key={s.id}
+                className={`flex items-center ${
+                  i !== STEPS.length - 1 ? "w-full" : ""
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={() => complete && setStep(s.id)}
+                  className={`flex items-center gap-2 ${
+                    complete ? "cursor-pointer" : "cursor-default"
+                  }`}
+                >
+                  <span
+                    className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition ${
+                      complete
+                        ? "bg-green-500 text-white"
+                        : active
+                        ? "bg-[#0073bc] text-white"
+                        : "bg-gray-200 text-gray-500"
+                    }`}
+                  >
+                    {complete ? <FaCheckCircle /> : s.id}
+                  </span>
+                  <span
+                    className={`hidden sm:block text-sm font-semibold ${
+                      active || complete
+                        ? "text-gray-900"
+                        : "text-gray-400"
+                    }`}
+                  >
+                    {s.label}
+                  </span>
+                </button>
+                {i !== STEPS.length - 1 && (
+                  <div
+                    className={`flex-1 mx-2 sm:mx-3 h-0.5 rounded ${
+                      complete ? "bg-green-500" : "bg-gray-200"
+                    }`}
+                  />
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+
+      <form onSubmit={handleStepSubmit} className="p-6 md:p-8 space-y-6">
+        {/* STEP 1: Shipping */}
+        {step === 1 && (
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 text-[#0073bc]">
+              <FaTruck />
+              <p className="font-bold text-sm uppercase">Shipping Information</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <input
+                required
+                value={shipping.name}
+                onChange={(e) => setShippingField("name", e.target.value)}
+                placeholder="Full name *"
+                className={inputCls}
+              />
+              <input
+                type="tel"
+                required
+                value={shipping.phone}
+                onChange={(e) => setShippingField("phone", e.target.value)}
+                placeholder="Phone *"
+                className={inputCls}
+              />
+              <input
+                type="email"
+                value={shipping.email}
+                onChange={(e) => setShippingField("email", e.target.value)}
+                placeholder="Email"
+                className={inputCls}
+              />
+              <input
+                required
+                value={shipping.country}
+                onChange={(e) => setShippingField("country", e.target.value)}
+                placeholder="Country *"
+                className={inputCls}
+              />
+              <input
+                required
+                value={shipping.address}
+                onChange={(e) => setShippingField("address", e.target.value)}
+                placeholder="Address *"
+                className={`${inputCls} md:col-span-2`}
+              />
+              <input
+                required
+                value={shipping.city}
+                onChange={(e) => setShippingField("city", e.target.value)}
+                placeholder="City *"
+                className={inputCls}
+              />
+              <input
+                value={shipping.state}
+                onChange={(e) => setShippingField("state", e.target.value)}
+                placeholder="State / Province"
+                className={inputCls}
+              />
+              <input
+                value={shipping.zip}
+                onChange={(e) => setShippingField("zip", e.target.value)}
+                placeholder="ZIP / Postal code"
+                className={inputCls}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <p className={labelCls}>Order Notes</p>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Special instructions (optional)"
+                rows={2}
+                className={inputCls}
+              />
+            </div>
+
+            {/* Billing same as shipping */}
+            <div className="rounded-lg border border-gray-200 p-4">
+              <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={sameAsShipping}
+                  onChange={(e) => setSameAsShipping(e.target.checked)}
+                  className="accent-[#0073bc]"
+                />
+                Billing same as shipping
+              </label>
+              {!sameAsShipping && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+                  <input
+                    required
+                    value={billing.name}
+                    onChange={(e) => setBillingField("name", e.target.value)}
+                    placeholder="Full name *"
+                    className={inputCls}
+                  />
+                  <input
+                    required
+                    value={billing.country}
+                    onChange={(e) =>
+                      setBillingField("country", e.target.value)
+                    }
+                    placeholder="Country *"
+                    className={inputCls}
+                  />
+                  <input
+                    required
+                    value={billing.address}
+                    onChange={(e) =>
+                      setBillingField("address", e.target.value)
+                    }
+                    placeholder="Address *"
+                    className={`${inputCls} md:col-span-2`}
+                  />
+                  <input
+                    required
+                    value={billing.city}
+                    onChange={(e) => setBillingField("city", e.target.value)}
+                    placeholder="City *"
+                    className={inputCls}
+                  />
+                  <input
+                    value={billing.state}
+                    onChange={(e) => setBillingField("state", e.target.value)}
+                    placeholder="State / Province"
+                    className={inputCls}
+                  />
+                  <input
+                    value={billing.zip}
+                    onChange={(e) => setBillingField("zip", e.target.value)}
+                    placeholder="ZIP / Postal code"
+                    className={inputCls}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* STEP 2: Payment */}
+        {step === 2 && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-[#0073bc]">
+              <FaCreditCard />
+              <p className="font-bold text-sm uppercase">Payment Method</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {PAYMENT_METHODS.map((m) => (
+                <label
+                  key={m.value}
+                  className={`flex items-start gap-3 border rounded-xl px-4 py-3 cursor-pointer transition ${
+                    paymentMethod === m.value
+                      ? "border-[#0073bc] bg-[#0073bc]/5 ring-1 ring-[#0073bc]/30"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="payment_method"
+                    value={m.value}
+                    checked={paymentMethod === m.value}
+                    onChange={() => setPaymentMethod(m.value)}
+                    className="accent-[#0073bc] mt-0.5"
+                  />
+                  <span>
+                    <span className="block text-sm font-semibold text-gray-800">
+                      {m.label}
+                    </span>
+                    <span className="block text-xs text-gray-500">
+                      {m.hint}
+                    </span>
+                  </span>
+                </label>
+              ))}
+            </div>
+
+            {paymentMethod !== "cod" && (
+              <div className="space-y-1.5">
+                <p className={labelCls}>Transaction ID</p>
+                <input
+                  value={paymentTransactionId}
+                  onChange={(e) => setPaymentTransactionId(e.target.value)}
+                  placeholder="Enter your payment transaction ID"
+                  className={inputCls}
+                />
+                <p className="text-xs text-gray-400">
+                  Complete the payment through {paymentMethod} and enter the
+                  transaction ID above.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* STEP 3: Review */}
+        {step === 3 && (
+          <div className="space-y-5">
+            <div className="flex items-center gap-2 text-[#0073bc]">
+              <FaClipboardCheck />
+              <p className="font-bold text-sm uppercase">
+                Review Your Order
+              </p>
+            </div>
+
+            {/* Items */}
+            <div className="space-y-3">
+              {items.map((item) => (
+                <div
+                  key={item.key}
+                  className="flex items-center justify-between gap-3"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-xs font-bold text-gray-500 w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                      {item.quantity}
+                    </span>
+                    <span className="text-sm text-gray-800 truncate">
+                      {item.name}
+                    </span>
+                  </div>
+                  <span className="text-sm font-semibold text-gray-900 shrink-0">
+                    Rs. {(item.price * item.quantity).toLocaleString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="border-t border-gray-100 pt-4 space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Subtotal</span>
+                <span className="text-gray-800">Rs. {subtotal.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Shipping</span>
+                <span className="text-gray-800">
+                  {shippingCost > 0
+                    ? `Rs. ${shippingCost.toLocaleString()}`
+                    : "Free"}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Tax ({taxRate}%)</span>
+                <span className="text-gray-800">Rs. {tax.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between font-bold text-gray-900 pt-2 border-t border-gray-100 text-base">
+                <span>Total</span>
+                <span>Rs. {total.toLocaleString()}</span>
+              </div>
+            </div>
+
+            <div className="rounded-lg bg-gray-50 p-4 text-sm text-gray-700 space-y-1">
+              <p className="font-semibold text-gray-800">Delivery to</p>
+              <p>{shipping.name}{shipping.phone ? ` · ${shipping.phone}` : ""}</p>
+              <p>
+                {shipping.address}, {shipping.city}
+                {shipping.state ? `, ${shipping.state}` : ""}{" "}
+                {shipping.country}
+              </p>
+              <p className="pt-1">
+                Payment:{" "}
+                <span className="font-semibold capitalize">
+                  {paymentMethod.replace("_", " ")}
+                </span>
+                {paymentMethod !== "cod" && paymentTransactionId
+                  ? ` (ID: ${paymentTransactionId})`
+                  : ""}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {authRequired && (
+          <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3">
+            Please{" "}
+            <a href="/login" className="font-semibold underline">
+              log in
+            </a>{" "}
+            to complete your order.
+          </p>
+        )}
+
+        {error && (
+          <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3">
+            {error}
+          </p>
+        )}
+
+        {/* Step nav buttons */}
+        <div className="flex items-center justify-between gap-3 pt-2">
+          {step > 1 ? (
+            <button
+              type="button"
+              onClick={goBack}
+              disabled={loading}
+              className="inline-flex items-center gap-2 px-5 py-3 text-sm font-semibold text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+            >
+              <FaArrowLeft /> Back
+            </button>
+          ) : (
+            <span />
+          )}
+
+          {step < 3 ? (
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 bg-[#0073bc] hover:brightness-90 text-white font-bold uppercase py-3 px-8 rounded-lg"
+            >
+              Continue <FaArrowRight />
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={loading}
+              className="inline-flex items-center gap-2 bg-[#0073bc] hover:brightness-90 text-white font-bold uppercase py-3 px-8 rounded-lg disabled:opacity-50"
+            >
+              {loading ? "Placing order..." : "Place Order"}
+              {!loading && <FaCheckCircle />}
+            </button>
+          )}
+        </div>
+      </form>
+    </div>
+  );
+}

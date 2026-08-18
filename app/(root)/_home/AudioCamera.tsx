@@ -4,6 +4,7 @@ import Image from "next/image";
 import React from "react";
 import { useGroupedCategories } from "@/hooks/useGroupedCategories";
 import AudioCameraSkeleton from "@/components/skeleton/AudioCameraSkeleton";
+import { resolveImageUrl } from "@/lib/utils";
 
 export default function AudioCamera() {
   const { data, isLoading, error } = useGroupedCategories();
@@ -18,8 +19,8 @@ export default function AudioCamera() {
     return {
       title: category.name,
       image: [
-        category.image,                 // main image
-        ...children.map((c) => c.image) // sub images
+        resolveImageUrl(category.image),        // main image
+        ...children.map((c) => resolveImageUrl(c.image)) // sub images
       ],
       idata: children.map((c) => c.name),
       items: children.map((c) => String(c.total_products)),

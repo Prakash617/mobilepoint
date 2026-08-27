@@ -8,6 +8,7 @@ import { resolveImageUrl } from "@/lib/utils";
 import { useCartStore } from "@/stores/cartStore";
 import { FaCartPlus } from "react-icons/fa";
 import { IoCheckmarkCircle, IoCloseCircle } from "react-icons/io5";
+import { toast } from "sonner";
 
 type Props = {
   product: Product;
@@ -60,6 +61,7 @@ const ProductCard = ({ product }: Props) => {
       quantity: 1,
       maxStock: default_variant?.stock_quantity ?? product.stock_quantity,
     });
+    toast.success("Added to cart");
   };
 
   return (

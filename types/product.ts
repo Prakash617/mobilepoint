@@ -82,6 +82,14 @@ export interface Product {
   free_shipping: boolean;
   free_gift: boolean;
   is_new: boolean;
+  shipping_class?: string;
+  shipping_class_info?: {
+    code: string;
+    label: string;
+    cost: string;
+    is_free: boolean;
+    estimated_delivery: string;
+  } | null;
   primary_image?: string | null;
   default_variant?: ProductVariant | null;
   variants?: ProductVariant[];
@@ -103,7 +111,6 @@ export interface FreeGiftPromotion {
 }
 
 export interface Promotions {
-  free_shipping: FreeGiftPromotion | null;
   free_gift: FreeGiftPromotion | null;
 }
 

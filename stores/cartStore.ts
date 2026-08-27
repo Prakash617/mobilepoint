@@ -5,6 +5,7 @@ export interface CartItem {
   key: string;
   productId: number;
   variantId?: number;
+  comboId?: number;
   slug: string;
   name: string;
   image: string;
@@ -25,8 +26,10 @@ interface CartState {
   clearCart: () => void;
 }
 
-const makeKey = (item: AddCartItem) =>
-  item.variantId ? `${item.productId}-${item.variantId}` : `${item.productId}`;
+const makeKey = (item: AddCartItem) => {
+  if (item.comboId) return `combo-${item.comboId}`;
+  return item.variantId ? `${item.productId}-${item.variantId}` : `${item.productId}`;
+};
 
 const clamp = (value: number, max: number) =>
   Math.min(Math.max(1, value), Math.max(1, max || 1));

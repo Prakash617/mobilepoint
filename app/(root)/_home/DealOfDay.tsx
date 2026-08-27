@@ -16,6 +16,7 @@ import { resolveImageUrl } from "@/lib/utils";
 import Link from "next/link";
 import DealsOfDaySkeleton from "@/components/skeleton/DealsOfDaySkeleton";
 import TrialBanner from "@/components/TrialBanner";
+import ErrorFallback from "@/components/ErrorFallback";
 import type { Deal } from "@/types/product";
 
 /* ---------- helpers ---------- */
@@ -180,12 +181,13 @@ const DealSlide = ({ deal, now }: { deal: Deal; now: number }) => {
 
 const DealOfDay = () => {
   const [api, setApi] = React.useState<CarouselApi>();
-  const { data, isLoading, error } = useDeals();
+  const { data, isLoading, error, refetch } = useDeals();
   const dealsData = data?.results || [];
 
   const {
       data: adsData,
       error: adsError,
+      refetch: refetchAds,
     } = useAdvertisements({
       ad_type: "photo",
       position: "home_top",
@@ -201,11 +203,10 @@ const DealOfDay = () => {
     return () => clearInterval(interval);
   }, []);
 
-  if (adsError) {
-    return <div>Error loading carousel</div>;
-  }
   if (isLoading) return <DealsOfDaySkeleton/>;
-  if (error) return <div>Error loading deals</div>;
+  if (error) {
+    return <ErrorFallback message="Failed to load deals" onRetry={() => refetch()} />;
+  }
   if (dealsData.length === 0) return null;
 
   return (

@@ -9,9 +9,10 @@ import { useState, useMemo, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import FreeAdvertizemantCard from "@/components/FreeAdvertizemantCard";
 import Longtextmore from "@/app/(root)/products/[slug]/Longtextmore";
+import ComboSection from "./ComboSection";
+import FrequantlyBrout from "./FrequantlyBrout";
 import Image from "next/image";
 import { resolveImageUrl } from "@/lib/utils";
-import FrequantlyBrout from "./FrequantlyBrout";
 import Button from "@/components/Button";
 import {
   FaCheckCircle,
@@ -38,13 +39,18 @@ import { useCartStore } from "@/stores/cartStore";
 import { useRouter } from "next/navigation";
 import { useDeals, useWishlist, useWishlistMutations } from "@/hooks/useProducts";
 import { useAuthStore, selectIsAuthenticated } from "@/stores/authStore";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { recentlyViewedService } from "@/services/productService";
+import { toast } from "sonner";
 
 type Props = {
   product: ProductDetail;
 };
 
 const MainProductDetail = ({ product }: Props) => {
+  const { data: siteSettings } = useSiteSettings();
+  const isAuthenticated = useAuthStore(selectIsAuthenticated);
+
   // State for selected variant attributes
   const [selectedAttributes, setSelectedAttributes] = useState<
     Record<string, string>
@@ -85,10 +91,12 @@ const MainProductDetail = ({ product }: Props) => {
   // Track recently viewed
   const queryClient = useQueryClient();
   useEffect(() => {
-    recentlyViewedService.track(product.slug).then(() => {
-      queryClient.invalidateQueries({ queryKey: ["recently-viewed"] });
-    }).catch(() => {});
-  }, [product.slug, queryClient]);
+    if (isAuthenticated) {
+      recentlyViewedService.track(product.slug).then(() => {
+        queryClient.invalidateQueries({ queryKey: ["recently-viewed"] });
+      }).catch(() => {});
+    }
+  }, [product.slug, queryClient, isAuthenticated]);
 
   // Find the currently selected variant based on selected attributes
   const selectedVariant: ProductVariant | undefined = useMemo(() => {
@@ -213,7 +221,6 @@ const MainProductDetail = ({ product }: Props) => {
 
   const addItem = useCartStore((s) => s.addItem);
   const router = useRouter();
-  const isAuthenticated = useAuthStore(selectIsAuthenticated);
   const { data: wishlist } = useWishlist(isAuthenticated);
   const { addWishlistItem, removeWishlistItem } = useWishlistMutations();
 
@@ -235,11 +242,17 @@ const MainProductDetail = ({ product }: Props) => {
       return;
     }
     if (wishlistItem) {
-      removeWishlistItem.mutate(wishlistItem.id);
+      removeWishlistItem.mutate(wishlistItem.id, {
+        onSuccess: () => toast.success("Removed from wishlist"),
+      });
     } else if (selectedVariant?.id) {
-      addWishlistItem.mutate({ productVariantId: selectedVariant.id });
+      addWishlistItem.mutate({ productVariantId: selectedVariant.id }, {
+        onSuccess: () => toast.success("Added to wishlist"),
+      });
     } else {
-      addWishlistItem.mutate({ productId: product.id });
+      addWishlistItem.mutate({ productId: product.id }, {
+        onSuccess: () => toast.success("Added to wishlist"),
+      });
     }
   };
 
@@ -264,6 +277,9 @@ const MainProductDetail = ({ product }: Props) => {
       price: dealPrice ?? (parseFloat(price) || 0),
       quantity,
       maxStock: currentStock,
+    });
+    toast.success("Added to cart", {
+      description: `${product.name} × ${quantity}`,
     });
   };
 
@@ -365,14 +381,35 @@ const MainProductDetail = ({ product }: Props) => {
               />
             </div>
 
-            <div className="flex gap-2 mt-2">
-              {product.free_shipping && (
+            <div className="flex flex-wrap items-center gap-2 mt-2">
+              {(product.shipping_class_info?.is_free ?? product.free_shipping) && (
                 <FreeAdvertizemantCard
-                  text="Free shipping"
+                  text="Free Shipping"
                   bgColor="#f4fcf4"
                   color="success"
                 />
               )}
+              {!(product.shipping_class_info?.is_free ??
+                product.free_shipping) &&
+                product.shipping_class_info && (
+                  <FreeAdvertizemantCard
+                    text={`${product.shipping_class_info.label} · Rs. ${product.shipping_class_info.cost}`}
+                    bgColor="#eef4fd"
+                    color="primary"
+                  />
+                )}
+              {product.shipping_class_info?.estimated_delivery && (
+                <span className="text-xs text-gray-500">
+                  Delivery: {product.shipping_class_info.estimated_delivery}
+                </span>
+              )}
+              {siteSettings?.free_shipping_threshold &&
+                Number(siteSettings.free_shipping_threshold) > 0 && (
+                  <span className="text-xs text-emerald-600 font-medium">
+                    Free shipping on orders over Rs.{" "}
+                    {Number(siteSettings.free_shipping_threshold).toLocaleString()}
+                  </span>
+                )}
               {product.free_gift && (
                 <FreeAdvertizemantCard
                   text="Free gift"
@@ -675,6 +712,8 @@ const MainProductDetail = ({ product }: Props) => {
           </div>
         </div>
       </div>
+
+      <ComboSection product={product} />
 
       <FrequantlyBrout product={product} />
 

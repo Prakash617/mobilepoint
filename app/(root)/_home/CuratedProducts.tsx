@@ -13,17 +13,24 @@ import {
 import { useCurated } from "@/hooks/useCurated";
 import Link from "next/link";
 import CuratedForYouCarouselSkeleton from "@/components/skeleton/CuratedProductsSkeleton";
+import ErrorFallback from "@/components/ErrorFallback";
 
 const CuratedProductsCarousel = () => {
   const [api, setApi] = React.useState<CarouselApi>();
 
   // Fetch curated items from API
-  const { data, isLoading, error } = useCurated();
+  const { data, isLoading, error, refetch } = useCurated();
 
   const products = data?.results || [];
 
   if (isLoading) return <CuratedForYouCarouselSkeleton />;
-  if (error) return <div>Failed to load curated products</div>;
+  if (error) {
+    return (
+      <div className="bg-white p-4 sm:p-6 rounded-lg">
+        <ErrorFallback message="Failed to load curated products" onRetry={() => refetch()} />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white p-4 sm:p-6 rounded-lg">

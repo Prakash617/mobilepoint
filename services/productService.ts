@@ -70,6 +70,11 @@ export const productService = {
     return data;
   },
 
+  getFBT: async (slug: string) => {
+    const { data } = await api.get<{ source: string, products: any[] }>(`/products/${slug}/frequently-bought-together/`);
+    return data;
+  },
+
 getBestProduct: async (params?: { category?: string, limit?: number }) => {
   const { data } = await api.get<PaginatedResponse<Product>>('/products/best_seller/', {
     params,
@@ -112,8 +117,8 @@ getBestProduct: async (params?: { category?: string, limit?: number }) => {
   },
 
   // Get all categories
-  getCategories: async () => {
-    const { data } = await api.get<PaginatedResponse<Category>>('/categories/');
+  getCategories: async (params?: { limit?: number; is_parent?: boolean }) => {
+    const { data } = await api.get<PaginatedResponse<Category>>('/categories/', { params });
     return data;
   },
 
@@ -150,7 +155,7 @@ getTopCategories : async (limit = 8): Promise<PaginatedResponse<Category>> => {
   },
 
   // Get featured categories
-// Get featured brands only
+  // Get featured brands only
 getFeaturedBrands: async (): Promise<PaginatedResponse<Brand>> => {
   const { data } = await api.get<PaginatedResponse<Brand>>("/brands/");
   return data;
@@ -158,6 +163,11 @@ getFeaturedBrands: async (): Promise<PaginatedResponse<Brand>> => {
 
 getDeals : async (): Promise<PaginatedResponse<Deal>> => {
   const { data } = await api.get<PaginatedResponse<Deal>>("/deals/");
+  return data;
+},
+
+getCombos: async (params?: { limit?: number, is_featured?: boolean }) => {
+  const { data } = await api.get<PaginatedResponse<any>>("/combos/", { params });
   return data;
 },
 

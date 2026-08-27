@@ -4,30 +4,34 @@ import { User } from "@/services/authService";
 
 interface AuthState {
   accessToken: string | null;
-  refreshToken: string | null;
   user: User | null;
-  setAuth: (access: string, refresh: string) => void;
+  _hasHydrated: boolean;
+  setAuth: (access: string) => void;
   setUser: (user: User) => void;
   clearAuth: () => void;
+  setHasHydrated: (state: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       accessToken: null,
-      refreshToken: null,
       user: null,
+      _hasHydrated: false,
 
-      setAuth: (access, refresh) =>
-        set({ accessToken: access, refreshToken: refresh }),
+      setAuth: (access) => set({ accessToken: access }),
 
       setUser: (user) => set({ user }),
 
-      clearAuth: () =>
-        set({ accessToken: null, refreshToken: null, user: null }),
+      clearAuth: () => set({ accessToken: null, user: null }),
+      
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
     }),
     {
       name: "mobilepoint_auth",
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

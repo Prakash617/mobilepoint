@@ -15,6 +15,7 @@ import Link from "next/link";
 import type { Carousel as CarouselType, CarouselSlide } from "@/types/carousel"; // type alias
 import { Skeleton } from "@/components/ui/skeleton";
 import { resolveImageUrl } from "@/lib/utils";
+import ErrorFallback from "@/components/ErrorFallback";
 
 const HomeCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -24,6 +25,7 @@ const HomeCarousel = () => {
     data: carousels,
     isLoading,
     error,
+    refetch,
   } = useCarousels({
     position: "home_main",
   });
@@ -58,7 +60,7 @@ const carouselData: CarouselSlide[] =
   }
 
   if (error) {
-    return <div>Error loading carousel</div>;
+    return <ErrorFallback message="Failed to load carousel" onRetry={() => refetch()} />;
   }
 
   if (carouselData.length === 0) {

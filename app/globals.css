@@ -186,3 +186,24 @@ button {
     @apply cursor-pointer;
 
   }
+
+/* Print only the order receipt */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  #printable-order,
+  #printable-order * {
+    visibility: visible !important;
+  }
+  #printable-order {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-shadow: none !important;
+    border: none !important;
+  }
+}

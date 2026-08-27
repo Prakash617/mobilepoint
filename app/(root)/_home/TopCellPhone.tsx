@@ -15,17 +15,20 @@ import { resolveImageUrl } from "@/lib/utils";
 import Link from "next/link";
 import CardCarouselSkeleton from "@/components/skeleton/TopCellCarouselSkeleton";
 import TopCellPhoneSkeleton from "@/components/skeleton/TopcellPhoneSkeleton";
+import ErrorFallback from "@/components/ErrorFallback";
 
 const TopCellPhone = () => {
   const {
     data: products,
     isLoading: productsLoading,
     error: productsError,
+    refetch: refetchProducts,
   } = useTopMobileTabletProducts();
   const {
     data: topCategories,
     isLoading: topCategoriesLoading,
     error: topCategoriesError,
+    refetch: refetchCategories,
   } = useTopCategories({
     limit: 6,
   });
@@ -33,19 +36,23 @@ const TopCellPhone = () => {
     data: ads,
     isLoading: isAdsLoading,
     error: isAdsError,
+    refetch: refetchAds,
   } = useAdvertisements();
 
   const advertisements = getAdsWithFallback(ads?.results || [], 6);
   const ad6 = advertisements[5];
 
   if (isAdsLoading) return <TopCellPhoneSkeleton />;
-  if (isAdsError) return <div>Failed to load ads</div>;
   if (productsLoading || topCategoriesLoading) {
     return <TopCellPhoneSkeleton />;
   }
 
   if (productsError || topCategoriesError) {
-    return <div>Error loading data</div>;
+    const retryAll = () => {
+      if (productsError) refetchProducts();
+      if (topCategoriesError) refetchCategories();
+    };
+    return <ErrorFallback message="Failed to load products" onRetry={retryAll} />;
   }
 
   const topCellPhone = (topCategories?.results ?? []).map((category) => ({

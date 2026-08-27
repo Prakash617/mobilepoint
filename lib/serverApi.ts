@@ -2,12 +2,22 @@ import { ProductDetail, Product, PaginatedResponse } from '@/types/product';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api';
 
-// Server-side fetch with error handling
-async function fetchApi<T>(endpoint: string): Promise<T> {
-  const res = await fetch(`${API_BASE_URL}${endpoint}`, {
-    cache: 'no-store', // or 'force-cache' for static generation
-    // next: { revalidate: 60 } // Revalidate every 60 seconds
+const MAX_RETRIES = 3;
+const BASE_DELAY_MS = 1000;
+
+async function fetchWithRetry<T>(url: string, retries = MAX_RETRIES): Promise<T> {
+  const res = await fetch(url, {
+    next: { revalidate: 60 },
   });
+
+  if (res.status === 429 && retries > 0) {
+    const retryAfter = res.headers.get('Retry-After');
+    const delay = retryAfter
+      ? parseInt(retryAfter, 10) * 1000
+      : BASE_DELAY_MS * 2 ** (MAX_RETRIES - retries);
+    await new Promise((r) => setTimeout(r, delay));
+    return fetchWithRetry<T>(url, retries - 1);
+  }
 
   if (!res.ok) {
     throw new Error(`Failed to fetch: ${res.statusText}`);
@@ -16,13 +26,15 @@ async function fetchApi<T>(endpoint: string): Promise<T> {
   return res.json();
 }
 
+function buildUrl(endpoint: string): string {
+  return `${API_BASE_URL}${endpoint}`;
+}
+
 export const serverProductService = {
-  // Get single product by slug (Server-side)
   getProduct: async (slug: string): Promise<ProductDetail> => {
-    return fetchApi<ProductDetail>(`/products/${slug}/`);
+    return fetchWithRetry<ProductDetail>(buildUrl(`/products/${slug}/`));
   },
 
-  // Get all products (Server-side)
   getProducts: async (params?: {
     page?: number;
     search?: string;
@@ -34,13 +46,13 @@ export const serverProductService = {
     if (params?.search) queryParams.set('search', params.search);
     if (params?.category) queryParams.set('category', params.category);
     if (params?.brand) queryParams.set('brand', params.brand);
-    
-    const endpoint = `/products/${queryParams.toString() ? `?${queryParams}` : ''}`;
-    return fetchApi<PaginatedResponse<Product>>(endpoint);
+
+    const qs = queryParams.toString();
+    const endpoint = `/products/${qs ? `?${qs}` : ''}`;
+    return fetchWithRetry<PaginatedResponse<Product>>(buildUrl(endpoint));
   },
 
-  // Get featured products (Server-side)
   getFeaturedProducts: async (): Promise<Product[]> => {
-    return fetchApi<Product[]>('/products/featured/');
+    return fetchWithRetry<Product[]>(buildUrl('/products/featured/'));
   },
 };

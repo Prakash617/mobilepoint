@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Star, Loader2 } from "lucide-react";
 import Button from "./Button";
 import { useReviews, useAddReview } from "@/hooks/useReviews";
+import { toast } from "sonner";
 
 type Props = {
   productSlug?: string;
@@ -41,12 +42,12 @@ const Review = ({ productSlug }: Props) => {
     e.preventDefault();
 
     if (!productSlug) {
-      alert("Error: Product slug is missing.");
+      toast.error("Product slug is missing.");
       return;
     }
 
     if (!formData.name || !formData.email || !formData.comment || rating === 0) {
-      alert("Please fill all fields and select a rating!");
+      toast.error("Please fill all fields and select a rating!");
       return;
     }
 

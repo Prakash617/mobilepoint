@@ -3,6 +3,7 @@ import { api } from "@/lib/api";
 export interface User {
   id: number;
   email: string;
+  username?: string;
   first_name: string;
   last_name: string;
   profile_image?: string | null;
@@ -11,7 +12,6 @@ export interface User {
 
 export interface LoginResponse {
   access: string;
-  refresh: string;
 }
 
 export interface RegisterRequest {

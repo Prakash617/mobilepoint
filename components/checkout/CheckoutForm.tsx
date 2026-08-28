@@ -14,17 +14,46 @@ import {
   orderService,
   OrderDetailResult,
   PaymentMethod,
+  CheckoutQuote,
 } from "@/services/orderService";
+import { paymentService } from "@/services/paymentService";
+import { toast } from "sonner";
+import ShipmentSummary from "@/components/checkout/ShipmentSummary";
+import { useAuthStore, selectIsAuthenticated } from "@/stores/authStore";
 
 interface CheckoutFormProps {
   items: CartItem[];
-  subtotal: number;
-  shippingCost: number;
-  taxRate: number;
-  tax: number;
-  total: number;
+  quote: CheckoutQuote | null;
+  loadingQuote: boolean;
+  quoteError: string | null;
+  shipping: ShippingFields;
+  setShipping: (key: keyof ShippingFields, value: string) => void;
+  billing: BillingFields;
+  setBilling: (key: keyof BillingFields, value: string) => void;
+  sameAsShipping: boolean;
+  setSameAsShipping: (v: boolean) => void;
   onSuccess: (order: OrderDetailResult) => void;
   onCancel: () => void;
+}
+
+export interface ShippingFields {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+}
+
+export interface BillingFields {
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
 }
 
 const PAYMENT_METHODS: { value: PaymentMethod; label: string; hint: string }[] =
@@ -39,39 +68,26 @@ const inputCls =
   "w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0073bc]/30 focus:border-[#0073bc] transition";
 const labelCls = "block text-xs font-semibold text-gray-600 mb-1.5 uppercase";
 
-interface ShippingFields {
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  city: string;
-  state: string;
-  zip: string;
-  country: string;
-}
-
-interface BillingFields {
-  name: string;
-  address: string;
-  city: string;
-  state: string;
-  zip: string;
-  country: string;
-}
-
 const STEPS = [
   { id: 1, label: "Shipping" },
   { id: 2, label: "Payment" },
   { id: 3, label: "Review" },
 ];
 
+const fmt = (v: string | number | undefined | null) =>
+  v == null ? "0" : Number(v).toLocaleString();
+
 export default function CheckoutForm({
   items,
-  subtotal,
-  shippingCost,
-  taxRate,
-  tax,
-  total,
+  quote,
+  loadingQuote,
+  quoteError,
+  shipping,
+  setShipping,
+  billing,
+  setBilling,
+  sameAsShipping,
+  setSameAsShipping,
   onSuccess,
   onCancel,
 }: CheckoutFormProps) {
@@ -79,36 +95,12 @@ export default function CheckoutForm({
   const [paymentMethod, setPaymentMethod] =
     useState<PaymentMethod>("cod");
   const [paymentTransactionId, setPaymentTransactionId] = useState("");
-  const [sameAsShipping, setSameAsShipping] = useState(true);
-
-  const [shipping, setShipping] = useState<ShippingFields>({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-    state: "",
-    zip: "",
-    country: "",
-  });
-  const [billing, setBilling] = useState<BillingFields>({
-    name: "",
-    address: "",
-    city: "",
-    state: "",
-    zip: "",
-    country: "",
-  });
   const [notes, setNotes] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [authRequired, setAuthRequired] = useState(false);
 
-  const setShippingField = (key: keyof ShippingFields, value: string) =>
-    setShipping((s) => ({ ...s, [key]: value }));
-  const setBillingField = (key: keyof BillingFields, value: string) =>
-    setBilling((b) => ({ ...b, [key]: value }));
+  const isAuthenticated = useAuthStore(selectIsAuthenticated);
 
   const billingData = sameAsShipping
     ? {
@@ -127,11 +119,10 @@ export default function CheckoutForm({
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setAuthRequired(false);
 
     setLoading(true);
     try {
-      const order = await orderService.createOrder({
+      const orderPayload = {
         items: orderService.buildItems(items),
         payment_method: paymentMethod,
         payment_transaction_id:
@@ -153,25 +144,60 @@ export default function CheckoutForm({
         billing_zip: billingData.zip,
         billing_country: billingData.country,
         notes: notes || undefined,
-      });
+      };
+
+      const order = isAuthenticated
+        ? await orderService.createOrder(orderPayload)
+        : await orderService.createGuestOrder(orderPayload);
+
+      if (paymentMethod === "esewa") {
+        const origin = typeof window !== "undefined" ? window.location.origin : "";
+        const esewaPayload = {
+          order_id: order.id,
+          amount: parseFloat(order.subtotal),
+          tax_amount: parseFloat(order.tax),
+          service_charge: 0,
+          delivery_charge: parseFloat(order.shipping_cost),
+          success_url: `${origin}/payment/esewa/success`,
+          failure_url: `${origin}/payment/esewa/failure`,
+        };
+
+        const esewaResponse = await paymentService.initiateEsewa(esewaPayload);
+        paymentService.redirectToFesewa(
+          esewaResponse.form_url,
+          esewaResponse.form_data
+        );
+        return;
+      }
+
+      if (paymentMethod === "khalti") {
+        const origin = typeof window !== "undefined" ? window.location.origin : "";
+        const khaltiPayload = {
+          order_id: order.id,
+          amount: parseFloat(order.total),
+          purchase_order_id: order.order_number,
+          purchase_order_name: `Order ${order.order_number}`,
+          return_url: `${origin}/payment/khalti/success`,
+          website_url: origin,
+        };
+        const khaltiResponse = await paymentService.initiateKhalti(khaltiPayload);
+        window.location.href = khaltiResponse.payment_url;
+        return;
+      }
+
       onSuccess(order);
     } catch (err: unknown) {
-      const status = (err as { response?: { status?: number } })
-        ?.response?.status;
-      if (status === 401) {
-        setAuthRequired(true);
-      } else {
-        const data = (err as { response?: { data?: unknown } })?.response
-          ?.data;
-        setError(
-          typeof data === "object" && data !== null
-            ? Object.values(data as Record<string, unknown>)
-                .flat()
-                .filter((v) => typeof v === "string")
-                .join(", ") || "Something went wrong. Please try again."
-            : "Something went wrong. Please try again."
-        );
-      }
+      const data = (err as { response?: { data?: unknown } })?.response
+        ?.data;
+      const message =
+        typeof data === "object" && data !== null
+          ? Object.values(data as Record<string, unknown>)
+              .flat()
+              .filter((v) => typeof v === "string")
+              .join(", ") || "Something went wrong. Please try again."
+          : "Something went wrong. Please try again.";
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -185,6 +211,13 @@ export default function CheckoutForm({
       handlePlaceOrder(e);
     }
   };
+
+  // Money values always come from the backend quote.
+  const subtotal = quote?.subtotal ?? "0";
+  const shippingCost = quote?.shipping ?? "0";
+  const tax = quote?.tax ?? "0";
+  const total = quote?.total ?? "0";
+  const showCalculating = loadingQuote || !quote;
 
   return (
     <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
@@ -233,9 +266,7 @@ export default function CheckoutForm({
                   </span>
                   <span
                     className={`hidden sm:block text-sm font-semibold ${
-                      active || complete
-                        ? "text-gray-900"
-                        : "text-gray-400"
+                      active || complete ? "text-gray-900" : "text-gray-400"
                     }`}
                   >
                     {s.label}
@@ -267,7 +298,7 @@ export default function CheckoutForm({
               <input
                 required
                 value={shipping.name}
-                onChange={(e) => setShippingField("name", e.target.value)}
+                onChange={(e) => setShipping("name", e.target.value)}
                 placeholder="Full name *"
                 className={inputCls}
               />
@@ -275,47 +306,47 @@ export default function CheckoutForm({
                 type="tel"
                 required
                 value={shipping.phone}
-                onChange={(e) => setShippingField("phone", e.target.value)}
+                onChange={(e) => setShipping("phone", e.target.value)}
                 placeholder="Phone *"
                 className={inputCls}
               />
               <input
                 type="email"
                 value={shipping.email}
-                onChange={(e) => setShippingField("email", e.target.value)}
+                onChange={(e) => setShipping("email", e.target.value)}
                 placeholder="Email"
                 className={inputCls}
               />
               <input
                 required
                 value={shipping.country}
-                onChange={(e) => setShippingField("country", e.target.value)}
+                onChange={(e) => setShipping("country", e.target.value)}
                 placeholder="Country *"
                 className={inputCls}
               />
               <input
                 required
                 value={shipping.address}
-                onChange={(e) => setShippingField("address", e.target.value)}
+                onChange={(e) => setShipping("address", e.target.value)}
                 placeholder="Address *"
                 className={`${inputCls} md:col-span-2`}
               />
               <input
                 required
                 value={shipping.city}
-                onChange={(e) => setShippingField("city", e.target.value)}
+                onChange={(e) => setShipping("city", e.target.value)}
                 placeholder="City *"
                 className={inputCls}
               />
               <input
                 value={shipping.state}
-                onChange={(e) => setShippingField("state", e.target.value)}
+                onChange={(e) => setShipping("state", e.target.value)}
                 placeholder="State / Province"
                 className={inputCls}
               />
               <input
                 value={shipping.zip}
-                onChange={(e) => setShippingField("zip", e.target.value)}
+                onChange={(e) => setShipping("zip", e.target.value)}
                 placeholder="ZIP / Postal code"
                 className={inputCls}
               />
@@ -348,44 +379,40 @@ export default function CheckoutForm({
                   <input
                     required
                     value={billing.name}
-                    onChange={(e) => setBillingField("name", e.target.value)}
+                    onChange={(e) => setBilling("name", e.target.value)}
                     placeholder="Full name *"
                     className={inputCls}
                   />
                   <input
                     required
                     value={billing.country}
-                    onChange={(e) =>
-                      setBillingField("country", e.target.value)
-                    }
+                    onChange={(e) => setBilling("country", e.target.value)}
                     placeholder="Country *"
                     className={inputCls}
                   />
                   <input
                     required
                     value={billing.address}
-                    onChange={(e) =>
-                      setBillingField("address", e.target.value)
-                    }
+                    onChange={(e) => setBilling("address", e.target.value)}
                     placeholder="Address *"
                     className={`${inputCls} md:col-span-2`}
                   />
                   <input
                     required
                     value={billing.city}
-                    onChange={(e) => setBillingField("city", e.target.value)}
+                    onChange={(e) => setBilling("city", e.target.value)}
                     placeholder="City *"
                     className={inputCls}
                   />
                   <input
                     value={billing.state}
-                    onChange={(e) => setBillingField("state", e.target.value)}
+                    onChange={(e) => setBilling("state", e.target.value)}
                     placeholder="State / Province"
                     className={inputCls}
                   />
                   <input
                     value={billing.zip}
-                    onChange={(e) => setBillingField("zip", e.target.value)}
+                    onChange={(e) => setBilling("zip", e.target.value)}
                     placeholder="ZIP / Postal code"
                     className={inputCls}
                   />
@@ -433,7 +460,7 @@ export default function CheckoutForm({
               ))}
             </div>
 
-            {paymentMethod !== "cod" && (
+            {paymentMethod !== "cod" && paymentMethod !== "esewa" && paymentMethod !== "khalti" && (
               <div className="space-y-1.5">
                 <p className={labelCls}>Transaction ID</p>
                 <input
@@ -445,6 +472,26 @@ export default function CheckoutForm({
                 <p className="text-xs text-gray-400">
                   Complete the payment through {paymentMethod} and enter the
                   transaction ID above.
+                </p>
+              </div>
+            )}
+
+            {paymentMethod === "esewa" && (
+              <div className="rounded-lg bg-blue-50 border border-blue-200 p-4 text-sm text-blue-700">
+                <p className="font-semibold mb-1">eSewa Payment</p>
+                <p>
+                  You will be redirected to eSewa to complete your payment securely.
+                  After successful payment, you will be redirected back to our site.
+                </p>
+              </div>
+            )}
+
+            {paymentMethod === "khalti" && (
+              <div className="rounded-lg bg-purple-50 border border-purple-200 p-4 text-sm text-purple-700">
+                <p className="font-semibold mb-1">Khalti Payment</p>
+                <p>
+                  You will be redirected to Khalti to complete your payment securely.
+                  After successful payment, you will be redirected back to our site.
                 </p>
               </div>
             )}
@@ -483,32 +530,54 @@ export default function CheckoutForm({
               ))}
             </div>
 
+            {/* Delivery (shipments) */}
+            <div className="space-y-2">
+              <p className={labelCls}>Delivery</p>
+              <ShipmentSummary
+                shipments={quote?.shipments}
+                loading={loadingQuote}
+                error={quoteError}
+              />
+            </div>
+
+            {/* Money summary */}
             <div className="border-t border-gray-100 pt-4 space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-500">Subtotal</span>
-                <span className="text-gray-800">Rs. {subtotal.toLocaleString()}</span>
+                <span className="text-gray-800">
+                  {showCalculating ? "Calculating..." : `Rs. ${fmt(subtotal)}`}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Shipping</span>
                 <span className="text-gray-800">
-                  {shippingCost > 0
-                    ? `Rs. ${shippingCost.toLocaleString()}`
+                  {showCalculating
+                    ? "Calculating..."
+                    : shippingCost && Number(shippingCost) > 0
+                    ? `Rs. ${fmt(shippingCost)}`
                     : "Free"}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Tax ({taxRate}%)</span>
-                <span className="text-gray-800">Rs. {tax.toLocaleString()}</span>
+                <span className="text-gray-500">Tax</span>
+                <span className="text-gray-800">
+                  {showCalculating ? "Calculating..." : `Rs. ${fmt(tax)}`}
+                </span>
               </div>
               <div className="flex justify-between font-bold text-gray-900 pt-2 border-t border-gray-100 text-base">
                 <span>Total</span>
-                <span>Rs. {total.toLocaleString()}</span>
+                <span>
+                  {showCalculating ? "Calculating..." : `Rs. ${fmt(total)}`}
+                </span>
               </div>
             </div>
 
             <div className="rounded-lg bg-gray-50 p-4 text-sm text-gray-700 space-y-1">
               <p className="font-semibold text-gray-800">Delivery to</p>
-              <p>{shipping.name}{shipping.phone ? ` · ${shipping.phone}` : ""}</p>
+              <p>
+                {shipping.name}
+                {shipping.phone ? ` · ${shipping.phone}` : ""}
+              </p>
               <p>
                 {shipping.address}, {shipping.city}
                 {shipping.state ? `, ${shipping.state}` : ""}{" "}
@@ -525,16 +594,6 @@ export default function CheckoutForm({
               </p>
             </div>
           </div>
-        )}
-
-        {authRequired && (
-          <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3">
-            Please{" "}
-            <a href="/login" className="font-semibold underline">
-              log in
-            </a>{" "}
-            to complete your order.
-          </p>
         )}
 
         {error && (
@@ -568,7 +627,7 @@ export default function CheckoutForm({
           ) : (
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || showCalculating}
               className="inline-flex items-center gap-2 bg-[#0073bc] hover:brightness-90 text-white font-bold uppercase py-3 px-8 rounded-lg disabled:opacity-50"
             >
               {loading ? "Placing order..." : "Place Order"}

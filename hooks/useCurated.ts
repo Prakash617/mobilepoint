@@ -7,6 +7,8 @@ export const useCurated = () => {
   return useQuery({
     queryKey: ["curated"],
     queryFn: () => curatedService.getCurated(),
-    staleTime: 1000 * 60 * 5, // cache 5 minutes
+    staleTime: 1000 * 60 * 5,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 };

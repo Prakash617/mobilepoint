@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { reviewService } from '@/services/reviewService';
+import { toast } from 'sonner';
 
 export const reviewKeys = {
   all: ['reviews'] as const,
@@ -21,10 +22,10 @@ export const useAddReview = () => {
     mutationFn: reviewService.createReview,
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: reviewKeys.list(variables.product_slug) });
-      alert("Review submitted successfully");
+      toast.success("Review submitted successfully");
     },
     onError: (error: any) => {
-      alert(error?.response?.data?.detail || "Failed to submit review. Please try again.");
+      toast.error(error?.response?.data?.detail || "Failed to submit review. Please try again.");
     }
   });
 };

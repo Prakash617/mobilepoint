@@ -5,6 +5,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '@/services/authService';
+import { toast } from 'sonner';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -23,10 +24,12 @@ export default function SignupPage() {
 
     if (password !== password2) {
       setError('Passwords do not match.');
+      toast.error('Passwords do not match.');
       return;
     }
     if (password.length < 8) {
       setError('Password must be at least 8 characters long.');
+      toast.error('Password must be at least 8 characters long.');
       return;
     }
 
@@ -45,18 +48,20 @@ export default function SignupPage() {
       const status = (err as { response?: { status?: number } })?.response?.status;
       const data = (err as { response?: { data?: unknown } })?.response?.data;
       if (status === 500) {
-        setError(
-          "Registration is temporarily unavailable (server error). Please try again later."
-        );
+        const msg = "Registration is temporarily unavailable (server error). Please try again later.";
+        setError(msg);
+        toast.error(msg);
       } else if (data && typeof data === 'object') {
         const firstError = Object.values(data as Record<string, string[]>).flat()[0];
-        setError(
-          typeof firstError === 'string'
+        const msg = typeof firstError === 'string'
             ? firstError
-            : 'Registration failed. Please check your details.'
-        );
+            : 'Registration failed. Please check your details.';
+        setError(msg);
+        toast.error(msg);
       } else {
-        setError('Registration failed. Please try again.');
+        const msg = 'Registration failed. Please try again.';
+        setError(msg);
+        toast.error(msg);
       }
     } finally {
       setLoading(false);

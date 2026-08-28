@@ -11,12 +11,13 @@ import Link from "next/link";
 type Props = {};
 
 const HomeCarouselSection = (props: Props) => {
-  const { data: categories, isLoading, error } = useCategories();
+  const { data: categories, isLoading, error, refetch: refetchCategories } = useCategories({ limit: 100, is_parent: true });
 
   const {
     data,
     isLoading: isAdsLoading,
     error: adsError,
+    refetch: refetchAds,
   } = useAdvertisements({
     ad_type: "photo",
     position: "home_top",
@@ -33,18 +34,7 @@ const HomeCarouselSection = (props: Props) => {
   return <HomeCarouselSectionSkeleton slides={3} categoriesCount={5} adsCount={4} />;
 }
 
-  if (error) {
-    return <div>Error loading carousel</div>;
-  }
 
- 
-  if (adsError) {
-    return <div>Error loading carousel</div>;
-  }
-
-
-
- 
   return (
     <div className="w-full ">
       {/* Mobile Layout (< 768px) - Stacked vertically */}
@@ -55,18 +45,19 @@ const HomeCarouselSection = (props: Props) => {
         </div>
 
         {/* Categories */}
-        <div className="rounded-xl bg-white text-left py-4 px-6 space-y-2">
-  <p className="text-red-600 font-semibold text-sm">Sale 40% Off</p>
+        <div className="rounded-xl bg-white text-left py-4 px-6 flex flex-col max-h-60">
+  <p className="text-red-600 font-semibold text-sm mb-2 shrink-0">Sale 40% Off</p>
+  <div className="flex-1 overflow-y-auto space-y-2 pr-2">
   {categories?.results?.map((category) => (
     <Link
       href={`/products/?category=${category.slug}`}
       key={category.id}
-      className="text-sm hover:underline cursor-pointer"
+      className="text-sm hover:underline cursor-pointer block text-gray-700"
     >
-    
-      {category.name} {/* Only show the category name as the link */}
+      {category.name}
     </Link>
   ))}
+  </div>
 </div>
 
 
@@ -101,17 +92,19 @@ const HomeCarouselSection = (props: Props) => {
       {/* Desktop Layout (> 1024px) - Original grid layout */}
       <div className="hidden lg:block">
         <div className="grid-layout gap-2">
-          <div className="area-left-side rounded-xl bg-white text-left py-6 px-10 space-y-2">
-            <p className="text-red-600 font-semibold">Sale 40% Off</p>
+          <div className="area-left-side rounded-xl bg-white text-left py-6 px-10 flex flex-col h-full">
+            <p className="text-red-600 font-semibold pb-2 shrink-0">Sale 40% Off</p>
+            <div className="flex-1 overflow-y-auto space-y-2 mt-2 pr-2 pb-4">
             {categories?.results?.map((category) => (
               <Link
                 href={`/products/?category=${category.slug}`}
                 key={category.id}
-                className="text-sm hover:underline cursor-pointer block"
+                className="text-sm hover:underline cursor-pointer block text-gray-700"
               >
                 {category.name}
               </Link>
             ))}
+            </div>
           </div>
 
           <div className="area-mid-main rounded-lg overflow-hidden">

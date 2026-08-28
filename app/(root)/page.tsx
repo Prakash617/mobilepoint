@@ -8,6 +8,7 @@ import DealOfDay from "./_home/DealOfDay";
 import ProductCardTab from "@/components/ProductCardTab";
 import AdsCards from "./_home/AdsCards";
 import CuratedProducts from "./_home/CuratedProducts";
+import ComboProducts from "./_home/ComboProducts";
 import { useCarousels } from "@/hooks/useCarousels";
 
 export default function Home() {
@@ -18,6 +19,7 @@ export default function Home() {
      <HomeCarouselSection/>
       <BrandFeature/>
       <DealOfDay/>
+      <ComboProducts/>
       <ProductCardTab/>
       <CuratedProducts/>
       <TopCellPhone/>

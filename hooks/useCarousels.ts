@@ -12,7 +12,8 @@ export const useCarousels = (params?: UseCarouselsParams) => {
   return useQuery<PaginatedResponse<Carousel>>({
     queryKey: ["carousels", params],
     queryFn: () => carouselService.getCarousels(params),
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    // keepPreviousData: true, // Fix to keep previous data when the query key changes
+    staleTime: 1000 * 60 * 5,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 };

@@ -8,6 +8,7 @@ import { resolveImageUrl } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import ErrorFallback from "@/components/ErrorFallback";
 
 type Props = {};
 
@@ -33,11 +34,22 @@ type Props = {};
 
 const BrandFeature = (props: Props) => {
   // const { data: categories, isLoading, error } = useCategories();
-  const { data: brands, isLoading: loadingBrands, error } = useFeaturedBrands();
+  const { data: brands, isLoading: loadingBrands, error, refetch } = useFeaturedBrands();
   const { data: top, isLoading: loadingTop } = useTopCategories({ limit: 10 });
   
   if (loadingBrands || loadingTop) return <div><FeatureBrandsSkeleton/></div>;
-  if (error) return <div>Something went wrong</div>;
+  if (error) {
+    return (
+      <div className="flex flex-col md:flex-row w-full mt-2 gap-2 justify-between">
+        <div className="rounded-xl p-6 w-full md:w-1/2 bg-white">
+          <ErrorFallback message="Failed to load brands" onRetry={() => refetch()} />
+        </div>
+        <div className="rounded-xl p-6 w-full md:w-1/2 bg-white">
+          <ErrorFallback message="Failed to load categories" onRetry={() => refetch()} />
+        </div>
+      </div>
+    );
+  }
 
   // const featureBrands = brands?.results.slice(0, 8);
   const featureBrands = brands?.results.slice(0, 10) || [];

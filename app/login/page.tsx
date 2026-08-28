@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '@/services/authService';
 import { useAuthStore } from '@/stores/authStore';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (window.location.search.includes('registered=1')) {
       setRegistered(true);
+      toast.success("Account created successfully! Please log in.");
       window.history.replaceState({}, '', '/login');
     }
   }, []);
@@ -30,8 +32,8 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      const { access, refresh } = await authService.login(email, password);
-      setAuth(access, refresh);
+      const { access } = await authService.login(email, password);
+      setAuth(access);
       try {
         const user = await authService.getMe();
         setUser(user);
@@ -44,6 +46,7 @@ export default function LoginPage() {
       const detail = (err as { response?: { data?: { detail?: string } } })
         ?.response?.data?.detail;
       setError(detail || 'Login failed. Please check your credentials.');
+      toast.error(detail || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }

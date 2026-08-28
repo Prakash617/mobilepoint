@@ -36,6 +36,8 @@ export function useProducts(params?: ProductParams) {
   return useQuery({
     queryKey: ['products', params],
     queryFn: () => productService.getProducts(params),
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 }
 export function useBestProducts(params?: { category?: string, limit?: number }) {
@@ -61,12 +63,16 @@ export function useProduct(slug: string) {
     queryKey: ['product', slug],
     queryFn: () => productService.getProduct(slug),
     enabled: !!slug,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 }
 export function useTopMobileTabletProducts(params?: { limit?: number }) {
   return useQuery({
     queryKey: ['products', 'top_phones_tablets', params],
     queryFn: () => productService.getTopMobileTabletProducts(params),
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 }
 
@@ -104,10 +110,12 @@ export function useFilteredProducts(
   });
 }
 // Get categories
-export function useCategories() {
+export function useCategories(params?: { limit?: number; is_parent?: boolean }) {
   return useQuery({
-    queryKey: ['categories'],
-    queryFn: productService.getCategories,
+    queryKey: ['categories', params],
+    queryFn: () => productService.getCategories(params),
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 }
 
@@ -128,6 +136,8 @@ export const useTopCategories = ({ limit = 6 }: { limit?: number } = { }) => {
   return useQuery({
     queryKey: ["categories", "top", limit],
     queryFn: () => productService.getTopCategories(limit),
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 };
 
@@ -145,6 +155,8 @@ export const useFeaturedBrands = () => {
   return useQuery({
     queryKey: ["brands", "featured"],
     queryFn: productService.getFeaturedBrands,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 };
 
@@ -158,11 +170,23 @@ export function useFindVariant() {
   });
 }
 
-export const useDeals = () => {
+export const useDeals = (params?: { deal_type?: string; is_featured?: boolean; limit?: number }) => {
   return useQuery({
-    queryKey: ['deals', 'all'],
-    queryFn: productService.getDeals,
-    staleTime: 5 * 60 * 1000, // optional: cache for 5 minutes
+    queryKey: ['deals', params],
+    queryFn: () => productService.getDeals(params),
+    staleTime: 5 * 60 * 1000,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
+  });
+};
+
+export const useCombos = (params?: { limit?: number; is_featured?: boolean; is_active?: boolean }) => {
+  return useQuery({
+    queryKey: ['combos', params],
+    queryFn: () => productService.getCombos(params),
+    staleTime: 5 * 60 * 1000,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 };
 

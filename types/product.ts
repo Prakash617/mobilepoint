@@ -82,6 +82,14 @@ export interface Product {
   free_shipping: boolean;
   free_gift: boolean;
   is_new: boolean;
+  shipping_class?: string;
+  shipping_class_info?: {
+    code: string;
+    label: string;
+    cost: string;
+    is_free: boolean;
+    estimated_delivery: string;
+  } | null;
   primary_image?: string | null;
   default_variant?: ProductVariant | null;
   variants?: ProductVariant[];
@@ -94,6 +102,8 @@ export interface Product {
     amount: number;
     percentage: number;
   } | null;
+  has_combo?: boolean;
+  has_deal?: boolean;
 }
 
 export interface FreeGiftPromotion {
@@ -103,7 +113,6 @@ export interface FreeGiftPromotion {
 }
 
 export interface Promotions {
-  free_shipping: FreeGiftPromotion | null;
   free_gift: FreeGiftPromotion | null;
 }
 
@@ -144,9 +153,12 @@ export type Deal = {
   id: number;
   title: string;
   deal_type: string;
+  product_id?: number;
   product_name: string;
   product_slug: string;
   brand_name: string;
+  base_price?: string | number;
+  selling_price?: string | number;
   discount_percent: number;
   start_at: string;
   end_at: string;
@@ -158,7 +170,31 @@ export type Deal = {
   sold_quantity: number;
   remaining_quantity: number;
   progress_percentage: number;
+  free_shipping?: boolean;
+  free_gift_text?: string;
 };
+
+export interface ProductComboItem {
+  id: number;
+  product: Product;
+  quantity: number;
+}
+
+export interface ProductCombo {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string;
+  image?: string | null;
+  main_product?: Product;
+  combo_regular_price: string | number;
+  combo_selling_price: string | number;
+  is_active: boolean;
+  is_featured: boolean;
+  items: ProductComboItem[];
+  created_at: string;
+  updated_at: string;
+}
 
 export interface RecentlyViewedProduct {
   id: number;
@@ -180,6 +216,9 @@ export interface ProductFilters {
   in_stock?: boolean;
   on_sale?: boolean;
   is_bestseller?: boolean;
+  is_combo?: boolean;
+  is_deal?: boolean;
+  is_featured?: boolean;
   search?: string;
   ordering?: string;
   page?: number;

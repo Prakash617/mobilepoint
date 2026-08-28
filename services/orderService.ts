@@ -1,4 +1,4 @@
-import { api } from "@/lib/api";
+import { api, guestApi } from "@/lib/api";
 import { CartItem } from "@/stores/cartStore";
 
 export type PaymentMethod =
@@ -154,9 +154,56 @@ export interface OrderQuery {
   ordering?: string;
 }
 
+export interface CheckoutQuoteItemRequest {
+  product_id?: number;
+  variant_id?: number;
+  quantity: number;
+}
+
+export interface CheckoutQuoteRequest {
+  items: CheckoutQuoteItemRequest[];
+  shipping_address?: Record<string, string>;
+}
+
+export interface CheckoutQuoteShipmentItem {
+  product_id: number;
+  name: string;
+  variant_name: string | null;
+  quantity: number;
+}
+
+export interface CheckoutQuoteShipment {
+  id: string;
+  shipping_class: string;
+  label: string;
+  items: CheckoutQuoteShipmentItem[];
+  shipping_cost: string;
+  is_free: boolean;
+  estimated_delivery: string;
+}
+
+export interface CheckoutQuote {
+  currency: string;
+  subtotal: string;
+  discount: string;
+  shipping: string;
+  shipping_discount: string;
+  tax: string;
+  total: string;
+  free_shipping_threshold: string | null;
+  free_shipping_threshold_met: boolean;
+  amount_to_free_shipping: string | null;
+  shipments: CheckoutQuoteShipment[];
+}
+
 export const orderService = {
   createOrder: async (payload: OrderCreateRequest) => {
     const { data } = await api.post<OrderDetailResult>("/orders/", payload);
+    return data;
+  },
+
+  createGuestOrder: async (payload: OrderCreateRequest) => {
+    const { data } = await guestApi.post<OrderDetailResult>("/orders/guest/", payload);
     return data;
   },
 
@@ -183,9 +230,19 @@ export const orderService = {
 
   buildItems: (items: CartItem[]): OrderItemRequest[] =>
     items.map((item) => ({
-      ...(item.variantId
+      ...(item.comboId
+        ? { combo: item.comboId }
+        : item.variantId
         ? { product_variant: item.variantId }
         : { product: item.productId }),
       quantity: item.quantity,
     })),
+
+  getQuote: async (payload: CheckoutQuoteRequest): Promise<CheckoutQuote> => {
+    const { data } = await guestApi.post<CheckoutQuote>(
+      "/orders/checkout/quote/",
+      payload
+    );
+    return data;
+  },
 };

@@ -31,6 +31,7 @@ import type { RecentlyViewedProduct } from "@/types/product";
 import { WishlistItem } from "@/services/wishlistService";
 import { resolveImageUrl } from "@/lib/utils";
 import { useCartStore } from "@/stores/cartStore";
+import { toast } from "sonner";
 
 type Tab = "overview" | "orders" | "wishlist" | "account";
 
@@ -147,7 +148,11 @@ export default function DashboardPage() {
     }
   }, []);
 
+  const hasHydrated = useAuthStore((s) => s._hasHydrated);
+
   useEffect(() => {
+    if (!hasHydrated) return;
+    
     if (!isAuthenticated) {
       router.replace("/login");
       return;
@@ -160,7 +165,7 @@ export default function DashboardPage() {
         email: user.email || "",
       });
     }
-  }, [isAuthenticated, user, router]);
+  }, [hasHydrated, isAuthenticated, user, router]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -231,6 +236,7 @@ export default function DashboardPage() {
       // ignore
     }
     clearAuth();
+    toast.success("Logged out successfully");
     router.replace("/login");
   };
 
@@ -248,8 +254,10 @@ export default function DashboardPage() {
         email: me.email || "",
       });
       setSaveMsg("Profile loaded from your account.");
+      toast.success("Profile loaded successfully");
     } catch {
       setSaveError("Could not load your profile.");
+      toast.error("Could not load your profile");
     } finally {
       setSaving(false);
     }
@@ -560,7 +568,9 @@ export default function DashboardPage() {
                 <h1 className="text-xl font-bold text-gray-900">My Wishlist</h1>
                 {wishlist && wishlist.items_count > 0 && (
                   <button
-                    onClick={() => clearWishlist.mutate()}
+                    onClick={() => clearWishlist.mutate(undefined, {
+                      onSuccess: () => toast.success("Wishlist cleared"),
+                    })}
                     disabled={clearWishlist.isPending}
                     className="flex items-center gap-2 text-sm font-semibold text-red-500 hover:text-red-700 disabled:opacity-50"
                   >
@@ -598,7 +608,9 @@ export default function DashboardPage() {
                     <WishlistRow
                       key={item.id}
                       item={item}
-                      onRemove={() => removeWishlistItem.mutate(item.id)}
+                      onRemove={() => removeWishlistItem.mutate(item.id, {
+                        onSuccess: () => toast.success("Removed from wishlist"),
+                      })}
                       onMoveToCart={() => {
                         const target = wishlistTarget(item);
                         addToCart({
@@ -610,7 +622,9 @@ export default function DashboardPage() {
                           price: parseFloat(target.price),
                           maxStock: Math.max(1, target.stock || 1),
                         });
-                        removeWishlistItem.mutate(item.id);
+                        removeWishlistItem.mutate(item.id, {
+                          onSuccess: () => toast.success("Moved to cart"),
+                        });
                       }}
                     />
                   ))}

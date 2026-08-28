@@ -6,26 +6,23 @@ import Link from "next/link";
 import CardCarouselSectionSkeleton from "./skeleton/ProductCardTabSkeleton";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { ProductTabs } from "@/components/ProductTabs";
+import ErrorFallback from "@/components/ErrorFallback";
 
 type Props = {};
 
 const ProductCardTab = (props: Props) => {
   // Best sellers
-  const { data: bestSellerData, isLoading: bestLoading, error: bestError } = useProducts({
+  const { data: bestSellerData, isLoading: bestLoading, error: bestError, refetch: refetchBest } = useProducts({
     endpoint: "best_seller",
     limit: 10,
   });
 
-  // if (isLoading) return <CardCarouselSectionSkeleton slides={5} tabsCount={3} />;
-  // if (error) return <div>Error loading products</div>;
-  // New products
-  const { data: newData, isLoading: newLoading, error: newError } = useProducts({
+  const { data: newData, isLoading: newLoading, error: newError, refetch: refetchNew } = useProducts({
     endpoint: "new",
     limit: 10,
   });
 
-  // Featured products (Popular)
-  const { data: featuredData, isLoading: featuredLoading, error: featuredError } = useProducts({
+  const { data: featuredData, isLoading: featuredLoading, error: featuredError, refetch: refetchFeatured } = useProducts({
     is_featured: true,
     limit: 8,
   });
@@ -35,7 +32,18 @@ const ProductCardTab = (props: Props) => {
   const popular = featuredData?.results || [];
 
   if (bestLoading || newLoading || featuredLoading) return <CardCarouselSectionSkeleton slides={5} tabsCount={3} />;
-  if (bestError || newError || featuredError) return <div>Error loading products</div>;
+  if (bestError || newError || featuredError) {
+    const retryAll = () => {
+      if (bestError) refetchBest();
+      if (newError) refetchNew();
+      if (featuredError) refetchFeatured();
+    };
+    return (
+      <div className="bg-white my-2 p-8 rounded-lg">
+        <ErrorFallback message="Failed to load products" onRetry={retryAll} />
+      </div>
+    );
+  }
 
   const tabs = [
     { value: "best-seller", label: "Best Seller" },

@@ -71,6 +71,11 @@ const ProductCard = ({ product }: Props) => {
     >
       {/* Badges Container */}
       <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5 items-start">
+        {product.has_combo && (
+          <span className="bg-orange-500 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md shadow-sm flex items-center gap-1">
+            🎁 Combo
+          </span>
+        )}
         {is_new && (
           <span className="bg-[#fbc02d] text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md shadow-sm">
             New

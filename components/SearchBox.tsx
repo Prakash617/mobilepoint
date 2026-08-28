@@ -6,6 +6,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCategories, useProducts } from '@/hooks/useProducts';
 import { resolveImageUrl } from '@/lib/utils';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const SearchBox = () => {
   const router = useRouter();
@@ -77,19 +84,25 @@ const SearchBox = () => {
     <div className="my-border bg-linear-to-r from-[#f0a181] to-primary my-2 p-3 flex flex-col lg:flex-row items-center justify-between gap-4 rounded-lg">
 
       {/* SEARCH SECTION */}
-      <div ref={containerRef} className="relative w-full lg:w-auto z-50">
+      <div ref={containerRef} className="relative w-full lg:w-auto">
         <form onSubmit={handleSearch} className="bg-white flex items-center w-full rounded-full px-3 py-2 shadow-sm border border-transparent focus-within:border-gray-200 transition-colors">
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="bg-transparent text-sm font-bold border-none outline-none focus:ring-0 text-gray-700 cursor-pointer pr-4 md:w-40 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%239CA3AF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_0.2rem_center] bg-[length:0.6rem_auto]"
+          <Select
+            value={selectedCategory || "all"}
+            onValueChange={(val) => setSelectedCategory(val === "all" ? "" : val)}
           >
-            <option value="">All Categories</option>
-            {categories.map((cat: any) => (
-              <option key={cat.id} value={cat.slug}>{cat.name}</option>
-            ))}
-          </select>
-          
+            <SelectTrigger className="border-none shadow-none focus:ring-0 bg-transparent md:w-44 shrink-0 font-bold text-gray-700 rounded-lg px-2 h-auto py-1">
+              <SelectValue placeholder="All Categories" />
+            </SelectTrigger>
+            <SelectContent className="z-[60] max-h-[320px]">
+              <SelectItem value="all">All Categories</SelectItem>
+              {categories.map((cat: any) => (
+                <SelectItem key={cat.id} value={cat.slug}>
+                  {cat.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           <div className="h-6 w-px bg-gray-300 mx-2"></div>
 
           <input

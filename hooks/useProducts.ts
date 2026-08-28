@@ -170,10 +170,20 @@ export function useFindVariant() {
   });
 }
 
-export const useDeals = () => {
+export const useDeals = (params?: { deal_type?: string; is_featured?: boolean; limit?: number }) => {
   return useQuery({
-    queryKey: ['deals', 'all'],
-    queryFn: productService.getDeals,
+    queryKey: ['deals', params],
+    queryFn: () => productService.getDeals(params),
+    staleTime: 5 * 60 * 1000,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
+  });
+};
+
+export const useCombos = (params?: { limit?: number; is_featured?: boolean; is_active?: boolean }) => {
+  return useQuery({
+    queryKey: ['combos', params],
+    queryFn: () => productService.getCombos(params),
     staleTime: 5 * 60 * 1000,
     retry: 2,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
@@ -250,11 +260,3 @@ export const useMenu = (location: string) => {
     staleTime: 1000 * 60 * 10,
   });
 };
-
-export function useCombos(params?: { limit?: number; is_featured?: boolean }) {
-  return useQuery({
-    queryKey: ['combos', params],
-    queryFn: () => productService.getCombos(params),
-    retry: 2,
-  });
-}

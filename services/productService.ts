@@ -1,14 +1,15 @@
 import { api } from '@/lib/api';
-import { 
-  Product, 
-  ProductDetail, 
-  PaginatedResponse, 
-  Category, 
+import {
+  Product,
+  ProductDetail,
+  PaginatedResponse,
+  Category,
   Brand,
-  ProductVariant, 
+  ProductVariant,
   Deal,
   RecentlyViewedProduct,
-  ProductFilters
+  ProductFilters,
+  ProductCombo,
 } from '@/types/product';
 import { FiltersMetadata } from '@/types/filters';
 
@@ -161,13 +162,13 @@ getFeaturedBrands: async (): Promise<PaginatedResponse<Brand>> => {
   return data;
 },
 
-getDeals : async (): Promise<PaginatedResponse<Deal>> => {
-  const { data } = await api.get<PaginatedResponse<Deal>>("/deals/");
+getDeals: async (params?: { deal_type?: string; is_featured?: boolean; is_active?: boolean; limit?: number }): Promise<PaginatedResponse<Deal>> => {
+  const { data } = await api.get<PaginatedResponse<Deal>>("/deals/", { params });
   return data;
 },
 
-getCombos: async (params?: { limit?: number, is_featured?: boolean }) => {
-  const { data } = await api.get<PaginatedResponse<any>>("/combos/", { params });
+getCombos: async (params?: { limit?: number; is_featured?: boolean; is_active?: boolean }): Promise<PaginatedResponse<ProductCombo>> => {
+  const { data } = await api.get<PaginatedResponse<ProductCombo>>("/combos/", { params });
   return data;
 },
 

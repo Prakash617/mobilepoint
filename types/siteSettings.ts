@@ -9,6 +9,7 @@ export interface SiteSettings {
   free_shipping_threshold: string;
   email: string | null;
   phone: string | null;
+  phone_number?: string | null;
   address: string | null;
   facebook_url: string | null;
   twitter_url: string | null;

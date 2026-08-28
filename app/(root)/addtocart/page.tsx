@@ -152,7 +152,7 @@ export default function AddToCartPage() {
   }
 
   return (
-    <div className="container mx-auto mt-10 px-4">
+    <div className="w-full mt-10">
       <div className="sm:flex shadow-md rounded-xl overflow-hidden my-10">
         {/* Cart items */}
         <div className="w-full sm:w-3/4 bg-white px-4 sm:px-10 py-10">
@@ -270,7 +270,7 @@ export default function AddToCartPage() {
         </div>
 
         {/* Order summary */}
-        <div id="summary" className="w-full sm:w-1/4 md:w-1/3 bg-gray-50 px-8 py-10">
+        <div id="summary" className="w-full sm:w-1/4 bg-gray-50 px-8 py-10">
           <h1 className="font-semibold text-2xl border-b pb-8">Order Summary</h1>
 
           <div className="flex justify-between mt-10 mb-5">

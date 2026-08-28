@@ -20,7 +20,11 @@ export type AddCartItem = Omit<CartItem, "key" | "quantity"> & {
 
 interface CartState {
   items: CartItem[];
-  addItem: (item: AddCartItem) => void;
+  isOpen: boolean;
+  openDrawer: () => void;
+  closeDrawer: () => void;
+  toggleDrawer: () => void;
+  addItem: (item: AddCartItem, autoOpen?: boolean) => void;
   removeItem: (key: string) => void;
   updateQuantity: (key: string, quantity: number) => void;
   clearCart: () => void;
@@ -44,8 +48,13 @@ export const useCartStore = create<CartState>()(
   persist(
     (set) => ({
       items: [],
+      isOpen: false,
 
-      addItem: (item) =>
+      openDrawer: () => set({ isOpen: true }),
+      closeDrawer: () => set({ isOpen: false }),
+      toggleDrawer: () => set((state) => ({ isOpen: !state.isOpen })),
+
+      addItem: (item, autoOpen = true) =>
         set((state) => {
           const key = makeKey(item);
           const qty = Math.max(1, Math.min(item.quantity ?? 1, item.maxStock));
@@ -58,11 +67,13 @@ export const useCartStore = create<CartState>()(
                   ? { ...i, quantity: Math.min(i.quantity + qty, i.maxStock) }
                   : i
               ),
+              isOpen: autoOpen ? true : state.isOpen,
             };
           }
 
           return {
             items: [...state.items, { ...item, key, quantity: qty }],
+            isOpen: autoOpen ? true : state.isOpen,
           };
         }),
 
@@ -82,6 +93,7 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: "mobilepoint_cart",
+      partialize: (state) => ({ items: state.items }),
     }
   )
 );

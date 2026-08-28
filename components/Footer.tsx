@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { useCategories } from "@/hooks/useProducts";
+import { api } from "@/lib/api";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -14,6 +16,27 @@ import {
 } from "react-icons/fa";
 
 const Footer = () => {
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterStatus, setNewsletterStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [newsletterMessage, setNewsletterMessage] = useState("");
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail.trim()) return;
+
+    setNewsletterStatus("loading");
+    try {
+      await api.post("/newsletter/", { email: newsletterEmail.trim() });
+      setNewsletterStatus("success");
+      setNewsletterMessage("Thank you for subscribing! Check your inbox for your 10% discount code.");
+      setNewsletterEmail("");
+    } catch (err: any) {
+      setNewsletterStatus("error");
+      const errDetail = err?.response?.data?.email?.[0] || err?.response?.data?.detail || "Could not subscribe. You may already be subscribed.";
+      setNewsletterMessage(errDetail);
+    }
+  };
+
   const {
     data: siteSettings,
     isLoading: isSiteSettingsLoading,
@@ -224,23 +247,49 @@ const Footer = () => {
 
         <div className="w-full lg:w-3/4 space-y-4 font-bold">
           <p className="uppercase text-center lg:text-left">
-            subscribe & get <span className="text-danger">10% off</span> for your first order
+            subscribe & get <span className="text-primary font-black">10% off</span> for your first order
           </p>
 
-          <div className="border-b pb-1 border-background flex justify-between">
-            <input
-              type="text"
-              placeholder="Enter your email address"
-              className="text-sm w-full text-secondary outline-none font-light ml-4"
-            />
-            <button className="text-success uppercase font-medium text-sm cursor-pointer">
-              Subscribe
-            </button>
-          </div>
+          <form onSubmit={handleNewsletterSubmit} className="space-y-2">
+            <div className="border-b pb-2 border-gray-200 flex items-center justify-between focus-within:border-primary transition-colors">
+              <input
+                type="email"
+                required
+                value={newsletterEmail}
+                onChange={(e) => {
+                  setNewsletterEmail(e.target.value);
+                  if (newsletterStatus !== "idle") setNewsletterStatus("idle");
+                }}
+                placeholder="Enter your email address"
+                className="text-sm w-full text-gray-800 outline-none font-normal px-2 placeholder:text-gray-400"
+                disabled={newsletterStatus === "loading"}
+              />
+              <button
+                type="submit"
+                disabled={newsletterStatus === "loading"}
+                className="bg-primary hover:bg-primary/90 text-white font-bold text-xs uppercase px-4 py-2 rounded-lg cursor-pointer transition-all disabled:opacity-50 shrink-0"
+              >
+                {newsletterStatus === "loading" ? "Subscribing..." : "Subscribe"}
+              </button>
+            </div>
 
-          <p className="text-secondary text-sm font-light italic">
-            By subscribing, you’re accepted the our{" "}
-            <span className="underline underline-offset-2 text-black cursor-pointer">Policy</span>
+            {newsletterStatus === "success" && (
+              <p className="text-xs text-emerald-600 font-semibold mt-1">
+                🎉 {newsletterMessage}
+              </p>
+            )}
+            {newsletterStatus === "error" && (
+              <p className="text-xs text-rose-600 font-semibold mt-1">
+                ⚠️ {newsletterMessage}
+              </p>
+            )}
+          </form>
+
+          <p className="text-secondary text-xs font-normal italic">
+            By subscribing, you agree to our{" "}
+            <Link href="/policy" className="underline underline-offset-2 text-primary font-semibold hover:text-black">
+              Privacy Policy
+            </Link>
           </p>
         </div>
       </div>

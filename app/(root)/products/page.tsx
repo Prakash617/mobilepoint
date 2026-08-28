@@ -59,6 +59,10 @@ const ProductList = (props: Props) => {
   const ordering = searchParams.get("ordering") || "-created_at"; // Default sort order
   const searchQuery = searchParams.get("search") || undefined; // Extract search query
 
+  const is_combo = searchParams.get("is_combo") === "true";
+  const is_deal = searchParams.get("is_deal") === "true";
+  const is_featured = searchParams.get("is_featured") === "true";
+
   // Get values from URL
   const filterQuery: any = {};
   if (categories?.length) filterQuery.category = categories;
@@ -67,10 +71,13 @@ const ProductList = (props: Props) => {
   if (minPrice !== undefined) filterQuery.min_price = minPrice;
   if (maxPrice !== undefined) filterQuery.max_price = maxPrice;
   if (ratings?.length) filterQuery.rating = ratings;
-  if (searchQuery) filterQuery.search = searchQuery; // Add search to filter query
+  if (searchQuery) filterQuery.search = searchQuery;
+  if (is_combo) filterQuery.is_combo = true;
+  if (is_deal) filterQuery.is_deal = true;
+  if (is_featured) filterQuery.is_featured = true;
   filterQuery.page = page;
   filterQuery.page_size = pageSize;
-  filterQuery.ordering = ordering; // Add ordering to filter query
+  filterQuery.ordering = ordering;
 
   const category_slug = searchParams.get("category") || "";
   const [defaultSlug] = useState(category_slug);
@@ -213,6 +220,54 @@ const ProductList = (props: Props) => {
         </div>
 
         <div className="rounded-lg w-full border-2 border-gray p-4 md:w-3/4">
+          {is_combo && (
+            <div className="mb-6 p-4 rounded-xl bg-orange-50 border border-orange-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-orange-500 text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-xs">
+                  🎁
+                </div>
+                <div>
+                  <h3 className="font-bold text-orange-950 text-sm">Special Product Combos & Bundles</h3>
+                  <p className="text-xs text-orange-700">Showing products that come with bundled package savings.</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+                <Link
+                  href="/combos"
+                  className="text-xs font-bold bg-orange-500 text-white px-3.5 py-1.5 rounded-lg hover:bg-orange-600 transition-colors"
+                >
+                  View Bundle Hub &rarr;
+                </Link>
+                <Link
+                  href="/products"
+                  className="text-xs font-bold text-orange-800 hover:text-orange-900 bg-white px-3 py-1.5 rounded-lg border border-orange-200 hover:bg-orange-100/50 transition-colors"
+                >
+                  Clear Filter &times;
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {is_deal && (
+            <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-red-500 text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-xs">
+                  🔥
+                </div>
+                <div>
+                  <h3 className="font-bold text-red-950 text-sm">Limited Time Hot Deals</h3>
+                  <p className="text-xs text-red-700">Showing all items currently on flash sale or special promotion.</p>
+                </div>
+              </div>
+              <Link
+                href="/products"
+                className="text-xs font-bold text-red-800 hover:text-red-900 bg-white px-3.5 py-1.5 rounded-lg border border-red-200 hover:bg-red-100/50 transition-colors self-start sm:self-auto shrink-0"
+              >
+                Clear Filter &times;
+              </Link>
+            </div>
+          )}
+
           <div>
             <p className="text-lg font-bold uppercase mb-4">
               Best seller in this category
